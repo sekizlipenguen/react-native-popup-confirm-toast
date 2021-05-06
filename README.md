@@ -6,9 +6,9 @@
 
 ## Example Bottom Sheet
 
-|Example 1|Example Confirm Message| 
-| :-----------------------------------------------------------: | :-----------------------------------------------------------: |
-| ![](assets/popup5.gif) | ![](assets/popup6.gif) |
+|Example 1|Example 2| Example 3|
+| :----: | :----: | :----: |
+| ![](assets/popup5.gif) | ![](assets/popup6.gif) | ![](assets/popup7.gif) |
 
 
 ## Example Popup Message
