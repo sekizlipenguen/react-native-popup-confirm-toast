@@ -1,0 +1,41 @@
+{
+  "name": "react-native-popup-confirm-toast",
+  "version": "2.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sekizlipenguen/react-native-popup-confirm-toast.git"
+  },
+  "keywords": [
+    "react native popup message",
+    "react native popup confirm",
+    "react native confirm",
+    "react native top toast",
+    "react native bottom toast",
+    "react native modal",
+    "react native custom modal",
+    "react-native",
+    "react-component",
+    "react-native-component",
+    "bottom-sheet",
+    "action-sheet",
+    "raw-bottom-sheet",
+    "bottom-drawer",
+    "bottom-animated",
+    "popup",
+    "message",
+    "toast",
+    "confirm",
+    "drawer",
+    "picker",
+    "swipper",
+    "modal",
+    "dialog"
+  ],
+  "author": "SekizliPenguen",
+  "license": "ISC",
+  "devDependencies": {
+    "metro-react-native-babel-preset": "^0.65.2"
+  }
+}
