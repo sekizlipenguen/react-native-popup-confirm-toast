@@ -1,7 +1,7 @@
 {
   "name": "react-native-popup-confirm-toast",
   "version": "2.0.0",
-  "description": "",
+  "description": "With react native, you can create a popup message, modifiable component area. Cheer up your app with toast (top, bottom) messages. (Android & iOS)\n\nNow we have a new feature \"bottom-sheet-drawer\" (Android & iOS)",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -31,7 +31,9 @@
     "picker",
     "swipper",
     "modal",
-    "dialog"
+    "dialog",
+    "react",
+    "native"
   ],
   "author": "SekizliPenguen",
   "license": "ISC",
