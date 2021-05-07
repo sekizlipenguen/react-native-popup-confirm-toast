@@ -5,12 +5,41 @@ export const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
 
 class Popup extends Component {
     static popupInstance;
-    state = {
-        positionView: new Animated.Value(HEIGHT),
-        opacity: new Animated.Value(0),
-        positionPopup: new Animated.Value(HEIGHT),
-        popupHeight: 0,
-    };
+
+    constructor(props) {
+        super(props);
+
+        this.defaultState = {
+            positionView: new Animated.Value(HEIGHT),
+            opacity: new Animated.Value(0),
+            positionPopup: new Animated.Value(HEIGHT),
+            popupHeight: 0,
+            title: false,
+            type: 'warning',
+            buttonEnabled: true,
+            textBody: false,
+            bodyComponent: false,
+            buttonText: 'Ok',
+            confirmText: 'Cancel',
+            callback: () => this.hidePopup(),
+            background: 'rgba(0, 0, 0, 0.5)',
+            timing: 0,
+            iconEnabled: true,
+            icon: false,
+            modalContainerStyle: false,
+            buttonContentStyle: false,
+            okButtonStyle: false,
+            confirmButtonStyle: false,
+            okButtonTextStyle: false,
+            confirmButtonTextStyle: false,
+            titleTextStyle: false,
+            descTextStyle: false,
+            start: false,
+        };
+
+        this.state = this.defaultState;
+
+    }
 
     static show({...config}) {
         this.popupInstance.start(config);
@@ -23,27 +52,8 @@ class Popup extends Component {
     start({...config}) {
 
         this.setState({
-            title: config.title || false,
-            type: config.type || 'warning',
-            buttonEnabled: config.buttonEnabled === false ? false : true,
-            textBody: config.textBody || false,
-            bodyComponent: config.bodyComponent || false,
-            buttonText: config.buttonText || 'Ok',
-            confirmText: config.confirmText || 'Cancel',
-            callback: config.callback !== undefined ? config.callback : this.hidePopup,
-            background: config.background || 'rgba(0, 0, 0, 0.5)',
-            timing: config.timing || 0,
-            iconEnabled: config.iconEnabled === false ? false : true,
-            icon: config.icon || false,
-            modalContainerStyle: config.modalContainerStyle || false,
-            buttonContentStyle: config.buttonContentStyle || false,
-            okButtonStyle: config.okButtonStyle || false,
-            confirmButtonStyle: config.confirmButtonStyle || false,
-            okButtonTextStyle: config.okButtonTextStyle || false,
-            confirmButtonTextStyle: config.confirmButtonTextStyle || false,
-            titleTextStyle: config.titleTextStyle || false,
-            descTextStyle: config.descTextStyle || false,
-            popupHeight: 0,
+            ...this.defaultState,
+            ...config,
             start: true,
         });
     }
@@ -80,18 +90,19 @@ class Popup extends Component {
     }
 
     hidePopup() {
+        const {positionPopup, opacity, positionView} = this.state;
         Animated.sequence([
-            Animated.timing(this.state.positionPopup, {
+            Animated.timing(positionPopup, {
                 toValue: HEIGHT,
                 duration: 250,
                 useNativeDriver: true,
             }),
-            Animated.timing(this.state.opacity, {
+            Animated.timing(opacity, {
                 toValue: 0,
                 duration: 300,
                 useNativeDriver: false,
             }),
-            Animated.timing(this.state.positionView, {
+            Animated.timing(positionView, {
                 toValue: HEIGHT,
                 duration: 100,
                 useNativeDriver: false,

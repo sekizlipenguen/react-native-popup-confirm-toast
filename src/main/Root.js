@@ -18,7 +18,6 @@ class Root extends Component {
                 {this.props.children}
                 <Popup
                     ref={c => {
-                        console.log('Popup',c);
                         if (c) {
                             Popup.popupInstance = c;
                         }
@@ -27,7 +26,6 @@ class Root extends Component {
 
                 <Toast
                     ref={c => {
-                        console.log('Toast',c);
                         if (c) {
                             Toast.toastInstance = c;
                         }
@@ -36,7 +34,6 @@ class Root extends Component {
 
                 <SPSheet
                     ref={c => {
-                        console.log('c',c);
                         if (c) {
                             SPSheet.spsheetInstance = c;
                         }
