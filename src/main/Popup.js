@@ -108,13 +108,7 @@ class Popup extends Component {
                 useNativeDriver: false,
             }),
         ]).start(() => {
-            this.setState({
-                start: false,
-                title: false,
-                textBody: false,
-                bodyComponent: false,
-                modalContainerStyle: false,
-            });
+            this.setState(this.defaultState);
         });
     }
 
