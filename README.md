@@ -1,5 +1,13 @@
 # react-native-popup-confirm-toast
 
+![platforms](https://img.shields.io/badge/platforms-Android%20%7C%20iOS-brightgreen.svg?style=flat-square&colorB=191A17)
+[![npm](https://img.shields.io/npm/v/react-native-popup-confirm-toast.svg?style=flat-square)](https://www.npmjs.com/package/react-native-popup-confirm-toast)
+[![npm](https://img.shields.io/npm/dm/react-native-popup-confirm-toast.svg?style=flat-square&colorB=007ec6)](https://www.npmjs.com/package/react-native-popup-confirm-toast)
+<!-- [![github release](https://img.shields.io/github/release/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/releases) -->
+[![github issues](https://img.shields.io/github/issues/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
+[![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
+[![Issue Stats](https://img.shields.io/issuestats/i/github/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](http://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
+
 ### Release notes(2.0.0)  🐧 🐐
 
 -New feature(SPSheet) 🎉
