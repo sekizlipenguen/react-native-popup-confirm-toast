@@ -8,16 +8,16 @@
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
 [![Issue Stats](https://img.shields.io/issuestats/i/github/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](http://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 
-### Release notes(2.0.0)  🐧 🐐
+### Release notes(2.0.1)  🐧 🐐
 
--New feature(SPSheet) 🎉
+- New feature(SPSheet) 🎉
+- SPSheet timing parameters
 
 ## Example Bottom Sheet
 
 |Example 1|Example 2| Example 3|
 | :----: | :----: | :----: |
 | ![](assets/popup5.gif) | ![](assets/popup6.gif) | ![](assets/popup7.gif) |
-
 
 ## Example Popup Message
 
@@ -46,7 +46,6 @@ yarn add react-native-popup-confirm-toast
 or
 npm install react-native-popup-confirm-toast
 ```
-
 
 ### Example Bottom Sheet
 
@@ -207,6 +206,7 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 |`onOpenComplete`|function| works after the window is opened| null|
 |`onCloseComplete`|function| works after window is closed | null|
 |`customStyles`|object| customStyles: { draggableIcon: {}, container: {}} | {}|
+|`timing`|number| Use this parameter for automatic shutdown. | 0(ms)|
 
 ### Popup
 

@@ -27,6 +27,7 @@ const defaultState = {
     open: false,
     onCloseComplete: false,
     onOpenComplete: false,
+    timing: 0,
 };
 
 class SPSheet extends Component {
@@ -81,7 +82,7 @@ class SPSheet extends Component {
     }
 
     startPopup() {
-        const {positionPopup, positionView, opacity, height, duration, onOpenComplete} = this.state;
+        const {positionPopup, positionView, opacity, height, duration, onOpenComplete, timing} = this.state;
         this.setState({
             start: false,
         }, () => {
@@ -104,6 +105,13 @@ class SPSheet extends Component {
                     useNativeDriver: false,
                 }),
             ]).start(() => {
+
+                if (timing > 0) {
+                    setTimeout(() => {
+                        this.hidePopup();
+                    }, timing);
+                }
+
                 if (typeof onOpenComplete === 'function') {
                     return onOpenComplete(this.props);
                 }
