@@ -27,7 +27,6 @@ const defaultState = {
     open: false,
     onCloseComplete: false,
     onOpenComplete: false,
-    timing: 0,
 };
 
 class SPSheet extends Component {
@@ -82,7 +81,7 @@ class SPSheet extends Component {
     }
 
     startPopup() {
-        const {positionPopup, positionView, opacity, height, duration, onOpenComplete, timing} = this.state;
+        const {positionPopup, positionView, opacity, height, duration, onOpenComplete} = this.state;
         this.setState({
             start: false,
         }, () => {
@@ -105,13 +104,6 @@ class SPSheet extends Component {
                     useNativeDriver: false,
                 }),
             ]).start(() => {
-
-                if (timing > 0) {
-                    setTimeout(() => {
-                        this.hidePopup();
-                    }, timing);
-                }
-
                 if (typeof onOpenComplete === 'function') {
                     return onOpenComplete(this.props);
                 }
@@ -121,6 +113,7 @@ class SPSheet extends Component {
 
     hidePopup() {
         const {pan, closeDuration, onCloseComplete} = this.state;
+
         Animated.sequence([
             Animated.timing(this.state.positionPopup, {
                 toValue: HEIGHT,
@@ -140,11 +133,13 @@ class SPSheet extends Component {
         ]).start(() => {
             this.setState({...defaultState, height: 0}, () => {
                 pan.setValue({x: 0, y: 0});
-                if (typeof onCloseComplete === 'function') {
-                    return onCloseComplete(this.props);
-                }
             });
         });
+        setTimeout(() => {
+            if (typeof onCloseComplete === 'function') {
+                onCloseComplete(this.props);
+            }
+        }, closeDuration);
     }
 
     createPanResponder() {
