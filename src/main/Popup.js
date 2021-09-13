@@ -14,6 +14,7 @@ class Popup extends Component {
             opacity: new Animated.Value(0),
             positionPopup: new Animated.Value(HEIGHT),
             popupHeight: 0,
+            bounciness: 15,
             title: false,
             type: 'warning',
             buttonEnabled: true,
@@ -75,7 +76,7 @@ class Popup extends Component {
                 }),
                 Animated.spring(this.state.positionPopup, {
                     toValue: (HEIGHT / 2) - (this.state.popupHeight / 2),
-                    bounciness: 15,
+                    bounciness: this.state.bounciness,
                     useNativeDriver: true,
                 }),
             ]).start();
