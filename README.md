@@ -8,10 +8,11 @@
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
 [![Issue Stats](https://img.shields.io/issuestats/i/github/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](http://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 
-### Release notes(2.0.1)  🐧 🐐
+### Release notes(2.0.3)  🐧 🐐
 
 - New feature(SPSheet) 🎉
 - SPSheet timing parameters
+- Popup Component (bounciness add)
 
 ## Example Bottom Sheet
 
@@ -231,6 +232,7 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 |`confirmButtonTextStyle`|object| |default  |
 |`titleTextStyle`|object|  | default |
 |`descTextStyle`|object|  |default |
+|`bounciness`|number|  |15 |
 
 ### Toast
 
