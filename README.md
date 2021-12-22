@@ -16,9 +16,9 @@
 
 ## Example Bottom Sheet
 
-|Example 1|Example 2| Example 3|
-| :----: | :----: | :----: |
-| ![](assets/popup5.gif) | ![](assets/popup6.gif) | ![](assets/popup7.gif) |
+|    Custom Example 1    |    Custom Example 2    |    Custom Example 3    |
+|:----------------------:|:----------------------:|:----------------------:|
+| ![](assets/popup6.gif) | ![](assets/popup5.gif) | ![](assets/popup7.gif) |
 
 ## Example Popup Message
 
