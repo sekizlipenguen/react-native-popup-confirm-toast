@@ -8,11 +8,12 @@
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
 [![Issue Stats](https://img.shields.io/issuestats/i/github/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](http://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 
-### Release notes(2.0.3)  🐧 🐐
+### Release notes(2.0.6)  🐧 🐐
 
 - New feature(SPSheet) 🎉
 - SPSheet timing parameters
 - Popup Component (bounciness add)
+- Popup Confirm Message(cancelCallback add)
 
 ## Example Bottom Sheet
 
@@ -115,14 +116,21 @@ import { Root, Popup } from 'react-native-popup-confirm-toast'
     <View>
         <TouchableOpacity
             onPress={() =>
-              Popup.show({
-                type: 'confirm',
-                title: 'Dikkat!',
-                textBody: 'Mutlak özgürlük, kendi başına hiçbir anlam ifade etmez. ',
-                buttonText: 'Tamam',
-                confirmText:'Vazgeç',
-                callback: () => Popup.hide()
-              })
+                Popup.show({
+                    type: 'confirm',
+                    title: 'Dikkat!',
+                    textBody: 'Mutlak özgürlük, kendi başına hiçbir anlam ifade etmez. ',
+                    buttonText: 'Tamam',
+                    confirmText: 'Vazgeç',
+                    callback: () => {
+                        alert('Okey Callback && hidden');
+                        Popup.hide();
+                    },
+                    cancelCallback: () => {
+                        alert('Cancel Callback && hidden');
+                        Popup.hide();
+                    },
+                })
             }
         >
             <Text>Open Popup Confirm Message</Text>
@@ -211,28 +219,29 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### Popup
 
-| Key | Type | Description| Default |
-|--- |--- |--- |--- |
-|`title`|string| |false|
-|`textBody`|string| |false| 
-|`bodyComponent`|component(hook or class)| custom modal component container | null| 
+| Key | Type | Description                             | Default |
+|--- |--- |-----------------------------------------|--- |
+|`title`|string|                                         |false|
+|`textBody`|string|                                         |false| 
+|`bodyComponent`|component(hook or class)| custom modal component container        | null| 
 |`type`|enum| enum(success, danger, warning, confirm) | warning|
-|`buttonText`|string| |Ok|
-|`confirmText`| string| |Cancel|
-|`callback`| function| ok button press|popupHidden|
-|`background`|string| |rgba(0, 0, 0, 0.5)
-|`timing`|number| 0 > autoClose | 0 |
-|`iconEnabled`|boolean| | true |
-|`icon`|requireUrl|   | require('../assets/{type}.png') |
-|`modalContainerStyle`|object| | { width: '90%',backgroundColor: '#fff', borderRadius: 8, alignItems: 'center', overflow: 'hidden', position: 'absolute'}} |
-|`buttonContentStyle`|object| | {} |
-|`okButtonStyle`|object| | {backgroundColor: '#702c91'} |
-|`confirmButtonStyle`|object| | default  |
-|`okButtonTextStyle`|object| | default  |
-|`confirmButtonTextStyle`|object| |default  |
-|`titleTextStyle`|object|  | default |
-|`descTextStyle`|object|  |default |
-|`bounciness`|number|  |15 |
+|`buttonText`|string|                                         |Ok|
+|`confirmText`| string|                                         |Cancel|
+|`callback`| function| ok button press                         |popupHidden|
+|`cancelCallback`| function| cancel button press                          |popupHidden|
+|`background`|string|                                         |rgba(0, 0, 0, 0.5)
+|`timing`|number| 0 > autoClose                           | 0 |
+|`iconEnabled`|boolean|                                         | true |
+|`icon`|requireUrl|                                         | require('../assets/{type}.png') |
+|`modalContainerStyle`|object|                                         | { width: '90%',backgroundColor: '#fff', borderRadius: 8, alignItems: 'center', overflow: 'hidden', position: 'absolute'}} |
+|`buttonContentStyle`|object|                                         | {} |
+|`okButtonStyle`|object|                                         | {backgroundColor: '#702c91'} |
+|`confirmButtonStyle`|object|                                         | default  |
+|`okButtonTextStyle`|object|                                         | default  |
+|`confirmButtonTextStyle`|object|                                         |default  |
+|`titleTextStyle`|object|                                         | default |
+|`descTextStyle`|object|                                         |default |
+|`bounciness`|number|                                         |15 |
 
 ### Toast
 

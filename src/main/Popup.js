@@ -14,7 +14,6 @@ class Popup extends Component {
             opacity: new Animated.Value(0),
             positionPopup: new Animated.Value(HEIGHT),
             popupHeight: 0,
-            bounciness: 15,
             title: false,
             type: 'warning',
             buttonEnabled: true,
@@ -23,6 +22,7 @@ class Popup extends Component {
             buttonText: 'Ok',
             confirmText: 'Cancel',
             callback: () => this.hidePopup(),
+            cancelCallback: () => this.hidePopup(),
             background: 'rgba(0, 0, 0, 0.5)',
             timing: 0,
             iconEnabled: true,
@@ -76,7 +76,7 @@ class Popup extends Component {
                 }),
                 Animated.spring(this.state.positionPopup, {
                     toValue: (HEIGHT / 2) - (this.state.popupHeight / 2),
-                    bounciness: this.state.bounciness,
+                    bounciness: 15,
                     useNativeDriver: true,
                 }),
             ]).start();
@@ -127,7 +127,7 @@ class Popup extends Component {
     }
 
     render() {
-        const {title, type, textBody, buttonEnabled, buttonText, confirmText, callback, background, iconEnabled, start} = this.state;
+        const {title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, start} = this.state;
         const {bodyComponent, modalContainerStyle, positionPopup, positionView, opacity} = this.state;
 
         const typeName = type + 'ButtonStyle';
@@ -204,7 +204,14 @@ class Popup extends Component {
                             {
                                 type === 'confirm' && (
                                     <>
-                                        <TouchableOpacity style={[styles.Button, styles.confirm, this.state.confirmButtonStyle]} onPress={() => this.hidePopup()}>
+                                        <TouchableOpacity style={[styles.Button, styles.confirm, this.state.confirmButtonStyle]} onPress={() => {
+                                            if (typeof cancelCallback == 'function') {
+                                                return cancelCallback();
+                                            } else {
+                                                this.hidePopup();
+                                            }
+
+                                        }}>
                                             <Text style={[styles.TextButton, styles[type + 'Text'], this.state.confirmButtonTextStyle]}>{confirmText}</Text>
                                         </TouchableOpacity>
                                     </>
