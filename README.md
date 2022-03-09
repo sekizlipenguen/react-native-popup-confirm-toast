@@ -6,8 +6,6 @@
 <!-- [![github release](https://img.shields.io/github/release/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/releases) -->
 [![github issues](https://img.shields.io/github/issues/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
-[![Issue Stats](https://img.shields.io/issuestats/i/github/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](http://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
-
 ### Release notes(2.0.7)  🐧 🐐
 
 - New feature(SPSheet) 🎉
