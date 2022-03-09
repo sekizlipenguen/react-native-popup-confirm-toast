@@ -14,6 +14,7 @@
 - SPSheet timing parameters
 - Popup Component (bounciness add)
 - Popup Confirm Message(cancelCallback add)
+- Popup Confirm Message(Animated useNativeDriver: true,false)
 
 ## Example Bottom Sheet
 
@@ -219,29 +220,30 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### Popup
 
-| Key | Type | Description                             | Default |
-|--- |--- |-----------------------------------------|--- |
-|`title`|string|                                         |false|
-|`textBody`|string|                                         |false| 
-|`bodyComponent`|component(hook or class)| custom modal component container        | null| 
-|`type`|enum| enum(success, danger, warning, confirm) | warning|
-|`buttonText`|string|                                         |Ok|
-|`confirmText`| string|                                         |Cancel|
-|`callback`| function| ok button press                         |popupHidden|
-|`cancelCallback`| function| cancel button press                          |popupHidden|
-|`background`|string|                                         |rgba(0, 0, 0, 0.5)
-|`timing`|number| 0 > autoClose                           | 0 |
-|`iconEnabled`|boolean|                                         | true |
-|`icon`|requireUrl|                                         | require('../assets/{type}.png') |
-|`modalContainerStyle`|object|                                         | { width: '90%',backgroundColor: '#fff', borderRadius: 8, alignItems: 'center', overflow: 'hidden', position: 'absolute'}} |
-|`buttonContentStyle`|object|                                         | {} |
-|`okButtonStyle`|object|                                         | {backgroundColor: '#702c91'} |
-|`confirmButtonStyle`|object|                                         | default  |
-|`okButtonTextStyle`|object|                                         | default  |
-|`confirmButtonTextStyle`|object|                                         |default  |
-|`titleTextStyle`|object|                                         | default |
-|`descTextStyle`|object|                                         |default |
-|`bounciness`|number|                                         |15 |
+| Key                      | Type                     | Description                             | Default                                                                                                                   |
+|--------------------------|--------------------------|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `title`                  | string                   |                                         | false                                                                                                                     |
+| `textBody`               | string                   |                                         | false                                                                                                                     | 
+| `bodyComponent`          | component(hook or class) | custom modal component container        | null                                                                                                                      | 
+| `type`                   | enum                     | enum(success, danger, warning, confirm) | warning                                                                                                                   |
+| `buttonText`             | string                   |                                         | Ok                                                                                                                        |
+| `confirmText`            | string                   |                                         | Cancel                                                                                                                    |
+| `callback`               | function                 | ok button press                         | popupHidden                                                                                                               |
+| `cancelCallback`         | function                 | cancel button press                     | popupHidden                                                                                                               |
+| `background`             | string                   |                                         | rgba(0, 0, 0, 0.5)                                                                                                        |
+| `timing`                 | number                   | 0 > autoClose                           | 0                                                                                                                         |
+| `iconEnabled`            | boolean                  |                                         | true                                                                                                                      |
+| `icon`                   | requireUrl               |                                         | require('../assets/{type}.png')                                                                                           |
+| `modalContainerStyle`    | object                   |                                         | { width: '90%',backgroundColor: '#fff', borderRadius: 8, alignItems: 'center', overflow: 'hidden', position: 'absolute'}} |
+| `buttonContentStyle`     | object                   |                                         | {}                                                                                                                        |
+| `okButtonStyle`          | object                   |                                         | {backgroundColor: '#702c91'}                                                                                              |
+| `confirmButtonStyle`     | object                   |                                         | default                                                                                                                   |
+| `okButtonTextStyle`      | object                   |                                         | default                                                                                                                   |
+| `confirmButtonTextStyle` | object                   |                                         | default                                                                                                                   |
+| `titleTextStyle`         | object                   |                                         | default                                                                                                                   |
+| `descTextStyle`          | object                   |                                         | default                                                                                                                   |
+| `bounciness`             | number                   |                                         | 15                                                                                                                        |
+| `useNativeDriver`        | boolean                  | true or false                           | true                                                                                                                      |
 
 ### Toast
 

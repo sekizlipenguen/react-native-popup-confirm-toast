@@ -36,6 +36,7 @@ class Popup extends Component {
             titleTextStyle: false,
             descTextStyle: false,
             start: false,
+            useNativeDriver: true,
         };
 
         this.state = this.defaultState;
@@ -67,17 +68,17 @@ class Popup extends Component {
                 Animated.timing(this.state.positionView, {
                     toValue: 0,
                     duration: 100,
-                    useNativeDriver: false,
+                    useNativeDriver: this.state.useNativeDriver,
                 }),
                 Animated.timing(this.state.opacity, {
                     toValue: 1,
                     duration: 300,
-                    useNativeDriver: false,
+                    useNativeDriver: this.state.useNativeDriver,
                 }),
                 Animated.spring(this.state.positionPopup, {
                     toValue: (HEIGHT / 2) - (this.state.popupHeight / 2),
                     bounciness: 15,
-                    useNativeDriver: true,
+                    useNativeDriver: this.state.useNativeDriver,
                 }),
             ]).start();
 
@@ -96,17 +97,17 @@ class Popup extends Component {
             Animated.timing(positionPopup, {
                 toValue: HEIGHT,
                 duration: 250,
-                useNativeDriver: true,
+                useNativeDriver: this.state.useNativeDriver,
             }),
             Animated.timing(opacity, {
                 toValue: 0,
                 duration: 300,
-                useNativeDriver: false,
+                useNativeDriver: this.state.useNativeDriver,
             }),
             Animated.timing(positionView, {
                 toValue: HEIGHT,
                 duration: 100,
-                useNativeDriver: false,
+                useNativeDriver: this.state.useNativeDriver,
             }),
         ]).start(() => {
             this.setState(this.defaultState);
