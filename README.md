@@ -8,7 +8,7 @@
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
 [![Issue Stats](https://img.shields.io/issuestats/i/github/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](http://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 
-### Release notes(2.0.6)  🐧 🐐
+### Release notes(2.0.7)  🐧 🐐
 
 - New feature(SPSheet) 🎉
 - SPSheet timing parameters
@@ -24,15 +24,15 @@
 
 ## Example Popup Message
 
-|Example Message|Example Confirm Message| Example Message AutoClose |Example Custom Body Component |
-| :-----------------------------------------------------------: | :-----------------------------------------------------------: | :-----------------------------------------------------------:| :-----------------------------------------------------------:|
-| ![](assets/popup1.gif) | ![](assets/popup2.gif) | ![](assets/popup3.gif) | ![](assets/popup4.gif) |
+|    Example Message     | Example Confirm Message | Example Message AutoClose | Example Custom Body Component |
+|:----------------------:|:-----------------------:|:-------------------------:|:-----------------------------:|
+| ![](assets/popup1.gif) | ![](assets/popup2.gif)  |  ![](assets/popup3.gif)   |    ![](assets/popup4.gif)     |
 
 ## Example Toast Message
 
-|                          Example Toast Top                    |                          Example Toast Bottom                 |
-| :-----------------------------------------------------------: | :-----------------------------------------------------------: |
-| ![](assets/3.gif) | ![](assets/4.gif) |
+| Example Toast Top | Example Toast Bottom |
+|:-----------------:|:--------------------:|
+| ![](assets/3.gif) |  ![](assets/4.gif)   |
 
 ## Usage
 
@@ -202,21 +202,21 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### SPSheet
 
-|Key |Type |Description | Default |
-|--- |--- |--- |--- |
-|`background`|string| | rgba(0, 0, 0, 0.5)|
-|`height`|number| auto height (min: 250) | 250|
-|`duration`|number| animation time used when opening| 250(ms)|
-|`closeDuration`|number| animation time used when closing | 300(ms)|
-|`closeOnDragDown`|boolean| Use drag with motion to close the window | true|
-|`closeOnPressMask`|boolean| press the outside space to close the window | true|
-|`closeOnPressBack`|boolean| Press the back key to close the window (Android only) | true|
-|`dragTopOnly`|boolean| use only the top area of the draggable icon to close the window | false|
-|`component`|component(hook or class)| custom modal component container | null| 
-|`onOpenComplete`|function| works after the window is opened| null|
-|`onCloseComplete`|function| works after window is closed | null|
-|`customStyles`|object| customStyles: { draggableIcon: {}, container: {}} | {}|
-|`timing`|number| Use this parameter for automatic shutdown. | 0(ms)|
+| Key                | Type                     | Description                                                     | Default            |
+|--------------------|--------------------------|-----------------------------------------------------------------|--------------------|
+| `background`       | string                   |                                                                 | rgba(0, 0, 0, 0.5) |
+| `height`           | number                   | auto height (min: 250)                                          | 250                |
+| `duration`         | number                   | animation time used when opening                                | 250(ms)            |
+| `closeDuration`    | number                   | animation time used when closing                                | 300(ms)            |
+| `closeOnDragDown`  | boolean                  | Use drag with motion to close the window                        | true               |
+| `closeOnPressMask` | boolean                  | press the outside space to close the window                     | true               |
+| `closeOnPressBack` | boolean                  | Press the back key to close the window (Android only)           | true               |
+| `dragTopOnly`      | boolean                  | use only the top area of the draggable icon to close the window | false              |
+| `component`        | component(hook or class) | custom modal component container                                | null               | 
+| `onOpenComplete`   | function                 | works after the window is opened                                | null               |
+| `onCloseComplete`  | function                 | works after window is closed                                    | null               |
+| `customStyles`     | object                   | customStyles: { draggableIcon: {}, container: {}}               | {}                 |
+| `timing`           | number                   | Use this parameter for automatic shutdown.                      | 0(ms)              |
 
 ### Popup
 
@@ -247,28 +247,28 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### Toast
 
-|Key |Type |Description | Default |
-|--- |--- |--- |--- |
-|`title`|string| | false|
-|`text`|string|Description | false|
-|`titleTextStyle`|object| | {color: '#fff',fontWeight: 'bold',fontSize: 16}|
-|`descTextStyle`|object| | {marginTop: 5,fontSize: 13,color: '#fff', fontWeight: '400',}|
-|`backgroundColor`| string| | #1da1f2|
-|`timeColor`| string| time backgroundColor | #1c6896|
-|`position`|enum| parameters => top, bottom| bottom |
-|`icon`|component| (react-native-vector-icons or <Image/> component)| null |
-|`timing`|number| | 5000 ms |
+| Key               | Type      | Description                                       | Default                                                       |
+|-------------------|-----------|---------------------------------------------------|---------------------------------------------------------------|
+| `title`           | string    |                                                   | false                                                         |
+| `text`            | string    | Description                                       | false                                                         |
+| `titleTextStyle`  | object    |                                                   | {color: '#fff',fontWeight: 'bold',fontSize: 16}               |
+| `descTextStyle`   | object    |                                                   | {marginTop: 5,fontSize: 13,color: '#fff', fontWeight: '400',} |
+| `backgroundColor` | string    |                                                   | #1da1f2                                                       |
+| `timeColor`       | string    | time backgroundColor                              | #1c6896                                                       |
+| `position`        | enum      | parameters => top, bottom                         | bottom                                                        |
+| `icon`            | component | (react-native-vector-icons or <Image/> component) | null                                                          |
+| `timing`          | number    |                                                   | 5000 ms                                                       |
 
 ### Methods
 
-|Component Name|Method Name |Example |Description |
-|--- |--- |--- |--- |
-|SPSheet|show| const spSheet = SPSheet; spSheet.show(config);| |
-|SPSheet|hide| const spSheet = SPSheet; spSheet.hide();| |
-|Popup|show| const popup = Popup; popup.show(config);| |
-|Popup|hide| const popup = Popup; popup.hide();| |
-|Toast|show| const toast = Toast; toast.show(config);| |
-|Toast|hide| const toast = Toast; toast.hide();| |
+| Component Name | Method Name | Example                                        | Description |
+|----------------|-------------|------------------------------------------------|-------------|
+| SPSheet        | show        | const spSheet = SPSheet; spSheet.show(config); |             |
+| SPSheet        | hide        | const spSheet = SPSheet; spSheet.hide();       |             |
+| Popup          | show        | const popup = Popup; popup.show(config);       |             |
+| Popup          | hide        | const popup = Popup; popup.hide();             |             |
+| Toast          | show        | const toast = Toast; toast.show(config);       |             |
+| Toast          | hide        | const toast = Toast; toast.hide();             |             |
 
 ## Author
 
