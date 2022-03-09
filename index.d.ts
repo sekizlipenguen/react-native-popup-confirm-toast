@@ -4,6 +4,7 @@ import Toast from './src/main/Toast';
 import SPSheet from './src/main/SPSheet';
 
 declare module 'react-native-popup-confirm-toast' {
+    // @ts-ignore
     export {
         Root,
         Popup,
