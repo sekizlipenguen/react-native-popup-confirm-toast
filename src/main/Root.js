@@ -7,15 +7,12 @@ import SPSheet from './SPSheet';
 
 
 class Root extends Component {
-
     render() {
         return (
             <View
                 ref={c => (this._root = c)}
                 style={{flex: 1}}
-                {...this.props}
             >
-                {this.props.children}
                 <Popup
                     ref={c => {
                         if (c) {
@@ -31,7 +28,7 @@ class Root extends Component {
                         }
                     }}
                 />
-
+                {this.props.children}
                 <SPSheet
                     ref={c => {
                         if (c) {
@@ -39,11 +36,9 @@ class Root extends Component {
                         }
                     }}
                 />
-
             </View>
         );
     }
-
 }
 
 Root.propTypes = {
