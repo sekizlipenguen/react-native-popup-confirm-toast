@@ -1,17 +1,20 @@
 import React, {Component} from 'react';
-import {View, ViewPropTypes} from 'react-native';
+import {Dimensions, View, ViewPropTypes} from 'react-native';
 import PropTypes from 'prop-types';
 import Popup from './Popup';
 import Toast from './Toast';
 import SPSheet from './SPSheet';
 
+const window = Dimensions.get('window');
+const width = window.width;
+const height = window.height;
 
 class Root extends Component {
     render() {
         return (
             <View
                 ref={c => (this._root = c)}
-                style={{flex: 1}}
+                style={{width: width, height: height}}
             >
                 {this.props.children}
                 <Popup
@@ -46,8 +49,8 @@ Root.propTypes = {
     style: PropTypes.oneOfType([
         PropTypes.object,
         PropTypes.number,
-        PropTypes.array
-    ])
-}
+        PropTypes.array,
+    ]),
+};
 
-export default Root
+export default Root;
