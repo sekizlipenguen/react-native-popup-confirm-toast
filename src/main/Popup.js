@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {Animated, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Animated, Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-export const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
 
 class Popup extends Component {
     static popupInstance;
@@ -9,10 +8,13 @@ class Popup extends Component {
     constructor(props) {
         super(props);
 
+        this.height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+        this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
+
         this.defaultState = {
-            positionView: new Animated.Value(HEIGHT),
+            positionView: new Animated.Value(this.height),
             opacity: new Animated.Value(0),
-            positionPopup: new Animated.Value(HEIGHT),
+            positionPopup: new Animated.Value(this.height),
             popupHeight: 0,
             title: false,
             type: 'warning',
@@ -40,6 +42,7 @@ class Popup extends Component {
         };
 
         this.state = this.defaultState;
+
 
     }
 
@@ -76,7 +79,7 @@ class Popup extends Component {
                     useNativeDriver: this.state.useNativeDriver,
                 }),
                 Animated.spring(this.state.positionPopup, {
-                    toValue: (HEIGHT / 2) - (this.state.popupHeight / 2),
+                    toValue: (this.height / 2) - (this.state.popupHeight / 2),
                     bounciness: 15,
                     useNativeDriver: this.state.useNativeDriver,
                 }),
@@ -95,7 +98,7 @@ class Popup extends Component {
         const {positionPopup, opacity, positionView} = this.state;
         Animated.sequence([
             Animated.timing(positionPopup, {
-                toValue: HEIGHT,
+                toValue: this.height,
                 duration: 250,
                 useNativeDriver: this.state.useNativeDriver,
             }),
@@ -105,7 +108,7 @@ class Popup extends Component {
                 useNativeDriver: this.state.useNativeDriver,
             }),
             Animated.timing(positionView, {
-                toValue: HEIGHT,
+                toValue: this.height,
                 duration: 100,
                 useNativeDriver: this.state.useNativeDriver,
             }),
@@ -139,6 +142,8 @@ class Popup extends Component {
             <Animated.View
                 ref={c => this._root = c}
                 style={[styles.Container, {
+                    width: this.width,
+                    height: this.height,
                     backgroundColor: background || 'transparent',
                     opacity: opacity,
                     transform: [
@@ -230,8 +235,6 @@ const styles = StyleSheet.create({
     Container: {
         position: 'absolute',
         zIndex: 9,
-        width: WIDTH,
-        height: HEIGHT,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         alignItems: 'center',
         top: 0,

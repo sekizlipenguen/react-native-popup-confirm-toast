@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import {Animated, Dimensions, Easing, Platform, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {getStatusBarHeight, isIPhoneWithMonobrow} from 'react-native-status-bar-height';
 
-const {width, height} = Dimensions.get('window');
+const height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+const width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
 const defaultTiming = 5000;
 const defaultColor = '#fff';

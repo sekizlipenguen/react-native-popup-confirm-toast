@@ -5,17 +5,12 @@ import Popup from './Popup';
 import Toast from './Toast';
 import SPSheet from './SPSheet';
 
-const window = Dimensions.get('window');
-const width = window.width;
-const height = window.height;
+const {width, height} = Dimensions.get('window');
 
 class Root extends Component {
     render() {
         return (
-            <View
-                ref={c => (this._root = c)}
-                style={{width: width, height: height}}
-            >
+            <>
                 {this.props.children}
                 <Popup
                     ref={c => {
@@ -39,7 +34,7 @@ class Root extends Component {
                         }
                     }}
                 />
-            </View>
+            </>
         );
     }
 }
@@ -49,8 +44,8 @@ Root.propTypes = {
     style: PropTypes.oneOfType([
         PropTypes.object,
         PropTypes.number,
-        PropTypes.array,
-    ]),
-};
+        PropTypes.array
+    ])
+}
 
-export default Root;
+export default Root
