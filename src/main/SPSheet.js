@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
-import { Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
+import React, {Component} from 'react';
+import {Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platform, StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
 
-const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height
-const WIDTH = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width
+const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+const WIDTH = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
-const minPopupHeight = 250
+const minPopupHeight = 250;
 
 const defaultState = {
     height: minPopupHeight,
@@ -34,41 +34,41 @@ const defaultState = {
 class SPSheet extends Component
 {
 
-    static spsheetInstance
+    static spsheetInstance;
 
-    constructor (props)
+    constructor(props)
     {
-        super(props)
+        super(props);
 
-        this.state = defaultState
-        this.createPanResponder()
+        this.state = defaultState;
+        this.createPanResponder();
 
-        this.keyboardDidShow = this.keyboardDidShow.bind(this)
-        this.keyboardDidHide = this.keyboardDidHide.bind(this)
+        this.keyboardDidShow = this.keyboardDidShow.bind(this);
+        this.keyboardDidHide = this.keyboardDidHide.bind(this);
     }
 
-    static show ({ ...config })
+    static show({...config})
     {
-        this.spsheetInstance.start(config)
+        this.spsheetInstance.start(config);
     }
 
-    static hide ()
+    static hide()
     {
-        this.spsheetInstance.hidePopup()
+        this.spsheetInstance.hidePopup();
     }
 
-    componentDidMount ()
+    componentDidMount()
     {
-        BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton())
-        this.keyboardDidShowSubscription = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow)
-        this.keyboardDidHideSubscription = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
+        BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton());
+        this.keyboardDidShowSubscription = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
+        this.keyboardDidHideSubscription = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
     }
 
-    componentWillUnmount ()
+    componentWillUnmount()
     {
-        BackHandler.removeEventListener('hardwareBackPress', () => this.handleBackButton())
-        this.keyboardDidShowSubscription.remove()
-        this.keyboardDidHideSubscription.remove()
+        BackHandler.removeEventListener('hardwareBackPress', () => this.handleBackButton());
+        this.keyboardDidShowSubscription.remove();
+        this.keyboardDidHideSubscription.remove();
 
     }
 
@@ -87,19 +87,19 @@ class SPSheet extends Component
         })
     }
 
-    handleBackButton ()
+    handleBackButton()
     {
-        let { open, closeOnPressBack } = this.state
+        let {open, closeOnPressBack} = this.state;
         if (open && closeOnPressBack) {
-            this.hidePopup()
-            return true
+            this.hidePopup();
+            return true;
         }
     }
 
-    start ({ ...config })
+    start({...config})
     {
 
-        const start = config.height > 0 ? false : true
+        const start = config.height > 0 ? false : true;
 
         this.setState({
             ...defaultState,
@@ -199,14 +199,14 @@ class SPSheet extends Component
 
         const {
             open, closeOnDragDown, dragTopOnly, closeOnPressMask, component, customStyles, pan, height, start, background, opacity, positionView, positionPopup, marginBottom,
-        } = this.state
+        } = this.state;
 
         if (!open) {
-            return null
+            return null;
         }
 
-        const BodyComponentElement = component ? component : false
-        const panResponder = this.panResponder
+        const BodyComponentElement = component ? component : false;
+        const panResponder = this.panResponder;
 
         console.log('marginBottom', marginBottom)
 
