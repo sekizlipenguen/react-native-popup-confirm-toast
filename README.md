@@ -6,15 +6,15 @@
 <!-- [![github release](https://img.shields.io/github/release/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/releases) -->
 [![github issues](https://img.shields.io/github/issues/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
-### Release notes(2.1.2)  🐧 🐐
+### Release notes 🐧
 
-- bugfix(deprecated-react-native-prop-types)
+- "keyboardHeightAdjustment" added
 
 ## Example Bottom Sheet
 
-|    Custom Example 1    |    Custom Example 2    |    Custom Example 3    |
-|:----------------------:|:----------------------:|:----------------------:|
-| ![](assets/popup6.gif) | ![](assets/popup5.gif) | ![](assets/popup7.gif) |
+|    Custom Example 1    |    Custom Example 2    |    Custom Example 3    |    Custom Example 4    |
+|:----------------------:|:----------------------:|:----------------------:|:----------------------:|
+| ![](assets/popup6.gif) | ![](assets/popup5.gif) | ![](assets/popup7.gif) | ![](assets/popup8.gif) |
 
 ## Example Popup Message
 
@@ -196,21 +196,22 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### SPSheet
 
-| Key                | Type                     | Description                                                     | Default            |
-|--------------------|--------------------------|-----------------------------------------------------------------|--------------------|
-| `background`       | string                   |                                                                 | rgba(0, 0, 0, 0.5) |
-| `height`           | number                   | auto height (min: 250)                                          | 250                |
-| `duration`         | number                   | animation time used when opening                                | 250(ms)            |
-| `closeDuration`    | number                   | animation time used when closing                                | 300(ms)            |
-| `closeOnDragDown`  | boolean                  | Use drag with motion to close the window                        | true               |
-| `closeOnPressMask` | boolean                  | press the outside space to close the window                     | true               |
-| `closeOnPressBack` | boolean                  | Press the back key to close the window (Android only)           | true               |
-| `dragTopOnly`      | boolean                  | use only the top area of the draggable icon to close the window | false              |
-| `component`        | component(hook or class) | custom modal component container                                | null               | 
-| `onOpenComplete`   | function                 | works after the window is opened                                | null               |
-| `onCloseComplete`  | function                 | works after window is closed                                    | null               |
-| `customStyles`     | object                   | customStyles: { draggableIcon: {}, container: {}}               | {}                 |
-| `timing`           | number                   | Use this parameter for automatic shutdown.                      | 0(ms)              |
+| Key                        | Type                     | Description                                                     | Default            |
+|----------------------------|--------------------------|-----------------------------------------------------------------|--------------------|
+| `background`               | string                   |                                                                 | rgba(0, 0, 0, 0.5) |
+| `height`                   | number                   | auto height (min: 250)                                          | 250                |
+| `duration`                 | number                   | animation time used when opening                                | 250(ms)            |
+| `closeDuration`            | number                   | animation time used when closing                                | 300(ms)            |
+| `closeOnDragDown`          | boolean                  | Use drag with motion to close the window                        | true               |
+| `closeOnPressMask`         | boolean                  | press the outside space to close the window                     | true               |
+| `closeOnPressBack`         | boolean                  | Press the back key to close the window (Android only)           | true               |
+| `dragTopOnly`              | boolean                  | use only the top area of the draggable icon to close the window | false              |
+| `component`                | component(hook or class) | custom modal component container                                | null               | 
+| `onOpenComplete`           | function                 | works after the window is opened                                | null               |
+| `onCloseComplete`          | function                 | works after window is closed                                    | null               |
+| `customStyles`             | object                   | customStyles: { draggableIcon: {}, container: {}}               | {}                 |
+| `timing`                   | number                   | Use this parameter for automatic shutdown.                      | 0(ms)              |
+| `keyboardHeightAdjustment` | boolean                  | sdfsdf                                                          | false              |
 
 ### Popup
 

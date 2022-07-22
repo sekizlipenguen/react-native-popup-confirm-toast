@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {Animated, BackHandler, Dimensions, Easing, PanResponder, Platform, StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, { Component } from 'react'
+import { Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
 
-const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
-const WIDTH = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
+const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height
+const WIDTH = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width
 
-const minPopupHeight = 250;
+const minPopupHeight = 250
 
 const defaultState = {
     height: minPopupHeight,
@@ -28,17 +28,22 @@ const defaultState = {
     open: false,
     onCloseComplete: false,
     onOpenComplete: false,
+    marginBottom: new Animated.Value(0),
 };
 
 class SPSheet extends Component {
 
     static spsheetInstance;
 
-    constructor(props) {
-        super(props);
+    constructor(props)
+    {
+        super(props)
 
-        this.state = defaultState;
-        this.createPanResponder();
+        this.state = defaultState
+        this.createPanResponder()
+
+        this.keyboardDidShow = this.keyboardDidShow.bind(this)
+        this.keyboardDidHide = this.keyboardDidHide.bind(this)
     }
 
     static show({...config}) {
@@ -49,19 +54,42 @@ class SPSheet extends Component {
         this.spsheetInstance.hidePopup();
     }
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton());
+    componentDidMount ()
+    {
+        BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton())
+        this.keyboardDidShowSubscription = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow)
+        this.keyboardDidHideSubscription = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
     }
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', () => this.handleBackButton());
+    componentWillUnmount ()
+    {
+        BackHandler.removeEventListener('hardwareBackPress', () => this.handleBackButton())
+        this.keyboardDidShowSubscription.remove()
+        this.keyboardDidHideSubscription.remove()
+
     }
 
-    handleBackButton() {
-        let {open, closeOnPressBack} = this.state;
+    keyboardDidShow (e)
+    {
+        let newSize = e.endCoordinates.height
+        this.setState({
+            marginBottom: new Animated.Value(newSize),
+        })
+    }
+
+    keyboardDidHide (e)
+    {
+        this.setState({
+            marginBottom: new Animated.Value(0),
+        })
+    }
+
+    handleBackButton ()
+    {
+        let { open, closeOnPressBack } = this.state
         if (open && closeOnPressBack) {
-            this.hidePopup();
-            return true;
+            this.hidePopup()
+            return true
         }
     }
 
@@ -165,20 +193,23 @@ class SPSheet extends Component {
     render() {
 
         const {
-            open, closeOnDragDown, dragTopOnly, closeOnPressMask, component, customStyles, pan, height, start, background, opacity, positionView, positionPopup,
+            open, closeOnDragDown, dragTopOnly, closeOnPressMask, component, customStyles, pan, height, start, background, opacity, positionView, positionPopup, marginBottom,
         } = this.state;
 
         if (!open) {
-            return null;
+            return null
         }
 
-        const BodyComponentElement = component ? component : false;
-        const panResponder = this.panResponder;
+        const BodyComponentElement = component ? component : false
+        const panResponder = this.panResponder
+
+        console.log('marginBottom', marginBottom)
 
         return (
-            <Animated.View
-                ref={c => this._root = c}
-                style={[styles.modalContainer, {
+          <Animated.View
+            ref={c => this._root = c}
+            style={[
+                styles.modalContainer, {
                     backgroundColor: background || 'transparent',
                     opacity: opacity,
                     transform: [
@@ -186,57 +217,58 @@ class SPSheet extends Component {
                             translateY: positionView,
                         },
                     ],
-                }]}>
+                },
+            ]}>
 
-                <Animated.View
-                    style={[{height: positionPopup}]}
-                >
-                    <TouchableOpacity
-                        style={[
-                            styles.mask,
-                        ]}
-                        activeOpacity={1}
-                        onPress={() => (closeOnPressMask ? this.hidePopup() : null)}
-                    />
-                </Animated.View>
+              <Animated.View
+                style={[{ height: positionPopup }]}
+              >
+                  <TouchableOpacity
+                    style={[
+                        styles.mask,
+                    ]}
+                    activeOpacity={1}
+                    onPress={() => (closeOnPressMask ? this.hidePopup() : null)}
+                  />
+              </Animated.View>
 
-                <View
-                    onLayout={event => {
-                        if (start) {
-                            const height = event.nativeEvent.layout.height;
-                            this.setState({height: height < minPopupHeight ? minPopupHeight : height}, () => {
-                                this.startPopup();
-                            });
-                        }
-                    }}
-                >
-                    <Animated.View
-                        {...(!dragTopOnly && panResponder?.panHandlers)}
-                        style={[
-                            styles.container,
-                            {
-                                height: height,
-                                transform: [{translateX: pan.x}, {translateY: pan.y}],
-                            },
-                            customStyles.container,
-                        ]}
-                    >
+              <View
+                onLayout={event => {
+                    if (start) {
+                        const height = event.nativeEvent.layout.height
+                        this.setState({ height: height < minPopupHeight ? minPopupHeight : height }, () => {
+                            this.startPopup()
+                        })
+                    }
+                }}
+              >
+                  <Animated.View
+                    {...(!dragTopOnly && panResponder?.panHandlers)}
+                    style={[
+                        styles.container,
                         {
-                            closeOnDragDown && (
-                                <View {...(dragTopOnly && panResponder?.panHandlers)} style={styles.draggableContainer}>
-                                    <View style={[styles.draggableIcon, customStyles.draggableIcon]}/>
-                                </View>
-                            )
-                        }
-                        {
-                            BodyComponentElement ? (
-                                <BodyComponentElement {...this.props} />
-                            ) : null
-                        }
-                    </Animated.View>
-                </View>
-            </Animated.View>
-
+                            height: height,
+                            transform: [{ translateX: pan.x }, { translateY: pan.y }],
+                            bottom: marginBottom,
+                        },
+                        customStyles.container,
+                    ]}
+                  >
+                      {
+                        closeOnDragDown && (
+                          <View {...(dragTopOnly && panResponder?.panHandlers)} style={styles.draggableContainer}>
+                              <View style={[styles.draggableIcon, customStyles.draggableIcon]}/>
+                          </View>
+                        )
+                      }
+                      {
+                          BodyComponentElement ? (
+                            <BodyComponentElement {...this.props} />
+                          ) : null
+                      }
+                  </Animated.View>
+              </View>
+          </Animated.View>
 
         );
     }
