@@ -31,11 +31,12 @@ const defaultState = {
     marginBottom: new Animated.Value(0),
 };
 
-class SPSheet extends Component {
+class SPSheet extends Component
+{
 
-    static spsheetInstance;
+    static spsheetInstance
 
-    constructor(props)
+    constructor (props)
     {
         super(props)
 
@@ -46,12 +47,14 @@ class SPSheet extends Component {
         this.keyboardDidHide = this.keyboardDidHide.bind(this)
     }
 
-    static show({...config}) {
-        this.spsheetInstance.start(config);
+    static show ({ ...config })
+    {
+        this.spsheetInstance.start(config)
     }
 
-    static hide() {
-        this.spsheetInstance.hidePopup();
+    static hide ()
+    {
+        this.spsheetInstance.hidePopup()
     }
 
     componentDidMount ()
@@ -93,9 +96,10 @@ class SPSheet extends Component {
         }
     }
 
-    start({...config}) {
+    start ({ ...config })
+    {
 
-        const start = config.height > 0 ? false : true;
+        const start = config.height > 0 ? false : true
 
         this.setState({
             ...defaultState,
@@ -190,11 +194,12 @@ class SPSheet extends Component {
         });
     }
 
-    render() {
+    render()
+    {
 
         const {
             open, closeOnDragDown, dragTopOnly, closeOnPressMask, component, customStyles, pan, height, start, background, opacity, positionView, positionPopup, marginBottom,
-        } = this.state;
+        } = this.state
 
         if (!open) {
             return null
