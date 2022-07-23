@@ -157,6 +157,7 @@ class SPSheet extends Component
           useNativeDriver: false,
         }),
       ]).start(() => {
+        console.log('start', this.state);
         if (typeof onOpenComplete === 'function') {
           return onOpenComplete(this.props);
         }
@@ -166,63 +167,79 @@ class SPSheet extends Component
 
   hidePopup()
   {
-    const {pan, closeDuration, onCloseComplete} = this.state;
+    const {pan, closeDuration, onCloseComplete, positionPopup, open} = this.state;
 
-    Animated.sequence([
-      Animated.timing(this.state.positionPopup, {
-        toValue: HEIGHT,
-        duration: closeDuration,
-        useNativeDriver: false,
-      }),
-      Animated.timing(this.state.opacity, {
-        toValue: 0,
-        duration: closeDuration,
-        useNativeDriver: false,
-      }),
-      Animated.timing(this.state.positionView, {
-        toValue: HEIGHT,
-        duration: 100,
-        useNativeDriver: false,
-      }),
-    ]).start(() => {
-      this.setState({...defaultState, height: 0}, () => {
-        pan.setValue({x: 0, y: 0});
+    if (open) {
+      Animated.sequence([
+        Animated.timing(positionPopup, {
+          toValue: HEIGHT,
+          duration: closeDuration,
+          useNativeDriver: false,
+        }),
+        Animated.timing(this.state.opacity, {
+          toValue: 0,
+          duration: closeDuration,
+          useNativeDriver: false,
+        }),
+        Animated.timing(this.state.positionView, {
+          toValue: HEIGHT,
+          duration: 100,
+          useNativeDriver: false,
+        }),
+      ]).start(() => {
+
+        this.setState({
+          ...defaultState,
+          height: 0,
+        }, () => {
+          pan.setValue({x: 0, y: 0});
+          console.log('close', this.state);
+        });
+
       });
-    });
-    setTimeout(() => {
-      if (typeof onCloseComplete === 'function') {
-        onCloseComplete(this.props);
-      }
-    }, closeDuration);
+      setTimeout(() => {
+        if (typeof onCloseComplete === 'function') {
+          onCloseComplete(this.props);
+        }
+      }, closeDuration);
+    }
+
   }
 
   setHeight(height, completeEvent = false)
   {
     const currentHeight = this.state.height;
-    const {positionPopup, opacity, duration} = this.state;
+    const {positionPopup, opacity, duration, closeDuration} = this.state;
 
     this.setState({
-      height: height < currentHeight ? currentHeight : height,
-      start: true,
+      height: height > currentHeight ? height : currentHeight,
+      start: false,
     }, () => {
-      Animated.spring(positionPopup, {
-        toValue: HEIGHT - height,
-        duration: duration,
-        bounciness: 0,
-        easing: Easing.linear,
-        useNativeDriver: false,
-      }).start(() => {
+      Animated.sequence([
+        Animated.timing(this.state.positionView, {
+          toValue: 0,
+          duration: 100,
+          useNativeDriver: false,
+        }),
+        Animated.timing(positionPopup, {
+          toValue: HEIGHT - height,
+          duration: closeDuration,
+          useNativeDriver: false,
+        }),
+      ]).start(() => {
         this.setState({
           height: height,
-          positionPopup: new Animated.Value(HEIGHT - height),
           start: false,
         }, () => {
-          if (typeof completeEvent === 'function') {
-            return completeEvent(this.props);
-          }
+          setTimeout(() => {
+            if (typeof completeEvent === 'function') {
+              completeEvent(this.props);
+            }
+          }, closeDuration);
         });
       });
     });
+
   }
 
   createPanResponder()
