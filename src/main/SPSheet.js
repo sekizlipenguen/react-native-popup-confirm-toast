@@ -90,9 +90,18 @@ class SPSheet extends Component
 
   keyboardDidHide(e)
   {
-    if (this.state.keyboardHeightAdjustment) {
-      this.setState({
-        marginBottom: new Animated.Value(0),
+    const {marginBottom, keyboardHeightAdjustment, duration} = this.state;
+    if (keyboardHeightAdjustment) {
+      Animated.spring(marginBottom, {
+        toValue: 0,
+        duration: 0,
+        bounciness: 0,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      }).start(() => {
+        this.setState({
+          marginBottom: new Animated.Value(0),
+        });
       });
     }
   }
@@ -189,23 +198,29 @@ class SPSheet extends Component
 
   setHeight(height, completeEvent = false)
   {
+    const currentHeight = this.state.height;
+    const {positionPopup, opacity, duration} = this.state;
+
     this.setState({
-      height: height,
+      height: height < currentHeight ? currentHeight : height,
       start: true,
     }, () => {
-      const {positionPopup, opacity, duration} = this.state;
-      Animated.sequence([
-        Animated.spring(positionPopup, {
-          toValue: HEIGHT - height,
-          duration: duration,
-          bounciness: 0,
-          easing: Easing.linear,
-          useNativeDriver: false,
-        }),
-      ]).start(() => {
-        if (typeof completeEvent === 'function') {
-          return completeEvent(this.props);
-        }
+      Animated.spring(positionPopup, {
+        toValue: HEIGHT - height,
+        duration: duration,
+        bounciness: 0,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      }).start(() => {
+        this.setState({
+          height: height,
+          positionPopup: new Animated.Value(HEIGHT - height),
+          start: false,
+        }, () => {
+          if (typeof completeEvent === 'function') {
+            return completeEvent(this.props);
+          }
+        });
       });
     });
   }
