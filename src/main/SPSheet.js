@@ -4,7 +4,7 @@ import {Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platf
 const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
 const WIDTH = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
-const minPopupHeight = 250;
+const minPopupHeight = 100;
 
 const defaultState = {
   height: minPopupHeight,
@@ -189,17 +189,24 @@ class SPSheet extends Component
 
   setHeight(height, completeEvent = false)
   {
-    const {positionPopup, duration} = this.state;
-    Animated.spring(positionPopup, {
-      toValue: HEIGHT - height,
-      duration: duration,
-      bounciness: 0,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start(() => {
-      if (typeof completeEvent === 'function') {
-        return completeEvent(this.props);
-      }
+    this.setState({
+      height: height,
+      start: true,
+    }, () => {
+      const {positionPopup, opacity, duration} = this.state;
+      Animated.sequence([
+        Animated.spring(positionPopup, {
+          toValue: HEIGHT - height,
+          duration: duration,
+          bounciness: 0,
+          easing: Easing.linear,
+          useNativeDriver: false,
+        }),
+      ]).start(() => {
+        if (typeof completeEvent === 'function') {
+          return completeEvent(this.props);
+        }
+      });
     });
   }
 
