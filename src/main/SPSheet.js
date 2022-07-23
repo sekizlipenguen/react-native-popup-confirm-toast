@@ -58,6 +58,11 @@ class SPSheet extends Component
     this.spsheetInstance.hidePopup();
   }
 
+  static setHeight(height, completeEvent = false)
+  {
+    this.spsheetInstance.setHeight(height, completeEvent);
+  }
+
   componentDidMount()
   {
     BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton());
@@ -182,6 +187,22 @@ class SPSheet extends Component
     }, closeDuration);
   }
 
+  setHeight(height, completeEvent = false)
+  {
+    const {positionPopup, duration} = this.state;
+    Animated.spring(positionPopup, {
+      toValue: HEIGHT - height,
+      duration: duration,
+      bounciness: 0,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }).start(() => {
+      if (typeof completeEvent === 'function') {
+        return completeEvent(this.props);
+      }
+    });
+  }
+
   createPanResponder()
   {
     const {pan, closeOnDragDown, height} = this.state;
@@ -215,8 +236,6 @@ class SPSheet extends Component
 
     const BodyComponentElement = component ? component : false;
     const panResponder = this.panResponder;
-
-    console.log('marginBottom', marginBottom);
 
     return (
         <Animated.View

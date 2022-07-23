@@ -6,9 +6,11 @@
 <!-- [![github release](https://img.shields.io/github/release/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/releases) -->
 [![github issues](https://img.shields.io/github/issues/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
+
 ### Release notes 🐧
 
-- "keyboardHeightAdjustment" added
+- "Sheet - keyboardHeightAdjustment" added
+- "Sheet.setHeight function" added
 
 ## Example Bottom Sheet
 
@@ -51,9 +53,10 @@ import { Root, SPSheet } from 'react-native-popup-confirm-toast'
 
 const component = (props) => {
     //hook or class 
-    return null;
+    return (<Text>Hi, SekizliPenguen</Text>);
     
-    props.spSheet.hide();
+    //props.spSheet.hide();
+    //props.spSheet.setHeight(150,()=>alert('nice'));
 };
 
 <Root>
@@ -211,7 +214,7 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 | `onCloseComplete`          | function                 | works after window is closed                                    | null               |
 | `customStyles`             | object                   | customStyles: { draggableIcon: {}, container: {}}               | {}                 |
 | `timing`                   | number                   | Use this parameter for automatic shutdown.                      | 0(ms)              |
-| `keyboardHeightAdjustment` | boolean                  | sdfsdf                                                          | false              |
+| `keyboardHeightAdjustment` | boolean                  | re-adjusts the height when the keyboard is opened               | false              |
 
 ### Popup
 
@@ -256,14 +259,15 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### Methods
 
-| Component Name | Method Name | Example                                        | Description |
-|----------------|-------------|------------------------------------------------|-------------|
-| SPSheet        | show        | const spSheet = SPSheet; spSheet.show(config); |             |
-| SPSheet        | hide        | const spSheet = SPSheet; spSheet.hide();       |             |
-| Popup          | show        | const popup = Popup; popup.show(config);       |             |
-| Popup          | hide        | const popup = Popup; popup.hide();             |             |
-| Toast          | show        | const toast = Toast; toast.show(config);       |             |
-| Toast          | hide        | const toast = Toast; toast.hide();             |             |
+| Component Name | Method Name | Example                                                                | Description                         |
+|----------------|-------------|------------------------------------------------------------------------|-------------------------------------|
+| SPSheet        | show        | const spSheet = SPSheet; spSheet.show(config);                         |                                     |
+| SPSheet        | hide        | const spSheet = SPSheet; spSheet.hide();                               |                                     |
+| SPSheet        | setHeight   | const spSheet = SPSheet; spSheet.setHeight(500,completeEventFunction); | allows you to change the box height |
+| Popup          | show        | const popup = Popup; popup.show(config);                               |                                     |
+| Popup          | hide        | const popup = Popup; popup.hide();                                     |                                     |
+| Toast          | show        | const toast = Toast; toast.show(config);                               |                                     |
+| Toast          | hide        | const toast = Toast; toast.hide();                                     |                                     |
 
 ## Author
 
