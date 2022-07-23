@@ -157,7 +157,6 @@ class SPSheet extends Component
           useNativeDriver: false,
         }),
       ]).start(() => {
-        console.log('start', this.state);
         if (typeof onOpenComplete === 'function') {
           return onOpenComplete(this.props);
         }
@@ -193,7 +192,6 @@ class SPSheet extends Component
           height: 0,
         }, () => {
           pan.setValue({x: 0, y: 0});
-          console.log('close', this.state);
         });
 
       });
