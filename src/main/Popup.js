@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Animated, Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-
 class Popup extends Component {
     static popupInstance;
 
@@ -234,7 +233,7 @@ class Popup extends Component {
 const styles = StyleSheet.create({
     Container: {
         position: 'absolute',
-        zIndex: 9,
+        zIndex: 10,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         alignItems: 'center',
         top: 0,
