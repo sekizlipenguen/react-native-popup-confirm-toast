@@ -27,7 +27,9 @@ const defaultState = {
   component: false,
   open: false,
   onCloseComplete: false,
+  onClose: false,
   onOpenComplete: false,
+  onOpen: false,
   marginBottom: new Animated.Value(0),
   keyboardHeightAdjustment: false,
 };
@@ -134,10 +136,13 @@ class SPSheet extends Component
 
   startPopup()
   {
-    const {positionPopup, positionView, opacity, height, duration, onOpenComplete} = this.state;
+    const {positionPopup, positionView, opacity, height, duration, onOpenComplete, onOpen} = this.state;
     this.setState({
       start: false,
     }, () => {
+      if (typeof onOpen === 'function') {
+        return onOpen(this.props);
+      }
       Animated.sequence([
         Animated.timing(positionView, {
           toValue: 0,
@@ -169,6 +174,9 @@ class SPSheet extends Component
     const {pan, closeDuration, onCloseComplete, positionPopup, open} = this.state;
 
     if (open) {
+      if (typeof onClose === 'function') {
+        onClose(this.props);
+      }
       Animated.sequence([
         Animated.timing(positionPopup, {
           toValue: HEIGHT,
@@ -186,20 +194,16 @@ class SPSheet extends Component
           useNativeDriver: false,
         }),
       ]).start(() => {
-
         this.setState({
           ...defaultState,
           height: 0,
         }, () => {
           pan.setValue({x: 0, y: 0});
+          if (typeof onCloseComplete === 'function') {
+            onCloseComplete(this.props);
+          }
         });
-
       });
-      setTimeout(() => {
-        if (typeof onCloseComplete === 'function') {
-          onCloseComplete(this.props);
-        }
-      }, closeDuration);
     }
 
   }

@@ -9,9 +9,8 @@
 
 ### Release notes 🐧
 
-- "Sheet - keyboardHeightAdjustment" added
-- "Sheet.setHeight function" added
-
+- "Sheet.onClose function" added
+- "Sheet.onOpen function" added
 ## Example Bottom Sheet
 
 |    Custom Example 1    |    Custom Example 2    |    Custom Example 3    |    Custom Example 4    |
@@ -210,7 +209,9 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 | `closeOnPressBack`         | boolean                  | Press the back key to close the window (Android only)           | true               |
 | `dragTopOnly`              | boolean                  | use only the top area of the draggable icon to close the window | false              |
 | `component`                | component(hook or class) | custom modal component container                                | null               | 
+| `onOpen`                   | function                 | works after the window is opened                                | null               |
 | `onOpenComplete`           | function                 | works after the window is opened                                | null               |
+| `onClose`                  | function                 | works after window is closed                                    | null               |
 | `onCloseComplete`          | function                 | works after window is closed                                    | null               |
 | `customStyles`             | object                   | customStyles: { draggableIcon: {}, container: {}}               | {}                 |
 | `timing`                   | number                   | Use this parameter for automatic shutdown.                      | 0(ms)              |
