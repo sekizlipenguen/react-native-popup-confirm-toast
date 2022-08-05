@@ -38,6 +38,7 @@ class Popup extends Component {
             descTextStyle: false,
             start: false,
             useNativeDriver: true,
+            bounciness: 15,
         };
 
         this.state = this.defaultState;
@@ -79,7 +80,7 @@ class Popup extends Component {
                 }),
                 Animated.spring(this.state.positionPopup, {
                     toValue: (this.height / 2) - (this.state.popupHeight / 2),
-                    bounciness: 15,
+                    bounciness: this.state.bounciness,
                     useNativeDriver: this.state.useNativeDriver,
                 }),
             ]).start();
