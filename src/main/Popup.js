@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
-import {Animated, Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { Component } from 'react'
+import { Animated, Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 class Popup extends Component {
-    static popupInstance;
+    static popupInstance
 
-    constructor(props) {
-        super(props);
+    constructor (props) {
+        super(props)
 
-        this.height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
-        this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
+        this.height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height
+        this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width
 
         this.defaultState = {
             positionView: new Animated.Value(this.height),
@@ -28,6 +28,7 @@ class Popup extends Component {
             timing: 0,
             iconEnabled: true,
             icon: false,
+            iconHeaderStyle: false,
             modalContainerStyle: false,
             buttonContentStyle: false,
             okButtonStyle: false,
@@ -39,31 +40,30 @@ class Popup extends Component {
             start: false,
             useNativeDriver: true,
             bounciness: 15,
-        };
+        }
 
-        this.state = this.defaultState;
-
+        this.state = this.defaultState
 
     }
 
-    static show({...config}) {
-        this.popupInstance.start(config);
+    static show ({ ...config }) {
+        this.popupInstance.start(config)
     }
 
-    static hide() {
-        this.popupInstance.hidePopup();
+    static hide () {
+        this.popupInstance.hidePopup()
     }
 
-    start({...config}) {
+    start ({ ...config }) {
 
         this.setState({
             ...this.defaultState,
             ...config,
             start: true,
-        });
+        })
     }
 
-    startPopup() {
+    startPopup () {
         this.setState({
             start: false,
         }, () => {
@@ -83,19 +83,19 @@ class Popup extends Component {
                     bounciness: this.state.bounciness,
                     useNativeDriver: this.state.useNativeDriver,
                 }),
-            ]).start();
+            ]).start()
 
             if (this.state.timing !== 0) {
-                const duration = this.state.timing > 0 ? this.state.timing : 5000;
+                const duration = this.state.timing > 0 ? this.state.timing : 5000
                 setTimeout(() => {
-                    this.hidePopup();
-                }, duration);
+                    this.hidePopup()
+                }, duration)
             }
-        });
+        })
     }
 
-    hidePopup() {
-        const {positionPopup, opacity, positionView} = this.state;
+    hidePopup () {
+        const { positionPopup, opacity, positionView } = this.state
         Animated.sequence([
             Animated.timing(positionPopup, {
                 toValue: this.height,
@@ -113,121 +113,121 @@ class Popup extends Component {
                 useNativeDriver: this.state.useNativeDriver,
             }),
         ]).start(() => {
-            this.setState(this.defaultState);
-        });
+            this.setState(this.defaultState)
+        })
     }
 
-    handleImage(type) {
+    handleImage (type) {
         switch (type) {
             case 'success':
-                return this.state.icon || require('../assets/success.png');
+                return this.state.icon || require('../assets/success.png')
             case 'danger':
-                return this.state.icon || require('../assets/error.png');
+                return this.state.icon || require('../assets/error.png')
             case 'warning':
-                return this.state.icon || require('../assets/warning.png');
+                return this.state.icon || require('../assets/warning.png')
             case 'confirm':
-                return this.state.icon || require('../assets/warning.png');
+                return this.state.icon || require('../assets/warning.png')
         }
     }
 
-    render() {
-        const {title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, start} = this.state;
-        const {bodyComponent, modalContainerStyle, positionPopup, positionView, opacity} = this.state;
+    render () {
+        const { title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, iconHeaderStyle, start } = this.state
+        const { bodyComponent, modalContainerStyle, positionPopup, positionView, opacity } = this.state
 
-        const typeName = type + 'ButtonStyle';
+        const typeName = type + 'ButtonStyle'
 
-        const BodyComponentElement = bodyComponent ? bodyComponent : false;
+        const BodyComponentElement = bodyComponent ? bodyComponent : false
 
         return (
-            <Animated.View
-                ref={c => this._root = c}
-                style={[styles.Container, {
-                    width: this.width,
-                    height: this.height,
-                    backgroundColor: background || 'transparent',
-                    opacity: opacity,
-                    transform: [
-                        {translateY: positionView},
-                    ],
-                }]}>
-                <Animated.View
-                    onLayout={event => {
-                        if (start) {
-                            const height = event.nativeEvent.layout.height;
-                            this.setState({popupHeight: height}, () => {
-                                this.startPopup();
-                            });
-                        }
-                    }}
-                    style={
-                        [
-                            styles.Message,
-                            modalContainerStyle,
-                            {
-                                transform: [
-                                    {translateY: positionPopup},
-                                ],
-                            },
-                        ]
+          <Animated.View
+            ref={c => this._root = c}
+            style={[styles.Container, {
+                width: this.width,
+                height: this.height,
+                backgroundColor: background || 'transparent',
+                opacity: opacity,
+                transform: [
+                    { translateY: positionView },
+                ],
+            }]}>
+              <Animated.View
+                onLayout={event => {
+                    if (start) {
+                        const height = event.nativeEvent.layout.height
+                        this.setState({ popupHeight: height }, () => {
+                            this.startPopup()
+                        })
                     }
-                >
-                    {
-                        iconEnabled && (
-                            <>
-                                <View style={styles.Header}/>
-                                <Image
-                                    source={this.handleImage(type)}
-                                    resizeMode="contain"
-                                    style={styles.Image}
-                                />
-                            </>
+                }}
+                style={
+                    [
+                        styles.Message,
+                        modalContainerStyle,
+                        {
+                            transform: [
+                                { translateY: positionPopup },
+                            ],
+                        },
+                    ]
+                }
+              >
+                  {
+                    iconEnabled && (
+                      <>
+                          <View style={[styles.Header, iconHeaderStyle]}/>
+                          <Image
+                            source={this.handleImage(type)}
+                            resizeMode="contain"
+                            style={styles.Image}
+                          />
+                      </>
+                    )
+                  }
+                  <View style={styles.Content}>
+                      {
+                        title && title.length > 0 && (
+                          <Text style={[styles.Title, this.state.titleTextStyle]}>{title}</Text>
                         )
-                    }
-                    <View style={styles.Content}>
-                        {
-                            title && title.length > 0 && (
-                                <Text style={[styles.Title, this.state.titleTextStyle]}>{title}</Text>
+                      }
+                      <Text style={[styles.Desc, this.state.descTextStyle]}>{textBody}</Text>
+                      {
+                          BodyComponentElement ? (
+                            <BodyComponentElement {...this.props} />
+                          ) : null
+                      }
+                      <View style={this.state.buttonContentStyle}>
+                          {
+                            buttonEnabled && (
+                              <TouchableOpacity style={[styles.Button, styles[typeName], this.state.okButtonStyle]} onPress={() => {
+                                  if (typeof callback == 'function') {
+                                      return callback()
+                                  }
+                              }}>
+                                  <Text style={[styles.TextButton, this.state.okButtonTextStyle]}>{buttonText}</Text>
+                              </TouchableOpacity>
                             )
-                        }
-                        <Text style={[styles.Desc, this.state.descTextStyle]}>{textBody}</Text>
-                        {
-                            BodyComponentElement ? (
-                                <BodyComponentElement {...this.props} />
-                            ) : null
-                        }
-                        <View style={this.state.buttonContentStyle}>
-                            {
-                                buttonEnabled && (
-                                    <TouchableOpacity style={[styles.Button, styles[typeName], this.state.okButtonStyle]} onPress={() => {
-                                        if (typeof callback == 'function') {
-                                            return callback();
-                                        }
-                                    }}>
-                                        <Text style={[styles.TextButton, this.state.okButtonTextStyle]}>{buttonText}</Text>
-                                    </TouchableOpacity>
-                                )
-                            }
-                            {
-                                type === 'confirm' && (
-                                    <>
-                                        <TouchableOpacity style={[styles.Button, styles.confirm, this.state.confirmButtonStyle]} onPress={() => {
-                                            if (typeof cancelCallback == 'function') {
-                                                return cancelCallback();
-                                            } else {
-                                                this.hidePopup();
-                                            }
+                          }
+                          {
+                            type === 'confirm' && (
+                              <>
+                                  <TouchableOpacity style={[styles.Button, styles.confirm, this.state.confirmButtonStyle]} onPress={() => {
+                                      if (typeof cancelCallback == 'function') {
+                                          return cancelCallback()
+                                      } else {
+                                          this.hidePopup()
+                                      }
 
-                                        }}>
-                                            <Text style={[styles.TextButton, styles[type + 'Text'], this.state.confirmButtonTextStyle]}>{confirmText}</Text>
-                                        </TouchableOpacity>
-                                    </>
-                                )
-                            }
-                        </View>
-                    </View>
-                </Animated.View>
-            </Animated.View>
-        );
+                                  }}>
+                                      <Text style={[styles.TextButton, styles[type + 'Text'], this.state.confirmButtonTextStyle]}>{confirmText}</Text>
+                                  </TouchableOpacity>
+                              </>
+                            )
+                          }
+                      </View>
+                  </View>
+              </Animated.View>
+          </Animated.View>
+        )
     }
 }
 
