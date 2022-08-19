@@ -29,6 +29,7 @@ class Popup extends Component {
             iconEnabled: true,
             icon: false,
             iconHeaderStyle: false,
+            containerStyle: false,
             modalContainerStyle: false,
             buttonContentStyle: false,
             okButtonStyle: false,
@@ -132,7 +133,7 @@ class Popup extends Component {
 
     render () {
         const { title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, iconHeaderStyle, start } = this.state
-        const { bodyComponent, modalContainerStyle, positionPopup, positionView, opacity } = this.state
+        const { bodyComponent, containerStyle, modalContainerStyle, positionPopup, positionView, opacity } = this.state
 
         const typeName = type + 'ButtonStyle'
 
@@ -141,15 +142,18 @@ class Popup extends Component {
         return (
           <Animated.View
             ref={c => this._root = c}
-            style={[styles.Container, {
-                width: this.width,
-                height: this.height,
-                backgroundColor: background || 'transparent',
-                opacity: opacity,
-                transform: [
-                    { translateY: positionView },
-                ],
-            }]}>
+            style={[
+                styles.Container, {
+                    width: this.width,
+                    height: this.height,
+                    backgroundColor: background || 'transparent',
+                    opacity: opacity,
+                    transform: [
+                        { translateY: positionView },
+                    ],
+                },
+                containerStyle
+            ]}>
               <Animated.View
                 onLayout={event => {
                     if (start) {
