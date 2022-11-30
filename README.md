@@ -13,6 +13,11 @@
 - "Sheet.onOpen function" added
 - popup iconHeaderStyle add
 - popup containerStyle add(window priority for multiple alerts {zIndex:10 or 11 or 12})
+- new event -(onCloseComplete - popup)
+- new option - (bodyComponentForce - popup component area)
+- new option - duration(popup)
+- new option - closeDuration(popup)
+
 ## Example Bottom Sheet
 
 |    Custom Example 1    |    Custom Example 2    |    Custom Example 3    |    Custom Example 4    |
