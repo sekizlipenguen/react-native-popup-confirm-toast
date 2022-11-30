@@ -43,6 +43,8 @@ class Popup extends Component {
       useNativeDriver: true,
       bounciness: 15,
       onCloseComplete: false,
+      duration: 100,
+      closeDuration: 100,
     };
 
     this.state = this.defaultState;
@@ -73,12 +75,12 @@ class Popup extends Component {
       Animated.sequence([
         Animated.timing(this.state.positionView, {
           toValue: 0,
-          duration: 100,
+          duration: this.state.duration,
           useNativeDriver: this.state.useNativeDriver,
         }),
         Animated.timing(this.state.opacity, {
           toValue: 1,
-          duration: 300,
+          duration: this.state.duration * 3,
           useNativeDriver: this.state.useNativeDriver,
         }),
         Animated.spring(this.state.positionPopup, {
@@ -102,17 +104,17 @@ class Popup extends Component {
     Animated.sequence([
       Animated.timing(positionPopup, {
         toValue: this.height,
-        duration: 250,
+        duration: this.state.closeDuration * 2.5,
         useNativeDriver: this.state.useNativeDriver,
       }),
       Animated.timing(opacity, {
         toValue: 0,
-        duration: 300,
+        duration: this.state.closeDuration * 3,
         useNativeDriver: this.state.useNativeDriver,
       }),
       Animated.timing(positionView, {
         toValue: this.height,
-        duration: 100,
+        duration: this.state.closeDuration,
         useNativeDriver: this.state.useNativeDriver,
       }),
     ]).start(() => {
