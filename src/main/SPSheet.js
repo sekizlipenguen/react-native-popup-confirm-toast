@@ -329,7 +329,7 @@ class SPSheet extends Component
             >
               {
                   closeOnDragDown && (
-                      <View {...(dragTopOnly && panResponder?.panHandlers)} style={styles.draggableContainer}>
+                      <View {...(dragTopOnly && panResponder?.panHandlers)} style={[styles.draggableContainer, customStyles.draggableContainer]}>
                         <View style={[styles.draggableIcon, customStyles.draggableIcon]}/>
                       </View>
                   )
