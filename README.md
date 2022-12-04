@@ -13,10 +13,14 @@
 - "Sheet.onOpen function" added
 - popup iconHeaderStyle add
 - popup containerStyle add(window priority for multiple alerts {zIndex:10 or 11 or 12})
-- new event -(onCloseComplete - popup)
 - new option - (bodyComponentForce - popup component area)
 - new option - duration(popup)
 - new option - closeDuration(popup)
+- new option - onClose(popup)
+- new option - onCloseComplete(popup)
+- new option - onOpen(popup)
+- new option - onOpenComplete(popup)
+- style - draggableContainer(Sheet)
 
 ## Example Bottom Sheet
 
@@ -205,24 +209,24 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### SPSheet
 
-| Key                        | Type                     | Description                                                     | Default            |
-|----------------------------|--------------------------|-----------------------------------------------------------------|--------------------|
-| `background`               | string                   |                                                                 | rgba(0, 0, 0, 0.5) |
-| `height`                   | number                   | auto height (min: 250)                                          | 250                |
-| `duration`                 | number                   | animation time used when opening                                | 250(ms)            |
-| `closeDuration`            | number                   | animation time used when closing                                | 300(ms)            |
-| `closeOnDragDown`          | boolean                  | Use drag with motion to close the window                        | true               |
-| `closeOnPressMask`         | boolean                  | press the outside space to close the window                     | true               |
-| `closeOnPressBack`         | boolean                  | Press the back key to close the window (Android only)           | true               |
-| `dragTopOnly`              | boolean                  | use only the top area of the draggable icon to close the window | false              |
-| `component`                | component(hook or class) | custom modal component container                                | null               | 
-| `onOpen`                   | function                 | works after the window is opened                                | null               |
-| `onOpenComplete`           | function                 | works after the window is opened                                | null               |
-| `onClose`                  | function                 | works after window is closed                                    | null               |
-| `onCloseComplete`          | function                 | works after window is closed                                    | null               |
-| `customStyles`             | object                   | customStyles: { draggableIcon: {}, container: {}}               | {}                 |
-| `timing`                   | number                   | Use this parameter for automatic shutdown.                      | 0(ms)              |
-| `keyboardHeightAdjustment` | boolean                  | re-adjusts the height when the keyboard is opened               | false              |
+| Key                        | Type                     | Description                                                               | Default            |
+|----------------------------|--------------------------|---------------------------------------------------------------------------|--------------------|
+| `background`               | string                   |                                                                           | rgba(0, 0, 0, 0.5) |
+| `height`                   | number                   | auto height (min: 250)                                                    | 250                |
+| `duration`                 | number                   | animation time used when opening                                          | 250(ms)            |
+| `closeDuration`            | number                   | animation time used when closing                                          | 300(ms)            |
+| `closeOnDragDown`          | boolean                  | Use drag with motion to close the window                                  | true               |
+| `closeOnPressMask`         | boolean                  | press the outside space to close the window                               | true               |
+| `closeOnPressBack`         | boolean                  | Press the back key to close the window (Android only)                     | true               |
+| `dragTopOnly`              | boolean                  | use only the top area of the draggable icon to close the window           | false              |
+| `component`                | component(hook or class) | custom modal component container                                          | null               | 
+| `onOpen`                   | function                 | works after the window is opened                                          | null               |
+| `onOpenComplete`           | function                 | works after the window is opened                                          | null               |
+| `onClose`                  | function                 | works after window is closed                                              | null               |
+| `onCloseComplete`          | function                 | works after window is closed                                              | null               |
+| `customStyles`             | object                   | customStyles: { draggableIcon: {}, container: {}, draggableContainer:{} } | {}                 |
+| `timing`                   | number                   | Use this parameter for automatic shutdown.                                | 0(ms)              |
+| `keyboardHeightAdjustment` | boolean                  | re-adjusts the height when the keyboard is opened                         | false              |
 
 ### Popup
 
@@ -251,7 +255,12 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 | `titleTextStyle`         | object                   |                                         | default                                                                                                                   |
 | `descTextStyle`          | object                   |                                         | default                                                                                                                   |
 | `bounciness`             | number                   |                                         | 15                                                                                                                        |
-| `useNativeDriver`        | boolean                  | true or false                           | true                                                                                                                      |
+| `onClose`                | function                 | when the popup is first closed          | false                                                                                                                     |
+| `onCloseComplete`        | function                 |                                         | false                                                                                                                     |
+| `onOpen`                 | function                 | when the popup is first opened          | false                                                                                                                     |
+| `onOpenComplete`         | function                 |                                         | false                                                                                                                     |
+| `duration`               | boolean                  |                                         | 100                                                                                                                       |
+| `closeDuration`          | boolean                  |                                         | 100                                                                                                                       |
 
 ### Toast
 

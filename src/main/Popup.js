@@ -42,7 +42,10 @@ class Popup extends Component {
       start: false,
       useNativeDriver: true,
       bounciness: 15,
+      onClose: false,
       onCloseComplete: false,
+      onOpenComplete: false,
+      onOpen: false,
       duration: 100,
       closeDuration: 100,
     };
@@ -69,6 +72,9 @@ class Popup extends Component {
   }
 
   startPopup() {
+    if (typeof this.state.onOpen == 'function') {
+      return this.state.onOpen();
+    }
     this.setState({
       start: false,
     }, () => {
@@ -88,7 +94,11 @@ class Popup extends Component {
           bounciness: this.state.bounciness,
           useNativeDriver: this.state.useNativeDriver,
         }),
-      ]).start();
+      ]).start(() => {
+        if (typeof this.state.onOpenComplete == 'function') {
+          return this.state.onOpenComplete();
+        }
+      });
 
       if (this.state.timing !== 0) {
         const duration = this.state.timing > 0 ? this.state.timing : 5000;
@@ -100,7 +110,10 @@ class Popup extends Component {
   }
 
   hidePopup() {
-    const {positionPopup, opacity, positionView, onCloseComplete} = this.state;
+    const {positionPopup, opacity, positionView, onCloseComplete, onClose} = this.state;
+    if (typeof onClose == 'function') {
+      return onClose();
+    }
     Animated.sequence([
       Animated.timing(positionPopup, {
         toValue: this.height,
