@@ -143,7 +143,7 @@ import { Root, Popup } from 'react-native-popup-confirm-toast'
 //hooks or class component
 const bodyComponent = ({props,bodyProps}) => {
     return (
-        <View onLayout={(e}=>bodyProps.onLayout(e)}>
+        <View onLayout={(e)=>bodyProps.onLayout(e)}>
         <Text>Mustafa Kemal ATATÜRK</Text>
         </View>
     );
