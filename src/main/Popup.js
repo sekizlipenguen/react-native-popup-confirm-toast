@@ -157,7 +157,6 @@ class Popup extends Component {
     const {bodyComponent, containerStyle, modalContainerStyle, positionPopup, positionView, opacity, bodyComponentForce} = this.state;
 
     const typeName = type + 'ButtonStyle';
-
     const BodyComponentElement = bodyComponent ? bodyComponent : false;
 
     return (
@@ -177,7 +176,7 @@ class Popup extends Component {
             ]}>
           <Animated.View
               onLayout={event => {
-                if (start) {
+                if (start && !bodyComponentForce) {
                   const height = event.nativeEvent.layout.height;
                   this.setState({popupHeight: height}, () => {
                     this.startPopup();
@@ -187,6 +186,9 @@ class Popup extends Component {
               style={
                 [
                   styles.Message,
+                  {
+                    minHeight: this.state.popupHeight,
+                  },
                   modalContainerStyle,
                   {
                     transform: [
@@ -199,7 +201,14 @@ class Popup extends Component {
             {
               bodyComponentForce ? (
                   BodyComponentElement ? (
-                      <BodyComponentElement {...this.props} />
+                      <BodyComponentElement {...this.props} onLayout={(event) => {
+                        if (event) {
+                          const height = event.nativeEvent.layout.height;
+                          this.setState({popupHeight: height}, () => {
+                            this.startPopup();
+                          });
+                        }
+                      }}/>
                   ) : null
               ) : (
                   <>

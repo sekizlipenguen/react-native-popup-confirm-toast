@@ -9,18 +9,7 @@
 
 ### Release notes 🐧
 
-- "Sheet.onClose function" added
-- "Sheet.onOpen function" added
-- popup iconHeaderStyle add
-- popup containerStyle add(window priority for multiple alerts {zIndex:10 or 11 or 12})
-- new option - (bodyComponentForce - popup component area)
-- new option - duration(popup)
-- new option - closeDuration(popup)
-- new option - onClose(popup)
-- new option - onCloseComplete(popup)
-- new option - onOpen(popup)
-- new option - onOpenComplete(popup)
-- style - draggableContainer(Sheet)
+- Popup = onLayout(automatic height calculation)
 
 ## Example Bottom Sheet
 
@@ -152,9 +141,12 @@ import { Root, Popup } from 'react-native-popup-confirm-toast'
 ```
 import { Root, Popup } from 'react-native-popup-confirm-toast'
 //hooks or class component
-const bodyComponent = (props) => {
-
-return null;
+const bodyComponent = ({props,bodyProps}) => {
+    return (
+        <View onLayout={(e}=>bodyProps.onLayout(e)}>
+        <Text>Mustafa Kemal ATATÜRK</Text>
+        </View>
+    );
 }
 
 <Root>
@@ -165,7 +157,7 @@ return null;
                 popup.show({
                     type: 'confirm',
                     textBody: 'Hesabınızın silinme işlemini onaylamak için şifrenizi giriniz.',
-                    bodyComponent: () => bodyComponent({...props,popup}),
+                    bodyComponent: (bodyProps) => bodyComponent({...props,bodyProps,popup}),
                     confirmText: 'Vazgeç',
                     iconEnabled: false,
                     descTextStyle: GlobalAlertModalStyle.descTextStyle,
@@ -230,37 +222,39 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### Popup
 
-| Key                      | Type                     | Description                             | Default                                                                                                                   |
-|--------------------------|--------------------------|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| `title`                  | string                   |                                         | false                                                                                                                     |
-| `textBody`               | string                   |                                         | false                                                                                                                     | 
-| `bodyComponent`          | component(hook or class) | custom modal component container        | null                                                                                                                      | 
-| `type`                   | enum                     | enum(success, danger, warning, confirm) | warning                                                                                                                   |
-| `buttonText`             | string                   |                                         | Ok                                                                                                                        |
-| `confirmText`            | string                   |                                         | Cancel                                                                                                                    |
-| `callback`               | function                 | ok button press                         | popupHidden                                                                                                               |
-| `cancelCallback`         | function                 | cancel button press                     | popupHidden                                                                                                               |
-| `background`             | string                   |                                         | rgba(0, 0, 0, 0.5)                                                                                                        |
-| `timing`                 | number                   | 0 > autoClose                           | 0                                                                                                                         |
-| `iconEnabled`            | boolean                  |                                         | true <br/>                                                                                                                |
-| `iconHeaderStyle`        | object                   |                                         | {height: 75, width: 100, backgroundColor: '#fff'}                                                                         |
-| `icon`                   | requireUrl               |                                         | require('../assets/{type}.png')                                                                                           |
-| `containerStyle`         | object                   |                                         | { position: 'absolute', zIndex: 10, backgroundColor: 'rgba(0, 0, 0, 0.5)', alignItems: 'center', top: 0, left: 0,}        |
-| `modalContainerStyle`    | object                   |                                         | { width: '90%',backgroundColor: '#fff', borderRadius: 8, alignItems: 'center', overflow: 'hidden', position: 'absolute'}} |
-| `buttonContentStyle`     | object                   |                                         | {}                                                                                                                        |
-| `okButtonStyle`          | object                   |                                         | {backgroundColor: '#702c91'}                                                                                              |
-| `confirmButtonStyle`     | object                   |                                         | default                                                                                                                   |
-| `okButtonTextStyle`      | object                   |                                         | default                                                                                                                   |
-| `confirmButtonTextStyle` | object                   |                                         | default                                                                                                                   |
-| `titleTextStyle`         | object                   |                                         | default                                                                                                                   |
-| `descTextStyle`          | object                   |                                         | default                                                                                                                   |
-| `bounciness`             | number                   |                                         | 15                                                                                                                        |
-| `onClose`                | function                 | when the popup is first closed          | false                                                                                                                     |
-| `onCloseComplete`        | function                 |                                         | false                                                                                                                     |
-| `onOpen`                 | function                 | when the popup is first opened          | false                                                                                                                     |
-| `onOpenComplete`         | function                 |                                         | false                                                                                                                     |
-| `duration`               | boolean                  |                                         | 100                                                                                                                       |
-| `closeDuration`          | boolean                  |                                         | 100                                                                                                                       |
+| Key                      | Type                     | Description                                                                                                 | Default                                                                                                                   |
+|--------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `title`                  | string                   |                                                                                                             | false                                                                                                                     |
+| `textBody`               | string                   |                                                                                                             | false                                                                                                                     | 
+| `bodyComponent`          | component(hook or class) | custom modal component container                                                                            | null                                                                                                                      | 
+| `bodyComponentForce`     | boolean                  | The component you specify covers the entire space                                                           | false                                                                                                                     | 
+| `onLayout`               | function                 | which triggers this feature for us to automatically calculate the height of the component area you specify. |
+| `type`                   | enum                     | enum(success, danger, warning, confirm)                                                                     | warning                                                                                                                   |
+| `buttonText`             | string                   |                                                                                                             | Ok                                                                                                                        |
+| `confirmText`            | string                   |                                                                                                             | Cancel                                                                                                                    |
+| `callback`               | function                 | ok button press                                                                                             | popupHidden                                                                                                               |
+| `cancelCallback`         | function                 | cancel button press                                                                                         | popupHidden                                                                                                               |
+| `background`             | string                   |                                                                                                             | rgba(0, 0, 0, 0.5)                                                                                                        |
+| `timing`                 | number                   | 0 > autoClose                                                                                               | 0                                                                                                                         |
+| `iconEnabled`            | boolean                  |                                                                                                             | true <br/>                                                                                                                |
+| `iconHeaderStyle`        | object                   |                                                                                                             | {height: 75, width: 100, backgroundColor: '#fff'}                                                                         |
+| `icon`                   | requireUrl               |                                                                                                             | require('../assets/{type}.png')                                                                                           |
+| `containerStyle`         | object                   |                                                                                                             | { position: 'absolute', zIndex: 10, backgroundColor: 'rgba(0, 0, 0, 0.5)', alignItems: 'center', top: 0, left: 0,}        |
+| `modalContainerStyle`    | object                   |                                                                                                             | { width: '90%',backgroundColor: '#fff', borderRadius: 8, alignItems: 'center', overflow: 'hidden', position: 'absolute'}} |
+| `buttonContentStyle`     | object                   |                                                                                                             | {}                                                                                                                        |
+| `okButtonStyle`          | object                   |                                                                                                             | {backgroundColor: '#702c91'}                                                                                              |
+| `confirmButtonStyle`     | object                   |                                                                                                             | default                                                                                                                   |
+| `okButtonTextStyle`      | object                   |                                                                                                             | default                                                                                                                   |
+| `confirmButtonTextStyle` | object                   |                                                                                                             | default                                                                                                                   |
+| `titleTextStyle`         | object                   |                                                                                                             | default                                                                                                                   |
+| `descTextStyle`          | object                   |                                                                                                             | default                                                                                                                   |
+| `bounciness`             | number                   |                                                                                                             | 15                                                                                                                        |
+| `onClose`                | function                 | when the popup is first closed                                                                              | false                                                                                                                     |
+| `onCloseComplete`        | function                 |                                                                                                             | false                                                                                                                     |
+| `onOpen`                 | function                 | when the popup is first opened                                                                              | false                                                                                                                     |
+| `onOpenComplete`         | function                 |                                                                                                             | false                                                                                                                     |
+| `duration`               | boolean                  |                                                                                                             | 100                                                                                                                       |
+| `closeDuration`          | boolean                  |                                                                                                             | 100                                                                                                                       |
 
 ### Toast
 
