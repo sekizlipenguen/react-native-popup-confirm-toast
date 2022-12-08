@@ -23,8 +23,7 @@ class Toast extends Component {
         this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
         this.defaultState = {
-            toast: new Animated.Value(this.height),
-            time: new Animated.Value(0),
+
             color: defaultColor,
             timeColor: defaultTimeColor,
             position: defaultPosition,
@@ -36,7 +35,11 @@ class Toast extends Component {
             startDuration: 200,
         };
 
-        this.state = this.defaultState;
+        this.state = {
+            ...this.defaultState,
+            toast: new Animated.Value(this.height),
+            time: new Animated.Value(0),
+        };
     }
 
     static show({...config}) {
@@ -72,7 +75,6 @@ class Toast extends Component {
             toValue = -25;
             minHeight = minHeight + (heightTopGeneral - (isIPhoneWithMonobrow() ? 20 : 0));
         } else if (position === 'bottom') {
-            minHeight = minHeight - (Platform.OS === 'android' ? 0 : iosHeight);
             toValue = this.height - (minHeight);
         }
         this.setState({
@@ -102,9 +104,11 @@ class Toast extends Component {
 
     hideToast() {
         const {minHeight} = this.state;
-        let toValue = this.height;
+        let toValue = 0;
         if (this.state.position === 'top') {
             toValue = -minHeight;
+        } else if (this.state.position === 'bottom') {
+            toValue = this.height;
         }
         Animated.sequence([
             Animated.timing(this.state.toast, {
@@ -119,7 +123,7 @@ class Toast extends Component {
                 useNativeDriver: true,
             }),
         ]).start(() => {
-            this.setState(this.defaultState);
+
         });
     }
 
@@ -151,9 +155,9 @@ class Toast extends Component {
                                 flex: 1,
                             },
                             (position === 'top' ? {paddingTop: (heightTopGeneral + 20)} : {}),
+                            (position === 'bottom' ? {paddingBottom: (isIPhoneWithMonobrow() ? 10 : 20)} : {}),
                         ]}
                         onLayout={event => {
-                            console.log('a', 1);
                             if (start) {
                                 const height = event.nativeEvent.layout.height;
                                 this.setState({minHeight: (height + 20)}, () => {
@@ -188,7 +192,7 @@ class Toast extends Component {
                                     backgroundColor: timeColor,
                                     transform: [{translateX: this.state.time}],
                                 },
-                                (position === 'top' ? {bottom: -11} : {top: 0}),
+                                (position === 'top' ? {bottom: -11} : {top: -10}),
                             ]}
                         />
                     </Animated.View>
