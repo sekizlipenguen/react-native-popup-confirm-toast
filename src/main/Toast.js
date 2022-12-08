@@ -15,7 +15,7 @@ let minHeight = defaultMinHeight;
 
 const iosHeight = 30;
 
-const heightTopGeneral = (isIPhoneWithMonobrow()) ? getStatusBarHeight() : 0;
+const heightTopGeneral = getStatusBarHeight();
 
 class Toast extends Component {
     static toastInstance;
@@ -126,7 +126,9 @@ class Toast extends Component {
 
         return (
             <>
-                <StatusBar hidden={start && position == 'top' ? true : false} animated={true}/>
+                {
+                  Platform.OS === 'ios' && !Platform.isPad && <StatusBar hidden={start && position == 'top' ? true : false} animated={true} translucent={true}/>
+                }
                 <Animated.View
                     ref={(c) => (this._root = c)}
                     style={[
