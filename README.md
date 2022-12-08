@@ -9,7 +9,7 @@
 
 ### Release notes 🐧
 
-- Popup = onLayout(automatic height calculation)
+- Toast Update(statusBarHidden,hiddenDuration,startDuration, autoHeight)
 
 ## Example Bottom Sheet
 
@@ -143,7 +143,7 @@ import { Root, Popup } from 'react-native-popup-confirm-toast'
 //hooks or class component
 const bodyComponent = ({props,bodyProps}) => {
     return (
-        <View onLayout={(e)=>bodyProps.onLayout(e)}>
+        <View onLayout={(e}=>bodyProps.onLayout(e)}>
         <Text>Mustafa Kemal ATATÜRK</Text>
         </View>
     );
@@ -180,15 +180,15 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
         <View>
             <TouchableOpacity
                 onPress={() => 
-                      Toast.show({
-                        title: 'Dikkat!',
-                        text: 'Mutlak özgürlük, kendi başına hiçbir anlam ifade etmez.',
-                        color: '#702c91',
-                        timeColor: '#440f5f',
-                        timing: 5000,
-                        icon: <Icon name={'check'} color={'#fff'} size={31}/>,
-                        position: 'bottom',
-                    })
+                   Toast.show({
+                      title: 'Hey!',
+                      text: 'The best gift I received in this life are the codes. They are worlds inside the worlds.',
+                      backgroundColor: '#702c91',
+                      timeColor: '#440f5f',
+                      timing: 1500,
+                      icon: <Icon name={'check'} color={'#fff'} size={31}/>,
+                      position: 'top'
+                    });
                 }
             >
                 <Text>Open Toast</Text>
@@ -269,6 +269,9 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 | `position`        | enum      | parameters => top, bottom                         | bottom                                                        |
 | `icon`            | component | (react-native-vector-icons or <Image/> component) | null                                                          |
 | `timing`          | number    |                                                   | 5000 ms                                                       |
+| `statusBarHidden` | boolean   |                                                   | false                                                         |
+| `hiddenDuration`  | number    |                                                   | 200 ms                                                        |
+| `startDuration`   | number    |                                                   | 200 ms                                                        |
 
 ### Methods
 

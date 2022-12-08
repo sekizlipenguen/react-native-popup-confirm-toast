@@ -2,31 +2,42 @@ import React, {Component} from 'react';
 import {Animated, Dimensions, Easing, Platform, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {getStatusBarHeight, isIPhoneWithMonobrow} from 'react-native-status-bar-height';
 
-const height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
-const width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
-
 const defaultTiming = 5000;
-const defaultColor = '#fff';
+const defaultColor = '#1f3676';
 const defaultBackgroundColor = '#1da1f2';
-const defaultTimeColor = '#1c6896';
+const defaultTimeColor = '#122459';
 const defaultPosition = 'bottom';
 const defaultMinHeight = 120;
-let minHeight = defaultMinHeight;
 
 const iosHeight = 30;
 
-const heightTopGeneral = (isIPhoneWithMonobrow()) ? getStatusBarHeight() : 0;
+const heightTopGeneral = getStatusBarHeight();
 
 class Toast extends Component {
     static toastInstance;
-    state = {
-        toast: new Animated.Value(height),
-        time: new Animated.Value(0),
-        color: defaultColor,
-        timeColor: defaultTimeColor,
-        position: defaultPosition,
-        start: false,
-    };
+
+    constructor(props) {
+        super(props);
+
+        this.height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+        this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
+
+        this.defaultState = {
+            toast: new Animated.Value(this.height),
+            time: new Animated.Value(0),
+            color: defaultColor,
+            timeColor: defaultTimeColor,
+            position: defaultPosition,
+            start: false,
+            minHeight: defaultMinHeight,
+
+            statusBarHidden: false,
+            hiddenDuration: 200,
+            startDuration: 200,
+        };
+
+        this.state = this.defaultState;
+    }
 
     static show({...config}) {
         this.toastInstance.start(config);
@@ -37,17 +48,9 @@ class Toast extends Component {
     }
 
     start({...config}) {
-        let toValue;
-        if (config.position == 'top') {
-            toValue = -25;
-            minHeight = minHeight + (heightTopGeneral - (isIPhoneWithMonobrow() ? 20 : 0));
-        } else if (config.position == 'bottom') {
-            minHeight = minHeight - (Platform.OS == 'android' ? 0 : iosHeight);
-            toValue = height - (minHeight);
-        }
-
+        let {minHeight} = this.state;
         this.setState({
-            ...this.state,
+            ...this.defaultState,
             title: config.title || false,
             text: config.text || false,
             titleTextStyle: config.titleTextStyle || false,
@@ -58,91 +61,111 @@ class Toast extends Component {
             icon: config.icon || false,
             timing: config.timing || 5000,
             type: config.type,
-            toast: new Animated.Value(config.position == 'top' ? -minHeight : height),
             start: true,
+        });
+
+    }
+
+    runStart() {
+        let {minHeight, position, startDuration} = this.state;
+        let toValue;
+        if (position == 'top') {
+            toValue = -25;
+            minHeight = minHeight + (heightTopGeneral - (isIPhoneWithMonobrow() ? 20 : 0));
+        } else if (position == 'bottom') {
+            minHeight = minHeight - (Platform.OS == 'android' ? 0 : iosHeight);
+            toValue = this.height - (minHeight);
+        }
+        this.setState({
+            start: false,
+            toast: new Animated.Value(position == 'top' ? -minHeight : this.height),
         }, () => {
             Animated.spring(this.state.toast, {
                 toValue: toValue,
                 bounciness: 0,
                 useNativeDriver: true,
                 easing: Easing.linear,
+                duration: startDuration,
             }).start();
             this.runTiming();
         });
-
     }
 
     runTiming() {
         const {timing, time} = this.state;
-        Animated.timing(
-            time,
-            {
-                toValue: width,
-                duration: timing,
-                easing: Easing.linear,
-                useNativeDriver: false,
-            },
-        ).start(() => this.hideToast());
+        Animated.timing(this.state.time, {
+            toValue: -this.width,
+            duration: timing,
+            easing: Easing.linear,
+            useNativeDriver: true,
+        }).start(() => this.hideToast());
     }
 
     hideToast() {
-
-        let toValue = height + 500;
+        const {timing, time, minHeight} = this.state;
+        let toValue = this.height;
         if (this.state.position == 'top') {
-            toValue = -20;
+            toValue = -minHeight;
         }
-
-        Animated.timing(this.state.toast, {
-            toValue: toValue,
-            duration: 300,
-            useNativeDriver: true,
-        }).start(() => {
-            this.setState({
-                timing: defaultTiming,
-                toast: new Animated.Value(this.state.position == 'top' ? -minHeight : height),
-                time: new Animated.Value(0),
-                start: false,
-            }, () => {
-                minHeight = defaultMinHeight;
-            });
+        Animated.sequence([
+            Animated.timing(this.state.toast, {
+                toValue: toValue,
+                duration: this.state.hiddenDuration,
+                useNativeDriver: true,
+            }),
+            Animated.timing(this.state.time, {
+                toValue: 0,
+                duration: 0,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            }),
+        ]).start(() => {
+            this.setState(this.defaultState);
         });
     }
 
     render() {
         const {
-            title, text, icon, backgroundColor, timeColor, time, position, start, titleTextStyle, descTextStyle,
+            title, text, icon, backgroundColor, timeColor, time, position, titleTextStyle, descTextStyle,
+            statusBarHidden, minHeight, start,
         } = this.state;
 
-        if (!start) {
-            return null;
-        }
-
-        let marginTop = {};
-        if (position == 'top') {
-            marginTop = isIPhoneWithMonobrow() ? {marginTop: -iosHeight} : {marginTop: -10};
-        } else if (position == 'bottom') {
-            marginTop = Platform.OS == 'android' ? {marginTop: -20} : {};
-        }
-
+        console.log('minHeight', minHeight, start);
         return (
             <>
-                <StatusBar hidden={start && position == 'top' ? true : false} animated={true}/>
+                <StatusBar hidden={statusBarHidden} animated={true} translucent={true}/>
                 <Animated.View
-                    ref={(c) => (this._root = c)}
+                    ref={c => this._root = c}
                     style={[
                         styles.toast,
                         {
-                            height: minHeight,
+                            width: this.width,
+                            minHeight: minHeight,
                             backgroundColor: backgroundColor,
                             transform: [{translateY: this.state.toast}],
                         },
-                        (position == 'top' ? {paddingTop: (heightTopGeneral + 20)} : {}),
                     ]}
                 >
-                    <View style={[
-                        {flexDirection: 'row', justifyContent: 'center'},
-                        marginTop,
-                    ]}>
+                    <Animated.View
+                        style={[
+                            {
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                flex: 1,
+                            },
+                            (position === 'top' ? {paddingTop: (heightTopGeneral + 20)} : {}),
+                        ]}
+                        onLayout={event => {
+                            console.log('a', 1);
+                            if (start) {
+                                const height = event.nativeEvent.layout.height;
+                                console.log('a', height);
+                                this.setState({minHeight: (height + 20)}, () => {
+                                    this.runStart();
+                                });
+                            }
+                        }}
+                    >
                         {
                             icon && (
                                 <View style={[styles.iconStatus]}>
@@ -162,19 +185,17 @@ class Toast extends Component {
                                 )
                             }
                         </View>
-                    </View>
-
-
-                    <Animated.View
-                        style={[
-                            styles.timing,
-                            {
-                                backgroundColor: timeColor,
-                                right: time,
-                            },
-                            (position == 'top' ? {bottom: 0} : {top: 0}),
-                        ]}
-                    />
+                        <Animated.View
+                            style={[
+                                styles.timing,
+                                {
+                                    backgroundColor: timeColor,
+                                    transform: [{translateX: this.state.time}],
+                                },
+                                (position == 'top' ? {bottom: -11} : {top: 0}),
+                            ]}
+                        />
+                    </Animated.View>
                 </Animated.View>
             </>
         );
