@@ -48,7 +48,6 @@ class Toast extends Component {
     }
 
     start({...config}) {
-        let {minHeight} = this.state;
         this.setState({
             ...this.defaultState,
             title: config.title || false,
@@ -69,16 +68,16 @@ class Toast extends Component {
     runStart() {
         let {minHeight, position, startDuration} = this.state;
         let toValue;
-        if (position == 'top') {
+        if (position === 'top') {
             toValue = -25;
             minHeight = minHeight + (heightTopGeneral - (isIPhoneWithMonobrow() ? 20 : 0));
-        } else if (position == 'bottom') {
-            minHeight = minHeight - (Platform.OS == 'android' ? 0 : iosHeight);
+        } else if (position === 'bottom') {
+            minHeight = minHeight - (Platform.OS === 'android' ? 0 : iosHeight);
             toValue = this.height - (minHeight);
         }
         this.setState({
             start: false,
-            toast: new Animated.Value(position == 'top' ? -minHeight : this.height),
+            toast: new Animated.Value(position === 'top' ? -minHeight : this.height),
         }, () => {
             Animated.spring(this.state.toast, {
                 toValue: toValue,
@@ -102,9 +101,9 @@ class Toast extends Component {
     }
 
     hideToast() {
-        const {timing, time, minHeight} = this.state;
+        const {minHeight} = this.state;
         let toValue = this.height;
-        if (this.state.position == 'top') {
+        if (this.state.position === 'top') {
             toValue = -minHeight;
         }
         Animated.sequence([
@@ -126,11 +125,9 @@ class Toast extends Component {
 
     render() {
         const {
-            title, text, icon, backgroundColor, timeColor, time, position, titleTextStyle, descTextStyle,
+            title, text, icon, backgroundColor, timeColor, position, titleTextStyle, descTextStyle,
             statusBarHidden, minHeight, start,
         } = this.state;
-
-        console.log('minHeight', minHeight, start);
         return (
             <>
                 <StatusBar hidden={statusBarHidden} animated={true} translucent={true}/>
@@ -159,7 +156,6 @@ class Toast extends Component {
                             console.log('a', 1);
                             if (start) {
                                 const height = event.nativeEvent.layout.height;
-                                console.log('a', height);
                                 this.setState({minHeight: (height + 20)}, () => {
                                     this.runStart();
                                 });
@@ -192,7 +188,7 @@ class Toast extends Component {
                                     backgroundColor: timeColor,
                                     transform: [{translateX: this.state.time}],
                                 },
-                                (position == 'top' ? {bottom: -11} : {top: 0}),
+                                (position === 'top' ? {bottom: -11} : {top: 0}),
                             ]}
                         />
                     </Animated.View>
