@@ -2,14 +2,10 @@ import React, {Component} from 'react';
 import {Animated, Dimensions, Easing, Platform, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {getStatusBarHeight, isIPhoneWithMonobrow} from 'react-native-status-bar-height';
 
-const defaultTiming = 5000;
 const defaultColor = '#1f3676';
 const defaultBackgroundColor = '#1da1f2';
 const defaultTimeColor = '#122459';
 const defaultPosition = 'bottom';
-const defaultMinHeight = 120;
-
-const iosHeight = 30;
 
 const heightTopGeneral = getStatusBarHeight();
 
@@ -28,7 +24,7 @@ class Toast extends Component {
             timeColor: defaultTimeColor,
             position: defaultPosition,
             start: false,
-            minHeight: defaultMinHeight,
+            minHeight: 120,
 
             statusBarHidden: false,
             hiddenDuration: 200,
