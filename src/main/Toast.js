@@ -7,8 +7,6 @@ const defaultBackgroundColor = '#1da1f2';
 const defaultTimeColor = '#122459';
 const defaultPosition = 'bottom';
 
-const heightTopGeneral = getStatusBarHeight();
-
 class Toast extends Component {
     static toastInstance;
 
@@ -27,8 +25,14 @@ class Toast extends Component {
             minHeight: 120,
 
             statusBarHidden: false,
+            statusBarTranslucent: false,
+            statusBarAnimation: true,
+            statusBarType: 'default',
             hiddenDuration: 200,
             startDuration: 200,
+            onCloseComplete: false,
+            onOpenComplete: false,
+            starting: false,
         };
 
         this.state = {
@@ -46,6 +50,10 @@ class Toast extends Component {
         this.toastInstance.hideToast();
     }
 
+    getBarHeight() {
+        return getStatusBarHeight();
+    }
+
     start({...config}) {
         this.setState({
             ...this.defaultState,
@@ -58,8 +66,19 @@ class Toast extends Component {
             position: config.position ? config.position : defaultPosition,
             icon: config.icon || false,
             timing: config.timing || 5000,
+            statusBarHidden: config.statusBarHidden || false,
+            statusBarTranslucent: config.statusBarTranslucent || false,
+            statusBarAnimation: (typeof config.statusBarAnimation !== 'undefined') ? config.statusBarAnimation : true,
+            statusBarType: config.statusBarType || 'dark-content',
+            onCloseComplete: config.onCloseComplete || false,
+            onOpenComplete: config.onOpenComplete || false,
             type: config.type,
             start: true,
+            starting: true,
+        }, () => {
+            if (typeof this.state.onOpenComplete == 'function') {
+                return this.state.onOpenComplete();
+            }
         });
 
     }
@@ -69,7 +88,7 @@ class Toast extends Component {
         let toValue;
         if (position === 'top') {
             toValue = -25;
-            minHeight = minHeight + (heightTopGeneral - (isIPhoneWithMonobrow() ? 20 : 0));
+            minHeight = minHeight + (this.getBarHeight() - (isIPhoneWithMonobrow() ? 20 : 0));
         } else if (position === 'bottom') {
             toValue = this.height - (minHeight);
         }
@@ -99,7 +118,7 @@ class Toast extends Component {
     }
 
     hideToast() {
-        const {minHeight} = this.state;
+        const {minHeight, onCloseComplete} = this.state;
         let toValue = 0;
         if (this.state.position === 'top') {
             toValue = -minHeight;
@@ -119,18 +138,35 @@ class Toast extends Component {
                 useNativeDriver: true,
             }),
         ]).start(() => {
-
+            this.setState({
+                statusBarTranslucent: false,
+                statusBarHidden: false,
+                starting: false,
+            }, () => {
+                if (onCloseComplete && typeof onCloseComplete == 'function') {
+                    return onCloseComplete();
+                }
+            });
         });
     }
 
     render() {
         const {
             title, text, icon, backgroundColor, timeColor, position, titleTextStyle, descTextStyle,
-            statusBarHidden, minHeight, start,
+            statusBarHidden, minHeight, start, starting, statusBarTranslucent, statusBarAnimation, statusBarType,
         } = this.state;
         return (
             <>
-                <StatusBar hidden={statusBarHidden} animated={true} translucent={true}/>
+                {
+                    starting && (
+                        <StatusBar
+                            hidden={statusBarHidden}
+                            animated={statusBarAnimation}
+                            translucent={statusBarTranslucent}
+                            barStyle={statusBarType}
+                        />
+                    )
+                }
                 <Animated.View
                     ref={c => this._root = c}
                     style={[
@@ -150,13 +186,13 @@ class Toast extends Component {
                                 justifyContent: 'center',
                                 flex: 1,
                             },
-                            (position === 'top' ? {paddingTop: (heightTopGeneral + 20)} : {}),
-                            (position === 'bottom' ? {paddingBottom: (isIPhoneWithMonobrow() ? 10 : 20)} : {}),
+                            (position === 'top' ? {paddingTop: (this.getBarHeight() + (isIPhoneWithMonobrow() ? 10 : 0))} : {}),
+                            (position === 'bottom' ? {paddingBottom: (isIPhoneWithMonobrow() ? 10 : 50)} : {}),
                         ]}
                         onLayout={event => {
                             if (start) {
                                 const height = event.nativeEvent.layout.height;
-                                this.setState({minHeight: (height + 20)}, () => {
+                                this.setState({minHeight: (height + 30)}, () => {
                                     this.runStart();
                                 });
                             }
@@ -188,7 +224,7 @@ class Toast extends Component {
                                     backgroundColor: timeColor,
                                     transform: [{translateX: this.state.time}],
                                 },
-                                (position === 'top' ? {bottom: -11} : {top: -10}),
+                                (position === 'top' ? {bottom: -15} : {top: -15}),
                             ]}
                         />
                     </Animated.View>
