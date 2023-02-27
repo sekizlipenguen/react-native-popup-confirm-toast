@@ -30,8 +30,10 @@ class Toast extends Component {
       statusBarType: 'default',
       hiddenDuration: 200,
       startDuration: 200,
-      onCloseComplete: false,
+      onOpen: false,
       onOpenComplete: false,
+      onClose: false,
+      onCloseComplete: false,
       starting: false,
     };
 
@@ -77,8 +79,8 @@ class Toast extends Component {
       start: true,
       starting: true,
     }, () => {
-      if (typeof this.state.onOpenComplete == 'function') {
-        return this.state.onOpenComplete();
+      if (typeof this.state.onOpen == 'function') {
+        return this.state.onOpen();
       }
     });
 
@@ -105,6 +107,9 @@ class Toast extends Component {
         easing: Easing.linear,
         duration: startDuration,
       }).start(() => {
+        if (typeof this.state.onOpenComplete == 'function') {
+          return this.state.onOpenComplete();
+        }
         this.runTiming();
       });
 
@@ -122,6 +127,9 @@ class Toast extends Component {
   }
 
   hideToast() {
+    if (typeof this.state.onClose == 'function') {
+      return this.state.onClose();
+    }
     const {minHeight, onCloseComplete} = this.state;
     let toValue = 0;
     if (this.state.position === 'top') {

@@ -9,7 +9,7 @@
 
 ### Release notes 🐧
 
-- Toast bugfix
+- Toast (event = onOpen,onClose)
 
 ## Example Bottom Sheet
 
@@ -299,8 +299,10 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 | `statusBarHidden`      | boolean   |                                                   | false                                                         |
 | `hiddenDuration`       | number    |                                                   | 200 ms                                                        |
 | `startDuration`        | number    |                                                   | 200 ms                                                        |
-| `onOpenComplete`       | function  | works after the window is opened                  | false                                                         |
-| `onCloseComplete`      | function  | works after window is closed                      | false                                                         |
+| `onOpen`               | function  | works after the window is opened                  | null                                                          |
+| `onOpenComplete`       | function  | works after the window is opened                  | null                                                          |
+| `onClose`              | function  | works after window is closed                      | null                                                          |
+| `onCloseComplete`      | function  | works after window is closed                      | null                                                          |
 
 ### Methods
 
