@@ -276,6 +276,8 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     marginTop: 0,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
   },
   title: {
     color: '#fff',
