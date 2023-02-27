@@ -32,13 +32,6 @@
 ## Usage
 
 ## Installation
-
-```
-yarn add react-native-status-bar-height
-or
-npm install react-native-status-bar-height
-```
-
 ```
 yarn add react-native-popup-confirm-toast
 or
@@ -321,9 +314,15 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 | Toast          | show        | const toast = Toast; toast.show(config);                               |                                     |
 | Toast          | hide        | const toast = Toast; toast.hide();                                     |                                     |
 
+### Helper Function
+
+```
+    import {getStatusBarHeight} from 'react-native-popup-confirm-toast';
+```
+
 ## Author
 
-SekizliPenguen, Inspired by "popup-ui"
+SekizliPenguen
 
 ## License
 
