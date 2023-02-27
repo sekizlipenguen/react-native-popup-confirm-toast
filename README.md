@@ -9,8 +9,7 @@
 
 ### Release notes 🐧
 
-- Toast Update(statusBarType,statusBarTranslucent,statusBarHidden,hiddenDuration,startDuration,
-  onCloseComplete,onOpenComplete)
+- Toast bugfix
 
 ## Example Bottom Sheet
 
