@@ -73,8 +73,10 @@ class Toast extends Component {
       statusBarTranslucent: config.statusBarTranslucent || false,
       statusBarAnimation: (typeof config.statusBarAnimation !== 'undefined') ? config.statusBarAnimation : true,
       statusBarType: config.statusBarType || 'dark-content',
-      onCloseComplete: config.onCloseComplete || false,
+      onOpen: config.onOpen || false,
       onOpenComplete: config.onOpenComplete || false,
+      onClose: config.onClose || false,
+      onCloseComplete: config.onCloseComplete || false,
       type: config.type,
       start: true,
       starting: true,
@@ -108,7 +110,7 @@ class Toast extends Component {
         duration: startDuration,
       }).start(() => {
         if (typeof this.state.onOpenComplete == 'function') {
-          return this.state.onOpenComplete();
+          this.state.onOpenComplete();
         }
         this.runTiming();
       });
@@ -128,7 +130,7 @@ class Toast extends Component {
 
   hideToast() {
     if (typeof this.state.onClose == 'function') {
-      return this.state.onClose();
+      this.state.onClose();
     }
     const {minHeight, onCloseComplete} = this.state;
     let toValue = 0;
