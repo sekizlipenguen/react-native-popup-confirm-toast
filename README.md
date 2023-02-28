@@ -32,10 +32,37 @@
 ## Usage
 
 ## Installation
+
 ```
 yarn add react-native-popup-confirm-toast
 or
 npm install react-native-popup-confirm-toast
+```
+
+## Usage
+
+Wrap your root component in Provider from react-native-popup-confirm-toast. If you have a vanilla React Native project,
+it's a good idea to add it in the component which is passed to AppRegistry.registerComponent. This will usually be in
+the index.js file. If you have an Expo project, you can do this inside the exported component in the App.js file.
+
+### Example Provider
+
+```
+import * as React from 'react';
+import { AppRegistry } from 'react-native';
+import {Root as PopupRootProvider} from 'react-native-popup-confirm-toast';
+import { name as appName } from './app.json';
+import App from './src/App';
+
+export default function Main() {
+  return (
+    <PopupRootProvider>
+      <App />
+    </PopupRootProvider>
+  );
+}
+
+AppRegistry.registerComponent(appName, () => Main);
 ```
 
 ### Example Bottom Sheet
