@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platform, StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
 
-const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
 const WIDTH = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
 const minPopupHeight = 100;
