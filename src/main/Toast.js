@@ -14,7 +14,7 @@ class Toast extends Component {
   constructor(props) {
     super(props);
 
-    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
     this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
     this.defaultState = {
@@ -53,7 +53,7 @@ class Toast extends Component {
   }
 
   getBarHeight() {
-    return getStatusBarHeight(true);
+    return getStatusBarHeight(false);
   }
 
   start({...config}) {
