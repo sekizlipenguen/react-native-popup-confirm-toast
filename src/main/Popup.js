@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Animated, Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Animated, Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 class Popup extends Component {
   static popupInstance;
@@ -7,7 +7,7 @@ class Popup extends Component {
   constructor(props) {
     super(props);
 
-    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
     this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
     this.defaultState = {

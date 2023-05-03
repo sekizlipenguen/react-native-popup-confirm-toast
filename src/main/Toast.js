@@ -14,7 +14,7 @@ class Toast extends Component {
   constructor(props) {
     super(props);
 
-    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
     this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
     this.defaultState = {
@@ -25,6 +25,8 @@ class Toast extends Component {
       start: false,
       minHeight: 120,
       statusBarHidden: false,
+      statusBarAndroidHidden: true,
+      statusBarAppleHidden: false,
       statusBarTranslucent: false,
       statusBarAnimation: true,
       statusBarType: 'default',
@@ -53,7 +55,7 @@ class Toast extends Component {
   }
 
   getBarHeight() {
-    return getStatusBarHeight(true);
+    return getStatusBarHeight();
   }
 
   start({...config}) {
@@ -70,6 +72,8 @@ class Toast extends Component {
       icon: config.icon || false,
       timing: config.timing || 5000,
       statusBarHidden: config.statusBarHidden || false,
+      statusBarAndroidHidden: (typeof config.statusBarAndroidHidden === 'undefined' ? true : config.statusBarAndroidHidden),
+      statusBarAppleHidden: config.statusBarAppleHidden || false,
       statusBarTranslucent: config.statusBarTranslucent || false,
       statusBarAnimation: (typeof config.statusBarAnimation !== 'undefined') ? config.statusBarAnimation : true,
       statusBarType: config.statusBarType || 'dark-content',
@@ -165,10 +169,21 @@ class Toast extends Component {
   }
 
   render() {
-    const {
-      title, text, icon, backgroundColor, timeColor, position, titleTextStyle, descTextStyle,
-      statusBarHidden, minHeight, start, starting, statusBarTranslucent, statusBarAnimation, statusBarType,
+    let {
+      title, text, icon, backgroundColor,
+      timeColor, position, titleTextStyle,
+      descTextStyle, minHeight, start, starting,
+      statusBarTranslucent, statusBarAnimation, statusBarType,
+      statusBarHidden, statusBarAndroidHidden, statusBarAppleHidden,
     } = this.state;
+
+    if (
+        (Platform.OS === 'android' && statusBarAndroidHidden === true) ||
+        Platform.OS === 'ios' && statusBarAppleHidden === true
+    ) {
+      statusBarHidden = true;
+    }
+
     return (
         <>
           {
@@ -264,6 +279,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     flexDirection: 'row',
+    borderWidth: 0,
   },
   timing: {
     height: 5,
@@ -276,8 +292,6 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     marginTop: 0,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
   },
   title: {
     color: '#fff',

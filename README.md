@@ -9,7 +9,7 @@
 
 ### Release notes 🐧
 
-- Toast (event = onOpen,onClose)
+- Toast (statusBarAppleHidden,statusBarAndroidHidden)
 
 ## Example Bottom Sheet
 
@@ -78,82 +78,76 @@ const component = (props) => {
     //props.spSheet.setHeight(150,()=>alert('nice'));
 };
 
-<Root>
-    <View>
-        <TouchableOpacity
-            onPress={() => {
-                const spSheet = SPSheet;
-                spSheet.show({
-                    component: () => component({...this.props, spSheet}),
-                    dragFromTopOnly: true,
-                    onCloseComplete: () => {
-                        alert('onCloseComplete');
-                    },
-                    onOpenComplete: () => {
-                        alert('onOpenComplete');
-                    },
-                    height:260
-                });
-            }
-        >
-            <Text>Open Popup Message</Text>
-        </TouchableOpacity>
-    </View>
-</Root>
+<View>
+    <TouchableOpacity
+        onPress={() => {
+            const spSheet = SPSheet;
+            spSheet.show({
+                component: () => component({...this.props, spSheet}),
+                dragFromTopOnly: true,
+                onCloseComplete: () => {
+                    alert('onCloseComplete');
+                },
+                onOpenComplete: () => {
+                    alert('onOpenComplete');
+                },
+                height:260
+            });
+        }
+    >
+        <Text>Open SPSheet Message</Text>
+    </TouchableOpacity>
+</View>
 ```
 
 ### Example Message
 
 ```
-import { Root, Popup } from 'react-native-popup-confirm-toast'
-<Root>
-    <View>
-        <TouchableOpacity
-            onPress={() =>
-              Popup.show({
-                type: 'success',
-                title: 'Dikkat!',
-                textBody: 'Mutlak özgürlük, kendi başına hiçbir anlam ifade etmez. ',
-                buttonText: 'Tamam',
-                callback: () => Popup.hide()
-              })
-            }
-        >
-            <Text>Open Popup Message</Text>
-        </TouchableOpacity>
-    </View>
-</Root>
+import {Popup} from 'react-native-popup-confirm-toast'
+<View>
+    <TouchableOpacity
+        onPress={() =>
+          Popup.show({
+            type: 'success',
+            title: 'Dikkat!',
+            textBody: 'Mutlak özgürlük, kendi başına hiçbir anlam ifade etmez. ',
+            buttonText: 'Tamam',
+            callback: () => Popup.hide()
+          })
+        }
+    >
+        <Text>Open Popup Message</Text>
+    </TouchableOpacity>
+</View>
 ```
 
 ### Example Confirm Message
 
 ```
-import { Root, Popup } from 'react-native-popup-confirm-toast'
-<Root>
-    <View>
-        <TouchableOpacity
-            onPress={() =>
-                Popup.show({
-                    type: 'confirm',
-                    title: 'Dikkat!',
-                    textBody: 'Mutlak özgürlük, kendi başına hiçbir anlam ifade etmez. ',
-                    buttonText: 'Tamam',
-                    confirmText: 'Vazgeç',
-                    callback: () => {
-                        alert('Okey Callback && hidden');
-                        Popup.hide();
-                    },
-                    cancelCallback: () => {
-                        alert('Cancel Callback && hidden');
-                        Popup.hide();
-                    },
-                })
-            }
-        >
-            <Text>Open Popup Confirm Message</Text>
-        </TouchableOpacity>
-    </View>
-</Root>
+import {Popup} from 'react-native-popup-confirm-toast'
+<View>
+    <TouchableOpacity
+        onPress={() =>
+            Popup.show({
+                type: 'confirm',
+                title: 'Dikkat!',
+                textBody: 'Mutlak özgürlük, kendi başına hiçbir anlam ifade etmez. ',
+                buttonText: 'Tamam',
+                confirmText: 'Vazgeç',
+                callback: () => {
+                    alert('Okey Callback && hidden');
+                    Popup.hide();
+                },
+                cancelCallback: () => {
+                    alert('Cancel Callback && hidden');
+                    Popup.hide();
+                },
+            })
+        }
+    >
+        <Text>Open Popup Confirm Message</Text>
+    </TouchableOpacity>
+</View>
 ```
 
 ### Example Custom Body Component
@@ -215,7 +209,7 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
                           onOpenComplete: () => {
                             alert('onOpenComplete');
                           },
-                        });
+                        })
                 }
             >
                 <Text>Open Bottom Toast</Text>
@@ -239,7 +233,7 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
                       onOpenComplete: () => {
                         alert('onOpenComplete');
                       },
-                    });
+                    })
                 }
             >
                 <Text>Open Top Toast</Text>
@@ -310,26 +304,28 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 
 ### Toast
 
-| Key                    | Type      | Description                                       | Default                                                       |
-|------------------------|-----------|---------------------------------------------------|---------------------------------------------------------------|
-| `title`                | string    |                                                   | false                                                         |
-| `text`                 | string    | Description                                       | false                                                         |
-| `titleTextStyle`       | object    |                                                   | {color: '#fff',fontWeight: 'bold',fontSize: 16}               |
-| `descTextStyle`        | object    |                                                   | {marginTop: 5,fontSize: 13,color: '#fff', fontWeight: '400',} |
-| `backgroundColor`      | string    |                                                   | #1da1f2                                                       |
-| `timeColor`            | string    | time backgroundColor                              | #1c6896                                                       |
-| `position`             | enum      | parameters => top, bottom                         | bottom                                                        |
-| `icon`                 | component | (react-native-vector-icons or <Image/> component) | null                                                          |
-| `timing`               | number    |                                                   | 5000 ms                                                       |
-| `statusBarType`        | string    |                                                   | default                                                       |
-| `statusBarTranslucent` | boolean   |                                                   | false                                                         |
-| `statusBarHidden`      | boolean   |                                                   | false                                                         |
-| `hiddenDuration`       | number    |                                                   | 200 ms                                                        |
-| `startDuration`        | number    |                                                   | 200 ms                                                        |
-| `onOpen`               | function  | works after the window is opened                  | null                                                          |
-| `onOpenComplete`       | function  | works after the window is opened                  | null                                                          |
-| `onClose`              | function  | works after window is closed                      | null                                                          |
-| `onCloseComplete`      | function  | works after window is closed                      | null                                                          |
+| Key                      | Type      | Description                                       | Default                                                       |
+|--------------------------|-----------|---------------------------------------------------|---------------------------------------------------------------|
+| `title`                  | string    |                                                   | false                                                         |
+| `text`                   | string    | Description                                       | false                                                         |
+| `titleTextStyle`         | object    |                                                   | {color: '#fff',fontWeight: 'bold',fontSize: 16}               |
+| `descTextStyle`          | object    |                                                   | {marginTop: 5,fontSize: 13,color: '#fff', fontWeight: '400',} |
+| `backgroundColor`        | string    |                                                   | #1da1f2                                                       |
+| `timeColor`              | string    | time backgroundColor                              | #1c6896                                                       |
+| `position`               | enum      | parameters => top, bottom                         | bottom                                                        |
+| `icon`                   | component | (react-native-vector-icons or <Image/> component) | null                                                          |
+| `timing`                 | number    |                                                   | 5000 ms                                                       |
+| `statusBarType`          | string    |                                                   | default                                                       |
+| `statusBarTranslucent`   | boolean   |                                                   | false                                                         |
+| `statusBarHidden`        | boolean   |                                                   | false                                                         |
+| `statusBarAndroidHidden` | boolean   |                                                   | true                                                          |
+| `statusBarAppleHidden`   | boolean   |                                                   | false                                                         |
+| `hiddenDuration`         | number    |                                                   | 200 ms                                                        |
+| `startDuration`          | number    |                                                   | 200 ms                                                        |
+| `onOpen`                 | function  | works after the window is opened                  | null                                                          |
+| `onOpenComplete`         | function  | works after the window is opened                  | null                                                          |
+| `onClose`                | function  | works after window is closed                      | null                                                          |
+| `onCloseComplete`        | function  | works after window is closed                      | null                                                          |
 
 ### Methods
 

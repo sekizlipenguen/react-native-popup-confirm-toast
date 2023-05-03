@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platform, StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
-
-const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height - StatusBar.currentHeight : Dimensions.get('window').height;
+import {Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
+// - StatusBar.currentHeight
+const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
 const WIDTH = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
 const minPopupHeight = 100;
@@ -34,13 +34,11 @@ const defaultState = {
   keyboardHeightAdjustment: false,
 };
 
-class SPSheet extends Component
-{
+class SPSheet extends Component {
 
   static spsheetInstance;
 
-  constructor(props)
-  {
+  constructor(props) {
     super(props);
 
     this.state = defaultState;
@@ -50,38 +48,32 @@ class SPSheet extends Component
     this.keyboardDidHide = this.keyboardDidHide.bind(this);
   }
 
-  static show({...config})
-  {
+  static show({...config}) {
     this.spsheetInstance.start(config);
   }
 
-  static hide()
-  {
+  static hide() {
     this.spsheetInstance.hidePopup();
   }
 
-  static setHeight(height, completeEvent = false)
-  {
+  static setHeight(height, completeEvent = false) {
     this.spsheetInstance.setHeight(height, completeEvent);
   }
 
-  componentDidMount()
-  {
+  componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton());
     this.keyboardDidShowSubscription = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
     this.keyboardDidHideSubscription = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
   }
 
-  componentWillUnmount()
-  {
+  componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', () => this.handleBackButton());
     this.keyboardDidShowSubscription.remove();
     this.keyboardDidHideSubscription.remove();
 
   }
 
-  keyboardDidShow(e)
-  {
+  keyboardDidShow(e) {
     if (this.state.keyboardHeightAdjustment) {
       let newSize = e.endCoordinates.height;
       this.setState({
@@ -90,8 +82,7 @@ class SPSheet extends Component
     }
   }
 
-  keyboardDidHide(e)
-  {
+  keyboardDidHide(e) {
     const {marginBottom, keyboardHeightAdjustment, duration} = this.state;
     if (keyboardHeightAdjustment) {
       Animated.spring(marginBottom, {
@@ -108,8 +99,7 @@ class SPSheet extends Component
     }
   }
 
-  handleBackButton()
-  {
+  handleBackButton() {
     let {open, closeOnPressBack} = this.state;
     if (open && closeOnPressBack) {
       this.hidePopup();
@@ -117,8 +107,7 @@ class SPSheet extends Component
     }
   }
 
-  start({...config})
-  {
+  start({...config}) {
 
     const start = config.height > 0 ? false : true;
 
@@ -134,8 +123,7 @@ class SPSheet extends Component
     });
   }
 
-  startPopup()
-  {
+  startPopup() {
     const {positionPopup, positionView, opacity, height, duration, onOpenComplete, onOpen} = this.state;
     this.setState({
       start: false,
@@ -169,8 +157,7 @@ class SPSheet extends Component
     });
   }
 
-  hidePopup()
-  {
+  hidePopup() {
     const {pan, closeDuration, onCloseComplete, positionPopup, open} = this.state;
 
     if (open) {
@@ -208,8 +195,7 @@ class SPSheet extends Component
 
   }
 
-  setHeight(height, completeEvent = false)
-  {
+  setHeight(height, completeEvent = false) {
     const currentHeight = this.state.height;
     const {positionPopup, opacity, duration, closeDuration} = this.state;
 
@@ -244,8 +230,7 @@ class SPSheet extends Component
 
   }
 
-  createPanResponder()
-  {
+  createPanResponder() {
     const {pan, closeOnDragDown, height} = this.state;
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => closeOnDragDown,
@@ -264,8 +249,7 @@ class SPSheet extends Component
     });
   }
 
-  render()
-  {
+  render() {
 
     const {
       open, closeOnDragDown, dragTopOnly, closeOnPressMask, component, customStyles, pan, height, start, background, opacity, positionView, positionPopup, marginBottom,
