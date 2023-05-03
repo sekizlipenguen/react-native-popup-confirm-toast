@@ -14,11 +14,8 @@ class Toast extends Component {
   constructor(props) {
     super(props);
 
-    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
     this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
-
     this.defaultState = {
-
       color: defaultColor,
       timeColor: defaultTimeColor,
       position: defaultPosition,
@@ -41,7 +38,7 @@ class Toast extends Component {
 
     this.state = {
       ...this.defaultState,
-      toast: new Animated.Value(this.height),
+      toast: new Animated.Value(-this.getHeight()),
       time: new Animated.Value(0),
     };
   }
@@ -56,6 +53,10 @@ class Toast extends Component {
 
   getBarHeight() {
     return getStatusBarHeight();
+  }
+
+  getHeight() {
+    return Platform.OS === 'android' ? Dimensions.get('window').height : Dimensions.get('window').height;
   }
 
   start({...config}) {
@@ -97,14 +98,12 @@ class Toast extends Component {
     let toValue;
     if (position === 'top') {
       toValue = 0;
-      //minHeight = minHeight + this.getBarHeight();
     } else if (position === 'bottom') {
-      toValue = this.height - minHeight;
+      toValue = this.getHeight() - minHeight;
     }
-
     this.setState({
       start: false,
-      toast: new Animated.Value(position === 'top' ? -minHeight : this.height),
+      toast: new Animated.Value(position === 'top' ? -minHeight : this.getHeight()),
     }, () => {
       Animated.spring(this.state.toast, {
         toValue: toValue,
@@ -141,7 +140,7 @@ class Toast extends Component {
     if (this.state.position === 'top') {
       toValue = -(minHeight + 10);
     } else if (this.state.position === 'bottom') {
-      toValue = this.height + 10;
+      toValue = this.getHeight() + this.getBarHeight() + minHeight;
     }
     Animated.sequence([
       Animated.timing(this.state.toast, {
@@ -160,6 +159,7 @@ class Toast extends Component {
         statusBarTranslucent: false,
         statusBarHidden: false,
         starting: false,
+        toast: new Animated.Value(-(this.getHeight() + this.getBarHeight())),
       }, () => {
         if (onCloseComplete && typeof onCloseComplete == 'function') {
           return onCloseComplete();
@@ -178,12 +178,30 @@ class Toast extends Component {
     } = this.state;
 
     if (
-        (Platform.OS === 'android' && statusBarAndroidHidden === true) ||
-        Platform.OS === 'ios' && statusBarAppleHidden === true
+        (
+            (Platform.OS === 'android' && statusBarAndroidHidden === true) ||
+            (Platform.OS === 'ios' && statusBarAppleHidden === true)
+        ) && position === 'top'
     ) {
       statusBarHidden = true;
     }
 
+    let exStyle = {};
+    if (Platform.OS === 'ios') {
+      if (position === 'top') {
+        exStyle = {paddingTop: this.getBarHeight()};
+      } else if (position === 'bottom') {
+        exStyle = {
+          paddingBottom: isIPhoneWithMonobrow() ? 10 : 0,
+        };
+      }
+    } else if (Platform.OS === 'android') {
+      if (position === 'bottom') {
+        exStyle = {
+          paddingBottom: this.getBarHeight(),
+        };
+      }
+    }
     return (
         <>
           {
@@ -215,13 +233,14 @@ class Toast extends Component {
                     justifyContent: 'center',
                     flex: 1,
                   },
-                  (position === 'top' ? {paddingTop: this.getBarHeight()} : {}),
-                  (position === 'bottom' ? {paddingBottom: (isIPhoneWithMonobrow() ? 10 : 50)} : {}),
+                  exStyle,
                 ]}
                 onLayout={event => {
+                  const height = event.nativeEvent.layout.height;
                   if (start) {
-                    const height = event.nativeEvent.layout.height;
-                    this.setState({minHeight: (height + 10)}, () => {
+                    this.setState({
+                      minHeight: (height + 10),
+                    }, () => {
                       this.runStart();
                     });
                   }
