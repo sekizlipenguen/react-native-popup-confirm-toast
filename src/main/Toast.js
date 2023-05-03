@@ -224,6 +224,7 @@ class Toast extends Component {
                   backgroundColor: backgroundColor,
                   transform: [{translateY: this.state.toast}],
                 },
+                !starting ? {display: 'none'} : {},
               ]}
           >
             <Animated.View
