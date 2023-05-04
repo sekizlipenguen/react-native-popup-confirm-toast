@@ -109,9 +109,9 @@ import {Popup} from 'react-native-popup-confirm-toast'
         onPress={() =>
           Popup.show({
             type: 'success',
-            title: 'Dikkat!',
+            title: 'Success!',
             textBody: 'Mutlak özgürlük, kendi başına hiçbir anlam ifade etmez. ',
-            buttonText: 'Tamam',
+            buttonText: 'OK',
             callback: () => Popup.hide()
           })
         }
@@ -166,19 +166,17 @@ const bodyComponent = ({props,bodyProps}) => {
 <Root>
     <View>
         <TouchableOpacity
-            onPress={() =>
+            onPress={() => {
                 const popup = Popup;
                 popup.show({
                     type: 'confirm',
                     textBody: 'Hesabınızın silinme işlemini onaylamak için şifrenizi giriniz.',
                     bodyComponent: (bodyProps) => bodyComponent({...props,bodyProps,popup}),
-                    confirmText: 'Vazgeç',
+                    confirmText: 'Cancel',
                     iconEnabled: false,
-                    descTextStyle: GlobalAlertModalStyle.descTextStyle,
-                    confirmButtonTextStyle: GlobalAlertModalStyle.confirmButtonTextStyle,
                     buttonEnabled: false,
                 });
-            }
+            }}
         >
             <Text>Open Popup Confirm Message</Text>
         </TouchableOpacity>
