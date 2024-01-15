@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     flexDirection: 'row',
     borderWidth: 0,
+    zIndex: 99999,
   },
   timing: {
     height: 5,
