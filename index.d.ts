@@ -1,7 +1,7 @@
 declare module "react-native-popup-confirm-toast" {
   import { FC } from "react"
   import { StyleProp, TextStyle, ViewStyle } from "react-native"
-  import { IconProps } from "react-native-vector-icons/Icon"
+  
   export interface Config {
     title?: string
     text?: string
@@ -10,7 +10,7 @@ declare module "react-native-popup-confirm-toast" {
     backgroundColor?: string
     timeColor?: string
     position?: "top" | "bottom"
-    icon?: FC<IconProps>
+    icon?: FC
     timing?: number
     statusBarType?: "default" | "dark-content" | "light-content"
     statusBarTranslucent?: boolean
