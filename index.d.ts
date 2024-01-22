@@ -61,4 +61,5 @@ declare module "react-native-popup-confirm-toast" {
   export const Toast: Toast
   export const Popup: Popup
   export const SPSheet: SPSheet
+  export const Root: FC
 }
