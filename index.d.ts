@@ -53,7 +53,7 @@ declare module "react-native-popup-confirm-toast" {
   }
 
   export interface SPSheet {
-    show: (props: Config) => void
+    show: (props: SheetConfig) => void
     setHeight: (height: number, onOpenComplete: () => void) => void
     hide: () => void
   }
