@@ -9,7 +9,7 @@
 
 ### Release notes 🐧
 
-- Toast (statusBarAppleHidden,statusBarAndroidHidden)
+- typescript full support thanks @jrdn91
 
 ## Example Bottom Sheet
 
