@@ -9,7 +9,8 @@
 
 ### Release notes 🐧
 
-- typescript full support thanks @jrdn91
+- getStatusBarHeight
+- isIPhoneWithMonobrow
 
 ## Example Bottom Sheet
 
