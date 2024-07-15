@@ -10,6 +10,7 @@ const defaultPosition = 'bottom';
 
 class Toast extends Component {
   static toastInstance;
+  toastQueue = [];
 
   constructor(props) {
     super(props);
@@ -60,41 +61,47 @@ class Toast extends Component {
   }
 
   start({...config}) {
-
-    this.setState({
-      ...this.defaultState,
-      title: config.title || false,
-      text: config.text || false,
-      titleTextStyle: config.titleTextStyle || false,
-      descTextStyle: config.descTextStyle || false,
-      backgroundColor: config.backgroundColor ? config.backgroundColor : defaultBackgroundColor,
-      timeColor: config.timeColor ? config.timeColor : defaultTimeColor,
-      position: config.position ? config.position : defaultPosition,
-      icon: config.icon || false,
-      timing: config.timing || 5000,
-      statusBarHidden: config.statusBarHidden || false,
-      statusBarAndroidHidden: (typeof config.statusBarAndroidHidden === 'undefined' ? true : config.statusBarAndroidHidden),
-      statusBarAppleHidden: config.statusBarAppleHidden || false,
-      statusBarTranslucent: config.statusBarTranslucent || false,
-      statusBarAnimation: (typeof config.statusBarAnimation !== 'undefined') ? config.statusBarAnimation : true,
-      statusBarType: config.statusBarType || 'dark-content',
-      onOpen: config.onOpen || false,
-      onOpenComplete: config.onOpenComplete || false,
-      onClose: config.onClose || false,
-      onCloseComplete: config.onCloseComplete || false,
-      type: config.type,
-      start: true,
-      starting: true,
-    }, () => {
-      if (typeof this.state.onOpen == 'function') {
-        return this.state.onOpen();
-      }
-    });
-
+    // Yeni toast mesajlarını kuyruğa ekleyin
+    if (this.state.starting) {
+      // Eğer zaten bir toast mesajı gösteriliyorsa, yeni mesajı kuyruğa ekleyin
+      this.toastQueue.push(config);
+    } else {
+      // Toast mesajını gösterin
+      this.setState({
+        ...this.defaultState,
+        title: config.title || false,
+        text: config.text || false,
+        titleTextStyle: config.titleTextStyle || false,
+        descTextStyle: config.descTextStyle || false,
+        backgroundColor: config.backgroundColor ? config.backgroundColor : defaultBackgroundColor,
+        timeColor: config.timeColor ? config.timeColor : defaultTimeColor,
+        position: config.position ? config.position : defaultPosition,
+        icon: config.icon || false,
+        timing: config.timing || 5000,
+        statusBarHidden: config.statusBarHidden || false,
+        statusBarAndroidHidden: typeof config.statusBarAndroidHidden === 'undefined' ? true : config.statusBarAndroidHidden,
+        statusBarAppleHidden: config.statusBarAppleHidden || false,
+        statusBarTranslucent: config.statusBarTranslucent || false,
+        statusBarAnimation: typeof config.statusBarAnimation !== 'undefined' ? config.statusBarAnimation : true,
+        statusBarType: config.statusBarType || 'dark-content',
+        onOpen: config.onOpen || false,
+        onOpenComplete: config.onOpenComplete || false,
+        onClose: config.onClose || false,
+        onCloseComplete: config.onCloseComplete || false,
+        type: config.type,
+        start: true,
+        starting: true,
+      }, () => {
+        if (typeof this.state.onOpen === 'function') {
+          this.state.onOpen();
+        }
+        this.runStart();
+      });
+    }
   }
 
   runStart() {
-    let {minHeight, position, startDuration} = this.state;
+    const {minHeight, position, startDuration} = this.state;
     let toValue;
     if (position === 'top') {
       toValue = 0;
@@ -112,7 +119,7 @@ class Toast extends Component {
         easing: Easing.linear,
         duration: startDuration,
       }).start(() => {
-        if (typeof this.state.onOpenComplete == 'function') {
+        if (typeof this.state.onOpenComplete === 'function') {
           this.state.onOpenComplete();
         }
         this.runTiming();
@@ -122,7 +129,9 @@ class Toast extends Component {
   }
 
   runTiming() {
-    const {timing, time} = this.state;
+    const {timing} = this.state;
+    // Yeni toast için zaman değerini sıfırlayın
+    this.state.time.setValue(0);
     Animated.timing(this.state.time, {
       toValue: -this.width,
       duration: timing,
@@ -132,7 +141,7 @@ class Toast extends Component {
   }
 
   hideToast() {
-    if (typeof this.state.onClose == 'function') {
+    if (typeof this.state.onClose === 'function') {
       this.state.onClose();
     }
     const {minHeight, onCloseComplete} = this.state;
@@ -161,8 +170,13 @@ class Toast extends Component {
         starting: false,
         toast: new Animated.Value(-(this.getHeight() + this.getBarHeight())),
       }, () => {
-        if (onCloseComplete && typeof onCloseComplete == 'function') {
-          return onCloseComplete();
+        if (onCloseComplete && typeof onCloseComplete === 'function') {
+          onCloseComplete();
+        }
+        // Gizlendikten sonra kuyrukta bekleyen mesajları kontrol edin
+        if (this.toastQueue.length > 0) {
+          const nextToast = this.toastQueue.shift();
+          this.start(nextToast);
         }
       });
     });
@@ -338,3 +352,4 @@ const styles = StyleSheet.create({
 });
 
 export default Toast;
+
