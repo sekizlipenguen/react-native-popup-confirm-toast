@@ -9,8 +9,7 @@
 
 ### Release notes 🐧
 
-- getStatusBarHeight
-- isIPhoneWithMonobrow
+- multiple toast notifications Shows multiple toast notifications by queuing them
 
 ## Example Bottom Sheet
 
