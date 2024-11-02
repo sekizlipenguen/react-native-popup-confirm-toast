@@ -52,6 +52,12 @@ class Popup extends Component {
 
     this.state = this.defaultState;
 
+    Dimensions.addEventListener('change', this.updateDimensions);
+
+  }
+
+  componentWillUnmount() {
+    Dimensions.removeEventListener('change', this.updateDimensions);
   }
 
   static show({...config}) {
@@ -151,6 +157,18 @@ class Popup extends Component {
         return this.state.icon || require('../assets/warning.png');
     }
   }
+
+  updateDimensions = () => {
+    setTimeout(() => {
+      const {height, width} = Platform.OS === 'android'
+          ? Dimensions.get('screen')
+          : Dimensions.get('window');
+
+      this.height = height;
+      this.width = width;
+      this.setState({});
+    }, 100);
+  };
 
   render() {
     const {title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, iconHeaderStyle, start} = this.state;
