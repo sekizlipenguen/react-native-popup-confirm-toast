@@ -52,12 +52,16 @@ class Popup extends Component {
 
     this.state = this.defaultState;
 
-    Dimensions.addEventListener('change', this.updateDimensions);
+    this.updateDimensions = this.updateDimensions.bind(this);
 
   }
 
+  componentDidMount() {
+    this.dimensionsSubscription = Dimensions.addEventListener('change', this.updateDimensions);
+  }
+
   componentWillUnmount() {
-    Dimensions.removeEventListener('change', this.updateDimensions);
+    this.dimensionsSubscription?.remove();
   }
 
   static show({...config}) {
