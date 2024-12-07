@@ -1,59 +1,40 @@
 import {Dimensions, Platform, StatusBar} from 'react-native';
 
-const STATUSBAR_DEFAULT_HEIGHT = 20;
-const STATUSBAR_X_HEIGHT = 44;
-const STATUSBAR_IP12_HEIGHT = 47;
-const STATUSBAR_IP12MAX_HEIGHT = 47;
-const STATUSBAR_IP14PRO_HEIGHT = 49;
-
-const X_WIDTH = 375;
-const X_HEIGHT = 812;
-
-const XSMAX_WIDTH = 414;
-const XSMAX_HEIGHT = 896;
-
-const IP12_WIDTH = 390;
-const IP12_HEIGHT = 844;
-
-const IP12MAX_WIDTH = 428;
-const IP12MAX_HEIGHT = 926;
-
-const IP14PRO_WIDTH = 393;
-const IP14PRO_HEIGHT = 852;
-
-const IP14PROMAX_WIDTH = 430;
-const IP14PROMAX_HEIGHT = 932;
+// Cihaz Boyutları ve Status Bar Yükseklikleri
+const DEVICE_SPECS = [
+  {width: 375, height: 812, statusBarHeight: 44}, // iPhone X
+  {width: 414, height: 896, statusBarHeight: 44}, // iPhone XS Max
+  {width: 390, height: 844, statusBarHeight: 47}, // iPhone 12
+  {width: 428, height: 926, statusBarHeight: 47}, // iPhone 12 Max
+  {width: 393, height: 852, statusBarHeight: 49}, // iPhone 14 Pro
+  {width: 430, height: 932, statusBarHeight: 49}, // iPhone 14 Pro Max
+  {width: 396, height: 852, statusBarHeight: 50}, // iPhone 15
+  {width: 430, height: 932, statusBarHeight: 50}, // iPhone 15 Max
+  {width: 402, height: 874, statusBarHeight: 51}, // iPhone 16 Pro
+  {width: 440, height: 956, statusBarHeight: 51}, // iPhone 16 Pro Max
+];
 
 const {height: W_HEIGHT, width: W_WIDTH} = Dimensions.get('window');
 
-let statusBarHeight = STATUSBAR_DEFAULT_HEIGHT;
-
+let statusBarHeight = 20; // Varsayılan Status Bar Yüksekliği
 let isIPhoneWithMonobrow_v = false;
 
+// Cihaz Boyutlarını Kontrol Et
 if (Platform.OS === 'ios' && !Platform.isPad && !Platform.isTVOS) {
-  if (W_WIDTH === X_WIDTH && W_HEIGHT === X_HEIGHT) {
-    statusBarHeight = STATUSBAR_X_HEIGHT;
-    isIPhoneWithMonobrow_v = true;
-  } else if (W_WIDTH === XSMAX_WIDTH && W_HEIGHT === XSMAX_HEIGHT) {
-    statusBarHeight = STATUSBAR_X_HEIGHT;
-    isIPhoneWithMonobrow_v = true;
-  } else if (W_WIDTH === IP12_WIDTH && W_HEIGHT === IP12_HEIGHT) {
-    statusBarHeight = STATUSBAR_IP12_HEIGHT;
-    isIPhoneWithMonobrow_v = true;
-  } else if (W_WIDTH === IP12MAX_WIDTH && W_HEIGHT === IP12MAX_HEIGHT) {
-    statusBarHeight = STATUSBAR_IP12MAX_HEIGHT;
-    isIPhoneWithMonobrow_v = true;
-  } else if (W_WIDTH === IP14PROMAX_WIDTH && W_HEIGHT === IP14PROMAX_HEIGHT) {
-    statusBarHeight = STATUSBAR_IP14PRO_HEIGHT;
-    isIPhoneWithMonobrow_v = true;
-  } else if (W_WIDTH === IP14PRO_WIDTH && W_HEIGHT === IP14PRO_HEIGHT) {
-    statusBarHeight = STATUSBAR_IP14PRO_HEIGHT;
+  const device = DEVICE_SPECS.find(
+      (d) => d.width === W_WIDTH && d.height === W_HEIGHT,
+  );
+
+  if (device) {
+    statusBarHeight = device.statusBarHeight;
     isIPhoneWithMonobrow_v = true;
   }
 }
 
+// Monobrow Kontrol Fonksiyonu
 export const isIPhoneWithMonobrow = () => isIPhoneWithMonobrow_v;
 
+// Status Bar Yüksekliği Fonksiyonu
 export function getStatusBarHeight(skipAndroid = false) {
   return Platform.select({
     ios: statusBarHeight,
