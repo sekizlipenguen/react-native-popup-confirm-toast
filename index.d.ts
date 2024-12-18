@@ -23,6 +23,8 @@ declare module "react-native-popup-confirm-toast" {
         onOpenComplete?: () => void
         onClose?: () => void
         onCloseComplete?: () => void
+        type?: string;
+        callback?: () => void;
     }
 
     export interface SheetConfig {
