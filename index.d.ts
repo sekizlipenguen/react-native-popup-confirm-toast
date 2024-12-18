@@ -1,71 +1,96 @@
 declare module "react-native-popup-confirm-toast" {
-    import {FC} from "react"
-    import {StyleProp, TextStyle, ViewStyle} from "react-native"
+    import {FC, ReactNode} from "react";
+    import {StyleProp, TextStyle, ViewStyle} from "react-native";
 
-    export interface Config {
-        title?: string
-        text?: string
-        titleTextStyle?: StyleProp<TextStyle>
-        descTextStyle?: StyleProp<TextStyle>
-        backgroundColor?: string
-        timeColor?: string
-        position?: "top" | "bottom"
-        icon?: FC
-        timing?: number
-        statusBarType?: "default" | "dark-content" | "light-content"
-        statusBarTranslucent?: boolean
-        statusBarHidden?: boolean
-        statusBarAndroidHidden?: boolean
-        statusBarAppleHidden?: boolean
-        hiddenDuration?: number
-        startDuration?: number
-        onOpen?: () => void
-        onOpenComplete?: () => void
-        onClose?: () => void
-        onCloseComplete?: () => void
-        type?: string;
-        callback?: () => void;
+    // Toast Config
+    export interface ToastConfig {
+        title?: string;
+        text?: string;
+        titleTextStyle?: StyleProp<TextStyle>;
+        descTextStyle?: StyleProp<TextStyle>;
+        backgroundColor?: string;
+        timeColor?: string;
+        position?: "top" | "bottom";
+        icon?: FC | ReactNode;
+        timing?: number;
+        statusBarType?: "default" | "dark-content" | "light-content";
+        statusBarTranslucent?: boolean;
+        statusBarHidden?: boolean;
+        statusBarAndroidHidden?: boolean;
+        statusBarAppleHidden?: boolean;
+        hiddenDuration?: number;
+        startDuration?: number;
+        onOpen?: () => void;
+        onOpenComplete?: () => void;
+        onClose?: () => void;
+        onCloseComplete?: () => void;
     }
 
+    // Popup Config
+    export interface PopupConfig {
+        title?: string;
+        textBody?: string;
+        type?: "success" | "info" | "danger" | "warning" | "confirm";
+        buttonText?: string;
+        confirmText?: string;
+        cancelCallback?: () => void;
+        callback?: () => void;
+        icon?: FC | ReactNode;
+        iconHeaderStyle?: StyleProp<ViewStyle>;
+        containerStyle?: StyleProp<ViewStyle>;
+        modalContainerStyle?: StyleProp<ViewStyle>;
+        bodyComponent?: FC<{ popupProps: any }>;
+        timing?: number;
+        onOpen?: () => void;
+        onOpenComplete?: () => void;
+        onClose?: () => void;
+        onCloseComplete?: () => void;
+    }
+
+    // Sheet Config
     export interface SheetConfig {
-        background?: string
-        height?: number
-        duration?: number
-        closeDuration?: number
-        closeOnDragDown?: boolean
-        closeOnPressMask?: boolean
-        closeOnPressBack?: boolean
-        dragTopOnly?: boolean
-        component?: FC
-        onOpen?: () => void
-        onOpenComplete?: () => void
-        onClose?: () => void
-        onCloseComplete?: () => void
-        customStyles?: StyleProp<ViewStyle>
-        timing?: number
-        keyboardHeightAdjustment?: boolean
+        background?: string;
+        height?: number;
+        duration?: number;
+        closeDuration?: number;
+        closeOnDragDown?: boolean;
+        closeOnPressMask?: boolean;
+        closeOnPressBack?: boolean;
+        dragTopOnly?: boolean;
+        component?: FC<{ sheetProps: any }>;
+        onOpen?: () => void;
+        onOpenComplete?: () => void;
+        onClose?: () => void;
+        onCloseComplete?: () => void;
+        customStyles?: {
+            draggableIcon?: StyleProp<ViewStyle>;
+            container?: StyleProp<ViewStyle>;
+            draggableContainer?: StyleProp<ViewStyle>;
+        };
+        timing?: number;
+        keyboardHeightAdjustment?: boolean;
     }
 
     export interface Toast {
-        show: (props: Config) => void
-        hide: () => void
+        show: (config: ToastConfig) => void;
+        hide: () => void;
     }
 
     export interface Popup {
-        show: (props: Config) => void
-        hide: () => void
+        show: (config: PopupConfig) => void;
+        hide: () => void;
     }
 
     export interface SPSheet {
-        show: (props: SheetConfig) => void
-        setHeight: (height: number, onOpenComplete: () => void) => void
-        hide: () => void
+        show: (config: SheetConfig) => void;
+        hide: () => void;
+        setHeight: (height: number, onComplete?: () => void) => void;
     }
 
-    export const Toast: Toast
-    export const Popup: Popup
-    export const SPSheet: SPSheet
-    export const Root: FC
-    export const getStatusBarHeight: FC
-    export const isIPhoneWithMonobrow: FC
+    export const Toast: Toast;
+    export const Popup: Popup;
+    export const SPSheet: SPSheet;
+    export const Root: FC;
+    export const getStatusBarHeight: () => number;
+    export const isIPhoneWithMonobrow: () => boolean;
 }
