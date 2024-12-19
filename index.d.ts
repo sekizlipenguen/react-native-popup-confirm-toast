@@ -1,6 +1,6 @@
 declare module "react-native-popup-confirm-toast" {
     import {FC, ReactNode} from "react";
-    import {StyleProp, TextStyle, ViewStyle} from "react-native";
+    import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
 
     // Toast Config
     export interface ToastConfig {
@@ -39,7 +39,9 @@ declare module "react-native-popup-confirm-toast" {
         iconHeaderStyle?: StyleProp<ViewStyle>;
         containerStyle?: StyleProp<ViewStyle>;
         modalContainerStyle?: StyleProp<ViewStyle>;
-        bodyComponent?: FC<{ popupProps: any }>;
+        background?: string;
+        bodyComponent?: FC<{ popupProps: any; onLayout?: (event: LayoutChangeEvent) => void }>;
+        bodyComponentForce?: boolean;
         timing?: number;
         onOpen?: () => void;
         onOpenComplete?: () => void;
