@@ -7,10 +7,6 @@
 [![github issues](https://img.shields.io/github/issues/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
 
-### Release notes 🐧
-
-- multiple toast notifications Shows multiple toast notifications by queuing them
-
 ## Example Bottom Sheet
 
 |    Custom Example 1    |    Custom Example 2    |    Custom Example 3    |    Custom Example 4    |
@@ -241,7 +237,7 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
     </Root>
 ```
 
-## Documentation
+## Features & Documentation
 
 ### SPSheet
 
