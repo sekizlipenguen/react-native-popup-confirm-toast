@@ -1,50 +1,49 @@
 {
-  "name": "react-native-popup-confirm-toast",
-  "version": "2.3.8",
-  "description": "",
+  "name": "@sekizlipenguen/react-native-popup-confirm-toast",
+  "version": "1.0.0",
+  "description": "A flexible and customizable popup, toast, and bottom sheet library for React Native. Supports Android, iOS, and Web with React Native 0.60+.",
   "main": "index.js",
   "types": "index.d.ts",
   "typings": "index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sekizlipenguen/react-native-popup-confirm-toast.git"
+    "url": "https://github.com/sekizlipenguen/react-native-popup-confirm-toast.git"
   },
   "keywords": [
-    "react native popup message",
-    "react native popup confirm",
-    "react native confirm",
-    "react native top toast",
-    "react native bottom toast",
-    "react native modal",
-    "react native custom modal",
-    "react native popup",
-    "react native modal",
-    "react native toast",
-    "react native confirm",
     "react-native",
-    "react-component",
-    "react-native-component",
-    "bottom-sheet",
-    "action-sheet",
-    "raw-bottom-sheet",
-    "bottom-drawer",
-    "bottom-animated",
     "popup",
-    "message",
     "toast",
     "confirm",
-    "drawer",
-    "picker",
-    "swipper",
+    "bottom-sheet",
+    "action-sheet",
     "modal",
-    "dialog"
+    "dialog",
+    "react native popup message",
+    "react native toast notification",
+    "react native confirmation dialog",
+    "react native custom modal",
+    "react native top toast",
+    "react native bottom toast",
+    "react native popup confirm",
+    "react native action sheet",
+    "web support",
+    "ios support",
+    "android support",
+    "cross-platform",
+    "react native 0.60+",
+    "react native flexible popup",
+    "react native bottom sheet"
   ],
   "author": "SekizliPenguen",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "metro-react-native-babel-preset": "^0.65.2"
   },
-  "dependencies": {
-    "react-native-popup-confirm-toast": "github:sekizlipenguen/react-native-popup-confirm-toast#c497b38c9070a5cd14f6ca8983c0aa271ed6a9bb"
-  }
+  "engines": {
+    "react-native": ">=0.60"
+  },
+  "bugs": {
+    "url": "https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues"
+  },
+  "homepage": "https://github.com/sekizlipenguen/react-native-popup-confirm-toast#readme"
 }

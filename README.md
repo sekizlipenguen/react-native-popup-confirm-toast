@@ -1,11 +1,14 @@
-# react-native-popup-confirm-toast
-
 ![platforms](https://img.shields.io/badge/platforms-Web%20%7C%20Android%20%7C%20iOS-brightgreen.svg?style=flat-square&colorB=191A17)
-[![npm](https://img.shields.io/npm/v/react-native-popup-confirm-toast.svg?style=flat-square)](https://www.npmjs.com/package/react-native-popup-confirm-toast)
-[![npm](https://img.shields.io/npm/dm/react-native-popup-confirm-toast.svg?style=flat-square&colorB=007ec6)](https://www.npmjs.com/package/react-native-popup-confirm-toast)
-<!-- [![github release](https://img.shields.io/github/release/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/releases) -->
+[![npm](https://img.shields.io/npm/v/@sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://www.npmjs.com/package/@sekizlipenguen/react-native-popup-confirm-toast)
+[![npm](https://img.shields.io/npm/dm/@sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=007ec6)](https://www.npmjs.com/package/@sekizlipenguen/react-native-popup-confirm-toast)
 [![github issues](https://img.shields.io/github/issues/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
 [![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
+
+# @sekizlipenguen/react-native-popup-confirm-toast
+
+A flexible and user-friendly popup, toast, and bottom sheet solution for React Native. This package provides customizable components for displaying interactive messages, confirmation dialogs, and toast notifications in your mobile applications.
+
+**Note:** This package has been moved to the `@sekizlipenguen` scope for improved organization and better support for future updates.
 
 ## Example Bottom Sheet
 
