@@ -1,6 +1,6 @@
 {
   "name": "@sekizlipenguen/react-native-popup-confirm-toast",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A flexible and customizable popup, toast, and bottom sheet library for React Native. Supports Android, iOS, and Web with React Native 0.60+.",
   "main": "index.js",
   "types": "index.d.ts",
