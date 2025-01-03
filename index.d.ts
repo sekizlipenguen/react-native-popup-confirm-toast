@@ -1,4 +1,4 @@
-declare module "react-native-popup-confirm-toast" {
+declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
     import {FC, ReactNode} from "react";
     import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
 
@@ -89,10 +89,16 @@ declare module "react-native-popup-confirm-toast" {
         setHeight: (height: number, onComplete?: () => void) => void;
     }
 
+    // Root Props Definition
+    export interface RootProps {
+        children?: ReactNode;
+        style?: StyleProp<ViewStyle>;
+    }
+
     export const Toast: Toast;
     export const Popup: Popup;
     export const SPSheet: SPSheet;
-    export const Root: FC<React.PropsWithChildren<{}>>;
+    export const Root: FC<RootProps>;
     export const getStatusBarHeight: () => number;
     export const isIPhoneWithMonobrow: () => boolean;
 }

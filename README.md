@@ -1,10 +1,10 @@
 ![platforms](https://img.shields.io/badge/platforms-Web%20%7C%20Android%20%7C%20iOS-brightgreen.svg?style=flat-square&colorB=191A17)
-[![npm](https://img.shields.io/npm/v/@sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://www.npmjs.com/package/@sekizlipenguen/react-native-popup-confirm-toast)
-[![npm](https://img.shields.io/npm/dm/@sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=007ec6)](https://www.npmjs.com/package/@sekizlipenguen/react-native-popup-confirm-toast)
-[![github issues](https://img.shields.io/github/issues/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues)
-[![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
+[![npm](https://img.shields.io/npm/v/@sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://www.npmjs.com/package/@sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast)
+[![npm](https://img.shields.io/npm/dm/@sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=007ec6)](https://www.npmjs.com/package/@sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast)
+[![github issues](https://img.shields.io/github/issues/sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square)](https://github.com/sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast/issues)
+[![github closed issues](https://img.shields.io/github/issues-closed/sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast.svg?style=flat-square&colorB=44cc11)](https://github.com/sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast/issues?q=is%3Aissue+is%3Aclosed)
 
-# @sekizlipenguen/react-native-popup-confirm-toast
+# @sekizlipenguen/@sekizlipenguen/react-native-popup-confirm-toast
 
 A flexible and user-friendly popup, toast, and bottom sheet solution for React Native. This package provides customizable components for displaying interactive messages, confirmation dialogs, and toast notifications in your mobile applications.
 
@@ -33,14 +33,14 @@ A flexible and user-friendly popup, toast, and bottom sheet solution for React N
 ## Installation
 
 ```
-yarn add react-native-popup-confirm-toast
+yarn add @sekizlipenguen/react-native-popup-confirm-toast
 or
-npm install react-native-popup-confirm-toast
+npm install @sekizlipenguen/react-native-popup-confirm-toast
 ```
 
 ## Usage
 
-Wrap your root component in Provider from react-native-popup-confirm-toast. If you have a vanilla React Native project,
+Wrap your root component in Provider from @sekizlipenguen/react-native-popup-confirm-toast. If you have a vanilla React Native project,
 it's a good idea to add it in the component which is passed to AppRegistry.registerComponent. This will usually be in
 the index.js file. If you have an Expo project, you can do this inside the exported component in the App.js file.
 
@@ -49,7 +49,7 @@ the index.js file. If you have an Expo project, you can do this inside the expor
 ```
 import * as React from 'react';
 import { AppRegistry } from 'react-native';
-import {Root as PopupRootProvider} from 'react-native-popup-confirm-toast';
+import {Root as PopupRootProvider} from '@sekizlipenguen/react-native-popup-confirm-toast';
 import { name as appName } from './app.json';
 import App from './src/App';
 
@@ -67,7 +67,7 @@ AppRegistry.registerComponent(appName, () => Main);
 ### Example Bottom Sheet
 
 ```
-import { Root, SPSheet } from 'react-native-popup-confirm-toast'
+import { Root, SPSheet } from '@sekizlipenguen/react-native-popup-confirm-toast'
 
 const component = (props) => {
     //hook or class 
@@ -102,7 +102,7 @@ const component = (props) => {
 ### Example Message
 
 ```
-import {Popup} from 'react-native-popup-confirm-toast'
+import {Popup} from '@sekizlipenguen/react-native-popup-confirm-toast'
 <View>
     <TouchableOpacity
         onPress={() =>
@@ -123,7 +123,7 @@ import {Popup} from 'react-native-popup-confirm-toast'
 ### Example Confirm Message
 
 ```
-import {Popup} from 'react-native-popup-confirm-toast'
+import {Popup} from '@sekizlipenguen/react-native-popup-confirm-toast'
 <View>
     <TouchableOpacity
         onPress={() =>
@@ -152,7 +152,7 @@ import {Popup} from 'react-native-popup-confirm-toast'
 ### Example Custom Body Component
 
 ```
-import { Root, Popup } from 'react-native-popup-confirm-toast'
+import { Root, Popup } from '@sekizlipenguen/react-native-popup-confirm-toast'
 //hooks or class component
 const bodyComponent = ({props,bodyProps}) => {
     return (
@@ -186,7 +186,7 @@ const bodyComponent = ({props,bodyProps}) => {
 ### Toast
 
 ```
-import { Root, Toast } from 'react-native-popup-confirm-toast'
+import { Root, Toast } from '@sekizlipenguen/react-native-popup-confirm-toast'
     <Root>
         <View>
             <TouchableOpacity
@@ -339,7 +339,7 @@ import { Root, Toast } from 'react-native-popup-confirm-toast'
 ### Helper Function
 
 ```
-    import {getStatusBarHeight} from 'react-native-popup-confirm-toast';
+    import {getStatusBarHeight} from '@sekizlipenguen/react-native-popup-confirm-toast';
 ```
 
 ## Author
