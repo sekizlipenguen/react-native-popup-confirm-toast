@@ -1,12 +1,9 @@
 import React, {Component} from 'react';
-import {Dimensions} from 'react-native';
 
 import PropTypes from 'prop-types';
 import Popup from './Popup';
 import Toast from './Toast';
 import SPSheet from './SPSheet';
-
-const {width, height} = Dimensions.get('window');
 
 class Root extends Component {
     render() {
