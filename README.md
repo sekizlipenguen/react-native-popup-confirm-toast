@@ -32,10 +32,16 @@ A flexible and user-friendly popup, toast, and bottom sheet solution for React N
 
 ## Installation
 
-```
-yarn add @sekizlipenguen/react-native-popup-confirm-toast
-or
+Using npm:
+
+```bash
 npm install @sekizlipenguen/react-native-popup-confirm-toast
+```
+
+Using yarn:
+
+```bash
+yarn add @sekizlipenguen/react-native-popup-confirm-toast
 ```
 
 ## Usage
@@ -46,7 +52,7 @@ the index.js file. If you have an Expo project, you can do this inside the expor
 
 ### Example Provider
 
-```
+```javascript
 import * as React from 'react';
 import { AppRegistry } from 'react-native';
 import {Root as PopupRootProvider} from '@sekizlipenguen/react-native-popup-confirm-toast';
@@ -66,7 +72,7 @@ AppRegistry.registerComponent(appName, () => Main);
 
 ### Example Bottom Sheet
 
-```
+```javascript
 import { Root, SPSheet } from '@sekizlipenguen/react-native-popup-confirm-toast'
 
 const component = (props) => {
@@ -101,7 +107,7 @@ const component = (props) => {
 
 ### Example Message
 
-```
+```javascript
 import {Popup} from '@sekizlipenguen/react-native-popup-confirm-toast'
 <View>
     <TouchableOpacity
@@ -122,7 +128,7 @@ import {Popup} from '@sekizlipenguen/react-native-popup-confirm-toast'
 
 ### Example Confirm Message
 
-```
+```javascript
 import {Popup} from '@sekizlipenguen/react-native-popup-confirm-toast'
 <View>
     <TouchableOpacity
@@ -151,7 +157,7 @@ import {Popup} from '@sekizlipenguen/react-native-popup-confirm-toast'
 
 ### Example Custom Body Component
 
-```
+```javascript
 import { Root, Popup } from '@sekizlipenguen/react-native-popup-confirm-toast'
 //hooks or class component
 const bodyComponent = ({props,bodyProps}) => {
@@ -185,7 +191,7 @@ const bodyComponent = ({props,bodyProps}) => {
 
 ### Toast
 
-```
+```javascript
 import { Root, Toast } from '@sekizlipenguen/react-native-popup-confirm-toast'
     <Root>
         <View>
@@ -338,8 +344,8 @@ import { Root, Toast } from '@sekizlipenguen/react-native-popup-confirm-toast'
 
 ### Helper Function
 
-```
-    import {getStatusBarHeight} from '@sekizlipenguen/react-native-popup-confirm-toast';
+```javascript
+import {getStatusBarHeight} from '@sekizlipenguen/react-native-popup-confirm-toast';
 ```
 
 ## Author
