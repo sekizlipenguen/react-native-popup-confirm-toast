@@ -48,6 +48,7 @@ class Popup extends Component {
       onOpen: false,
       duration: 100,
       closeDuration: 100,
+      show: false,
     };
 
     this.state = this.defaultState;
@@ -56,20 +57,20 @@ class Popup extends Component {
 
   }
 
-  componentDidMount() {
-    this.dimensionsSubscription = Dimensions.addEventListener('change', this.updateDimensions);
-  }
-
-  componentWillUnmount() {
-    this.dimensionsSubscription?.remove();
-  }
-
   static show({...config}) {
     this.popupInstance.start(config);
   }
 
   static hide() {
     this.popupInstance.hidePopup();
+  }
+
+  componentDidMount() {
+    this.dimensionsSubscription = Dimensions.addEventListener('change', this.updateDimensions);
+  }
+
+  componentWillUnmount() {
+    this.dimensionsSubscription?.remove();
   }
 
   start({...config}) {
@@ -105,9 +106,11 @@ class Popup extends Component {
           useNativeDriver: this.state.useNativeDriver,
         }),
       ]).start(() => {
-        if (typeof this.state.onOpenComplete == 'function') {
-          return this.state.onOpenComplete();
-        }
+        this.setState({show: true}, () => {
+          if (typeof this.state.onOpenComplete == 'function') {
+            return this.state.onOpenComplete();
+          }
+        });
       });
 
       if (this.state.timing !== 0) {
@@ -180,10 +183,11 @@ class Popup extends Component {
 
     const typeName = type + 'ButtonStyle';
     const BodyComponentElement = bodyComponent ? bodyComponent : false;
-
+    console.log('a', this.state.start);
     return (
         <Animated.View
             ref={c => this._root = c}
+            pointerEvents={this.state.show ? 'auto' : 'box-none'}
             style={[
               styles.Container, {
                 width: this.width,
@@ -219,6 +223,7 @@ class Popup extends Component {
                   },
                 ]
               }
+              pointerEvents={this.state.show ? 'auto' : 'box-none'}
           >
             {
               bodyComponentForce ? (
