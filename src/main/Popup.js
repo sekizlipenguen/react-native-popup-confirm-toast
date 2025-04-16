@@ -183,7 +183,6 @@ class Popup extends Component {
 
     const typeName = type + 'ButtonStyle';
     const BodyComponentElement = bodyComponent ? bodyComponent : false;
-    console.log('a', this.state.start);
     return (
         <Animated.View
             ref={c => this._root = c}
