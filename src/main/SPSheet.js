@@ -1,7 +1,16 @@
 import React, {Component} from 'react';
-import {Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 // - StatusBar.currentHeight
-const HEIGHT = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
+import {Animated, BackHandler, Dimensions, Easing, Keyboard, PanResponder, Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
+
+const ANDROID_API_LEVEL = Platform.Version; // Android'de sayı, iOS'ta string gelir
+
+const HEIGHT =
+    Platform.OS === 'android'
+        ? ANDROID_API_LEVEL >= 29
+            ? Dimensions.get('window').height
+            : Dimensions.get('screen').height
+        : Dimensions.get('window').height;
+
 const WIDTH = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
 const minPopupHeight = 100;
