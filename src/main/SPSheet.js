@@ -55,6 +55,7 @@ class SPSheet extends Component {
 
     this.keyboardDidShow = this.keyboardDidShow.bind(this);
     this.keyboardDidHide = this.keyboardDidHide.bind(this);
+    this.handleBackButton = this.handleBackButton.bind(this);
   }
 
   static show({...config}) {
@@ -70,15 +71,19 @@ class SPSheet extends Component {
   }
 
   componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton());
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     this.keyboardDidShowSubscription = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
     this.keyboardDidHideSubscription = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', () => this.handleBackButton());
-    this.keyboardDidShowSubscription.remove();
-    this.keyboardDidHideSubscription.remove();
+    if (this.backHandler && typeof this.backHandler.remove === 'function') {
+      this.backHandler.remove();
+    } else {
+      BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+    this.keyboardDidShowSubscription?.remove?.();
+    this.keyboardDidHideSubscription?.remove?.();
 
   }
 
@@ -167,7 +172,7 @@ class SPSheet extends Component {
   }
 
   hidePopup() {
-    const {pan, closeDuration, onCloseComplete, positionPopup, open} = this.state;
+    const {pan, closeDuration, onCloseComplete, onClose, positionPopup, open} = this.state;
 
     if (open) {
       if (typeof onClose === 'function') {
