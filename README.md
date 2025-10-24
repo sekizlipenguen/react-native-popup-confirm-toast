@@ -196,7 +196,8 @@ import { Root, Toast } from '@sekizlipenguen/react-native-popup-confirm-toast'
     <Root>
         <View>
             <TouchableOpacity
-                onPress={() => 
+onPress = {()
+=>
                       Toast.show({
                           title: 'I\'m Eight!',
                           text: 'The best gift I received in this life are the codes. They are worlds inside the worlds.',
@@ -217,9 +218,9 @@ import { Root, Toast } from '@sekizlipenguen/react-native-popup-confirm-toast'
             >
                 <Text>Open Bottom Toast</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
-                onPress={() => 
+                onPress={() =>
                     Toast.show({
                       title: 'I\'m Eight!',
                       text: 'The best gift I received in this life are the codes. They are worlds inside the worlds.',
@@ -244,6 +245,85 @@ import { Root, Toast } from '@sekizlipenguen/react-native-popup-confirm-toast'
 
         </View>
     </Root>
+```
+
+### Drawer
+
+```javascript
+import {Root, Drawer} from '@sekizlipenguen/react-native-popup-confirm-toast'
+
+const DrawerContent = ({onClose}) => {
+  return (
+      <View style={{flex: 1, padding: 20}}>
+        <Text>Custom Drawer Content</Text>
+        <TouchableOpacity onPress={onClose}>
+          <Text>Close Drawer</Text>
+        </TouchableOpacity>
+      </View>
+  );
+};
+
+<Root>
+  <View>
+    <TouchableOpacity
+        onPress={() => {
+          Drawer.show({
+            component: DrawerContent,
+            position: 'left',
+            drawerWidth: 300,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            drawerColor: '#ffffff',
+            duration: 300,
+            backdropPressToClose: true,
+            onOpenComplete: () => {
+              console.log('Drawer opened');
+            },
+            onCloseComplete: () => {
+              console.log('Drawer closed');
+            },
+          });
+        }}
+    >
+      <Text>Open Left Drawer</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+        onPress={() => {
+          Drawer.show({
+            component: DrawerContent,
+            position: 'right',
+            drawerWidth: 280,
+          });
+        }}
+    >
+      <Text>Open Right Drawer</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+        onPress={() => {
+          Drawer.show({
+            component: DrawerContent,
+            position: 'top',
+            drawerWidth: 200,
+          });
+        }}
+    >
+      <Text>Open Top Drawer</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+        onPress={() => {
+          Drawer.show({
+            component: DrawerContent,
+            position: 'bottom',
+            drawerWidth: 250,
+          });
+        }}
+    >
+      <Text>Open Bottom Drawer</Text>
+    </TouchableOpacity>
+  </View>
+</Root>
 ```
 
 ## Features & Documentation
@@ -330,6 +410,22 @@ import { Root, Toast } from '@sekizlipenguen/react-native-popup-confirm-toast'
 | `onClose`                | function  | works after window is closed                      | null                                                          |
 | `onCloseComplete`        | function  | works after window is closed                      | null                                                          |
 
+### Drawer
+
+| Key                    | Type                     | Description                                        | Default            |
+|------------------------|--------------------------|----------------------------------------------------|--------------------|
+| `component`            | component(hook or class) | custom drawer component (receives onClose as prop) | null               |
+| `position`             | enum                     | enum(left, right, top, bottom)                     | left               |
+| `drawerWidth`          | number                   | width or height of drawer depending on position    | 80% of screen      |
+| `backgroundColor`      | string                   | backdrop background color                          | rgba(0, 0, 0, 0.5) |
+| `drawerColor`          | string                   | drawer background color                            | #ffffff            |
+| `duration`             | number                   | animation duration in milliseconds                 | 300(ms)            |
+| `backdropPressToClose` | boolean                  | close drawer when pressing backdrop                | true               |
+| `onOpen`               | function                 | works when the drawer starts opening               | null               |
+| `onOpenComplete`       | function                 | works after the drawer is fully opened             | null               |
+| `onClose`              | function                 | works when the drawer starts closing               | null               |
+| `onCloseComplete`      | function                 | works after the drawer is fully closed             | null               |
+
 ### Methods
 
 | Component Name | Method Name | Example                                                                | Description                         |
@@ -341,6 +437,8 @@ import { Root, Toast } from '@sekizlipenguen/react-native-popup-confirm-toast'
 | Popup          | hide        | const popup = Popup; popup.hide();                                     |                                     |
 | Toast          | show        | const toast = Toast; toast.show(config);                               |                                     |
 | Toast          | hide        | const toast = Toast; toast.hide();                                     |                                     |
+| Drawer         | show        | const drawer = Drawer; drawer.show(config);                            |                                     |
+| Drawer         | hide        | const drawer = Drawer; drawer.hide();                                  |                                     |
 
 ### Helper Function
 
