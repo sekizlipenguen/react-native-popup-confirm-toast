@@ -73,6 +73,21 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         keyboardHeightAdjustment?: boolean;
     }
 
+    // Drawer Config
+    export interface DrawerConfig {
+        position?: "left" | "right" | "top" | "bottom";
+        drawerWidth?: number;
+        drawerColor?: string;
+        backgroundColor?: string;
+        duration?: number;
+        backdropPressToClose?: boolean;
+        component?: FC<{ onClose: () => void }>;
+        onOpen?: () => void;
+        onOpenComplete?: () => void;
+        onClose?: () => void;
+        onCloseComplete?: () => void;
+    }
+
     export interface Toast {
         show: (config: ToastConfig) => void;
         hide: () => void;
@@ -89,6 +104,11 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         setHeight: (height: number, onComplete?: () => void) => void;
     }
 
+    export interface Drawer {
+        show: (config: DrawerConfig) => void;
+        hide: () => void;
+    }
+
     // Root Props Definition
     export interface RootProps {
         children?: ReactNode;
@@ -98,6 +118,7 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
     export const Toast: Toast;
     export const Popup: Popup;
     export const SPSheet: SPSheet;
+    export const Drawer: Drawer;
     export const Root: FC<RootProps>;
     export const getStatusBarHeight: () => number;
     export const isIPhoneWithMonobrow: () => boolean;
