@@ -16,6 +16,12 @@ A flexible and user-friendly popup, toast, and bottom sheet solution for React N
 |:----------------------:|:----------------------:|:----------------------:|:----------------------:|
 | ![](assets/popup6.gif) | ![](assets/popup5.gif) | ![](assets/popup7.gif) | ![](assets/popup8.gif) |
 
+## Example Drawer
+
+|       Drawer Left       |      Drawer Right       |       Drawer Top        |      Drawer Bottom      |
+|:-----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
+| ![](assets/drawer2.gif) | ![](assets/drawer1.gif) | ![](assets/drawer3.gif) | ![](assets/drawer4.gif) |
+
 ## Example Popup Message
 
 |    Example Message     | Example Confirm Message | Example Message AutoClose | Example Custom Body Component |
