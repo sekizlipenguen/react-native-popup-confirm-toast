@@ -247,6 +247,7 @@ class Toast extends Component {
                     flexDirection: 'row',
                     justifyContent: 'center',
                     flex: 1,
+                    position: 'relative',
                   },
                   exStyle,
                 ]}
@@ -280,17 +281,17 @@ class Toast extends Component {
                     )
                 }
               </View>
-              <Animated.View
-                  style={[
-                    styles.timing,
-                    {
-                      backgroundColor: timeColor,
-                      transform: [{translateX: this.state.time}],
-                    },
-                    (position === 'top' ? {bottom: -10} : {top: -10}),
-                  ]}
-              />
+
             </Animated.View>
+            <Animated.View
+                style={[
+                  styles.timing,
+                  {
+                    backgroundColor: timeColor,
+                    transform: [{translateX: this.state.time}],
+                  },
+                ]}
+            />
           </Animated.View>
         </>
     );
@@ -315,17 +316,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderWidth: 0,
     zIndex: 99999,
+    overflow: 'hidden',
   },
   timing: {
     height: 5,
     width: '100%',
     backgroundColor: defaultTimeColor,
     position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+
   },
   content: {
     flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
+    paddingBottom: 8,
     marginTop: 0,
   },
   title: {
@@ -352,4 +359,3 @@ const styles = StyleSheet.create({
 });
 
 export default Toast;
-
