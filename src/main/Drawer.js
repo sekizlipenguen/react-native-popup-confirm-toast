@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Animated, Dimensions, Easing, Platform, StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
+import {Animated, Dimensions, Easing, StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
 
 const defaultBackgroundColor = 'rgba(0, 0, 0, 0.5)';
 const defaultDrawerColor = '#ffffff';
@@ -11,8 +11,9 @@ class Drawer extends Component {
   constructor(props) {
     super(props);
 
-    this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
-    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
+    const {width, height} = Dimensions.get('window');
+    this.width = width;
+    this.height = height;
 
     this.defaultState = {
       backgroundColor: defaultBackgroundColor,
@@ -57,9 +58,7 @@ class Drawer extends Component {
 
   updateDimensions = () => {
     setTimeout(() => {
-      const {height, width} = Platform.OS === 'android'
-          ? Dimensions.get('screen')
-          : Dimensions.get('window');
+      const {width, height} = Dimensions.get('window');
 
       this.height = height;
       this.width = width;
