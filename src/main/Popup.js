@@ -83,6 +83,11 @@ class Popup extends Component {
   }
 
   startPopup() {
+    // Eğer popup zaten gösteriliyorsa veya start false ise, tekrar başlatma
+    if (this.state.show || !this.state.start) {
+      return;
+    }
+
     if (typeof this.state.onOpen == 'function') {
       return this.state.onOpen();
     }
@@ -228,11 +233,19 @@ class Popup extends Component {
               bodyComponentForce ? (
                   BodyComponentElement ? (
                       <BodyComponentElement {...this.props} onLayout={(event) => {
-                        if (event) {
+                        if (event && start && !this.state.show) {
                           const height = event.nativeEvent.layout.height;
-                          this.setState({popupHeight: height}, () => {
-                            this.startPopup();
-                          });
+                          // Eğer popupHeight zaten set edilmişse ve aynıysa, tekrar startPopup çağırma
+                          if (this.state.popupHeight !== height) {
+                            this.setState({popupHeight: height}, () => {
+                              this.startPopup();
+                            });
+                          } else if (this.state.popupHeight === 0) {
+                            // İlk kez set ediliyorsa
+                            this.setState({popupHeight: height}, () => {
+                              this.startPopup();
+                            });
+                          }
                         }
                       }}/>
                   ) : null
