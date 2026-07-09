@@ -1,3 +1,34 @@
+## [2.1.0] - 2026-07-10
+
+### Added
+
+- **Popup card animations** — `animation`: `slide` | `fade` | `fadeSlide` | `spring` | `none`; `from`: `bottom` | `top` | `left` | `right` | `center`. Mask stays static.
+- **Configurable mask color/opacity** (Popup + SPSheet) — `background`, `maskColor`, `maskOpacity` / `opacity`, or `mask: { color, opacity }`.
+- **Exports** — `POPUP_ANIMATIONS`, `POPUP_FROM`.
+- **Hook-based SPSheet** — core rewritten as `SPSheetHost` (hooks) with a thin class wrapper so `SPSheet.show` / `hide` / `setHeight` / `reportContentHeight` stay unchanged.
+- **Sheet animations** — `animation`: `slide` | `fade` | `fadeSlide` | `spring` | `none`.
+- **Entry direction** — `from`: `bottom` | `top` | `left` | `right` | `center`.
+- **Backdrop animation** — `backdropAnimation`: `fade` | `none` (or `{ type, duration, closeDuration }`).
+- **Detailed override** — `sheetAnimation: { type, from, duration, closeDuration, bounciness, speed }`.
+- **Exports** — `SHEET_ANIMATIONS`, `SHEET_FROM`, `BACKDROP_ANIMATIONS`, `LAYER_Z`.
+- **Popup portal** — when SPSheet Modal is open, `Popup` renders via `PopupPortal` + `OverlayBus` inside the sheet Modal (iOS cannot stack a second Modal reliably).
+- **`zIndex`** on sheet / popup for stacking inside the shared host (defaults: sheet `10`, popup `100`).
+- Richer `customStyles`: `backdrop`, `overlay`, `handle` in addition to container / drag styles.
+
+### Fixed
+
+- **Missing dim/mask again** — restored 2.0.0 Fabric-safe dim: static `backgroundColor` on Modal root overlay with explicit `WIDTH × HEIGHT`. Animated backdrop opacity removed (unreliable inside Modal).
+- **Popup mask missing over SPSheet** — portal dim now uses explicit `WIDTH×HEIGHT` + static `backgroundColor` (same Fabric-safe pattern as sheet). `OverlayBus.setHostActive` marks sheet Modal open so `Popup.show` portals immediately and stacks above the drawer.
+- **Mask tap not closing** — dim root is a full-screen `Pressable`; sheet is a nested `Pressable` so content taps do not bubble to dismiss. `closeOnPressMask` works again.
+- **Fabric crash** `Cannot assign to property 'state' which has only a getter` — removed `get state()` / `get open()` from the SPSheet class wrapper (React assigns `instance.state`). Use `isOpen()` / `getState()` instead.
+
+### Changed
+
+- Default open/close durations: `280` / `240` ms.
+- Backdrop dim uses native-driver opacity fade (sheet motion remains native-driver translate / opacity / scale).
+
+---
+
 ## [2.0.1] - 2026-07-09
 
 ### Fixed

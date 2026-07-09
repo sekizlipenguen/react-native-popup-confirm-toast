@@ -1,7 +1,7 @@
 {
   "name": "@sekizlipenguen/react-native-popup-confirm-toast",
-  "version": "2.0.1",
-  "description": "Popup, toast, action toast, bottom sheet (SPSheet), and drawer for React Native. Auto-height sheets, keyboard-aware, iOS/Android/Web.",
+  "version": "2.1.0",
+  "description": "Popup, toast, action toast, bottom sheet (SPSheet), and drawer for React Native. Hook-based SPSheet, animated Popup cards, configurable masks, Fabric-safe.",
   "main": "index.js",
   "types": "index.d.ts",
   "typings": "index.d.ts",

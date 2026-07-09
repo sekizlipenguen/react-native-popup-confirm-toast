@@ -2,16 +2,26 @@ import React, {Component} from 'react';
 import {
   Animated,
   Dimensions,
-  Easing,
   Image,
   Modal,
   Platform,
   Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import OverlayBus from './OverlayBus';
+import {DEFAULT_DIM, resolveMaskColor} from './shared/mask';
+import {
+  POPUP_ANIMATIONS,
+  POPUP_FROM,
+  buildPopupClose,
+  buildPopupOpen,
+  createPopupAnimValues,
+  getPopupTransformStyle,
+  resetPopupHidden,
+  resolvePopupAnimation,
+} from './popup/animations';
 
 const PRIMARY = '#D6001F';
 const PRIMARY_PRESSED = '#B8001A';
@@ -19,462 +29,758 @@ const TEXT_PRIMARY = '#111111';
 const TEXT_SECONDARY = '#666666';
 const BORDER = '#E5E5E5';
 const SURFACE = '#FFFFFF';
-const DEFAULT_DIM = 'rgba(0, 0, 0, 0.5)';
+/** Default above SPSheet (sheet=10). Pass `zIndex` in Popup.show to override. */
+const DEFAULT_POPUP_Z = 100;
+
+function getWindowSize() {
+  const screen = Dimensions.get(Platform.OS === 'android' ? 'screen' : 'window');
+  return {width: screen.width, height: screen.height};
+}
+
+/** Presentational card — used by Modal host and by in-sheet portal. */
+export function PopupCard({
+  title,
+  textBody,
+  type,
+  iconEnabled,
+  icon,
+  iconHeaderStyle,
+  titleTextStyle,
+  descTextStyle,
+  bodyComponent: BodyComponent,
+  bodyComponentForce,
+  modalContainerStyle,
+  buttonEnabled,
+  buttonText,
+  confirmText,
+  buttonContentStyle,
+  okButtonStyle,
+  confirmButtonStyle,
+  okButtonTextStyle,
+  confirmButtonTextStyle,
+  onPrimaryPress,
+  onCancelPress,
+  extraProps,
+}) {
+  const resolveIcon = () => {
+    if (icon) {
+      return icon;
+    }
+    switch (type) {
+      case 'success':
+        return require('../assets/success.png');
+      case 'danger':
+      case 'error':
+        return require('../assets/error.png');
+      case 'warning':
+      case 'confirm':
+      default:
+        return require('../assets/warning.png');
+    }
+  };
+
+  if (bodyComponentForce && BodyComponent) {
+    return (
+      <View style={[styles.card, modalContainerStyle]} testID="popup-card">
+        <BodyComponent {...(extraProps || {})} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.card, modalContainerStyle]} testID="popup-card">
+      {iconEnabled ? (
+        <View style={styles.iconWrap}>
+          <View style={[styles.iconSpacer, iconHeaderStyle]} />
+          <Image source={resolveIcon()} resizeMode="contain" style={styles.icon} />
+        </View>
+      ) : null}
+
+      <View style={[styles.content, !iconEnabled && styles.contentCompact]}>
+        {title ? (
+          <Text style={[styles.title, titleTextStyle]} testID="popup-title">
+            {title}
+          </Text>
+        ) : null}
+        {textBody ? (
+          <Text style={[styles.desc, descTextStyle]} testID="popup-body">
+            {textBody}
+          </Text>
+        ) : null}
+        {BodyComponent ? <BodyComponent {...(extraProps || {})} /> : null}
+
+        {buttonEnabled ? (
+          type === 'confirm' ? (
+            <View style={[styles.buttonRow, buttonContentStyle]} testID="popup-confirm-buttons">
+              <Pressable
+                testID="popup-cancel-button"
+                style={({pressed}) => [
+                  styles.button,
+                  styles.cancelButton,
+                  confirmButtonStyle,
+                  pressed && styles.cancelPressed,
+                ]}
+                onPress={onCancelPress}
+              >
+                <Text style={[styles.cancelText, confirmButtonTextStyle]} numberOfLines={1}>
+                  {confirmText}
+                </Text>
+              </Pressable>
+              <Pressable
+                testID="popup-ok-button"
+                style={({pressed}) => [
+                  styles.button,
+                  styles.primaryButton,
+                  okButtonStyle,
+                  pressed && styles.primaryPressed,
+                ]}
+                onPress={onPrimaryPress}
+              >
+                <Text style={[styles.primaryText, okButtonTextStyle]} numberOfLines={1}>
+                  {buttonText}
+                </Text>
+              </Pressable>
+            </View>
+          ) : (
+            <View style={[styles.buttonRow, styles.buttonRowSingle, buttonContentStyle]}>
+              <Pressable
+                testID="popup-ok-button"
+                style={({pressed}) => [
+                  styles.button,
+                  styles.primaryButton,
+                  okButtonStyle,
+                  pressed && styles.primaryPressed,
+                ]}
+                onPress={onPrimaryPress}
+              >
+                <Text style={[styles.primaryText, okButtonTextStyle]} numberOfLines={1}>
+                  {buttonText}
+                </Text>
+              </Pressable>
+            </View>
+          )
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Animated card wrapper — mask stays static; only the card moves/fades.
+ */
+class AnimatedPopupCard extends Component {
+  constructor(props) {
+    super(props);
+    this.values = createPopupAnimValues();
+    this.closing = false;
+    this.animKey = 0;
+  }
+
+  componentDidMount() {
+    this.playOpen();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.dismissToken !== prevProps.dismissToken && this.props.dismissToken) {
+      this.playClose();
+      return;
+    }
+    if (this.props.animKey !== prevProps.animKey) {
+      this.playOpen();
+    }
+  }
+
+  playOpen = () => {
+    this.closing = false;
+    const anim = resolvePopupAnimation(this.props.config || {});
+    resetPopupHidden(this.values, anim);
+    const driver = buildPopupOpen(this.values, anim);
+    if (driver) {
+      driver.start();
+    }
+  };
+
+  playClose = () => {
+    if (this.closing) {
+      return;
+    }
+    this.closing = true;
+    const anim = resolvePopupAnimation(this.props.config || {});
+    const driver = buildPopupClose(this.values, anim);
+    const finish = () => {
+      this.closing = false;
+      if (typeof this.props.onCloseAnimationComplete === 'function') {
+        this.props.onCloseAnimationComplete();
+      }
+    };
+    if (driver) {
+      driver.start(finish);
+    } else {
+      finish();
+    }
+  };
+
+  render() {
+    const {config, onPrimaryPress, onCancelPress, extraProps} = this.props;
+    return (
+      <Animated.View style={getPopupTransformStyle(this.values)}>
+        <PopupCard
+          {...config}
+          onPrimaryPress={onPrimaryPress}
+          onCancelPress={onCancelPress}
+          extraProps={extraProps}
+        />
+      </Animated.View>
+    );
+  }
+}
+
+/**
+ * Renders inside SPSheet Modal so alerts appear above the sheet on iOS.
+ * Dim: Fabric-safe static color. Card: animated.
+ */
+export class PopupPortal extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      config: OverlayBus.get(),
+      dismissToken: 0,
+      animKey: 0,
+    };
+  }
+
+  componentDidMount() {
+    this.unsubscribe = OverlayBus.subscribe(config => {
+      if (!config) {
+        this.setState({config: null, dismissToken: 0});
+        return;
+      }
+      if (config.__dismissing) {
+        this.setState(prev => ({
+          config: {...config, __dismissing: undefined},
+          dismissToken: prev.dismissToken + 1,
+        }));
+        return;
+      }
+      this.setState(prev => ({
+        config,
+        animKey: prev.animKey + 1,
+        dismissToken: 0,
+      }));
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe?.();
+  }
+
+  onPrimaryPress = () => {
+    const config = this.state.config;
+    if (!config) {
+      return;
+    }
+    if (typeof config.callback === 'function') {
+      config.callback();
+      return;
+    }
+    Popup.hide();
+  };
+
+  onCancelPress = () => {
+    const config = this.state.config;
+    if (!config) {
+      return;
+    }
+    if (typeof config.cancelCallback === 'function') {
+      config.cancelCallback();
+      return;
+    }
+    Popup.hide();
+  };
+
+  onCloseAnimationComplete = () => {
+    Popup.finishDismiss();
+  };
+
+  render() {
+    const {config, dismissToken, animKey} = this.state;
+    if (!config) {
+      return null;
+    }
+
+    const dimColor = resolveMaskColor(config);
+    const layerZ = Number.isFinite(config.zIndex) ? config.zIndex : DEFAULT_POPUP_Z;
+    const {width, height} = getWindowSize();
+    const closeOnPressMask = config.closeOnPressMask !== false;
+
+    return (
+      <View
+        style={[
+          styles.portalRoot,
+          {
+            width,
+            height,
+            zIndex: layerZ,
+            elevation: Math.max(40, layerZ),
+          },
+        ]}
+        testID="popup-root"
+        pointerEvents="box-none"
+        collapsable={false}
+      >
+        {/* Static mask — color/opacity from config; NEVER animated */}
+        <Pressable
+          testID="popup-mask"
+          accessibilityRole="button"
+          accessibilityLabel="Close popup"
+          pointerEvents="auto"
+          disabled={!closeOnPressMask}
+          onPress={() => {
+            if (closeOnPressMask) {
+              Popup.hide();
+            }
+          }}
+          style={[
+            styles.portalDim,
+            {
+              width,
+              height,
+              backgroundColor: dimColor,
+            },
+          ]}
+        />
+        <View style={styles.portalCenter} pointerEvents="box-none">
+          <AnimatedPopupCard
+            config={config}
+            animKey={animKey}
+            dismissToken={dismissToken}
+            onPrimaryPress={this.onPrimaryPress}
+            onCancelPress={this.onCancelPress}
+            onCloseAnimationComplete={this.onCloseAnimationComplete}
+          />
+        </View>
+      </View>
+    );
+  }
+}
 
 class Popup extends Component {
   static popupInstance;
+  static POPUP_ANIMATIONS = POPUP_ANIMATIONS;
+  static POPUP_FROM = POPUP_FROM;
 
   constructor(props) {
     super(props);
 
-    this.height = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
-    this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
+    const {width, height} = getWindowSize();
+    this.width = width;
+    this.height = height;
+    this.autoHideTimer = null;
+    this.pendingCloseComplete = null;
+    this.modalAnimKey = 0;
+    this.modalDismissToken = 0;
+    this.state = this.createIdleState();
+  }
 
-    // Only the card slides. Dim is a static backgroundColor (Fabric-safe).
-    this.positionPopup = new Animated.Value(this.height);
-
-    this.defaultState = {
-      popupHeight: 0,
-      title: false,
+  createIdleState() {
+    return {
+      open: false,
+      title: '',
       type: 'warning',
       buttonEnabled: true,
-      textBody: false,
-      bodyComponent: false,
+      textBody: '',
+      bodyComponent: null,
       bodyComponentForce: false,
       buttonText: 'Ok',
       confirmText: 'Cancel',
-      callback: () => this.hidePopup(),
-      cancelCallback: () => this.hidePopup(),
+      callback: null,
+      cancelCallback: null,
       background: DEFAULT_DIM,
+      maskColor: null,
+      maskOpacity: null,
+      mask: null,
       timing: 0,
       iconEnabled: true,
-      icon: false,
-      iconHeaderStyle: false,
-      containerStyle: false,
-      modalContainerStyle: false,
-      buttonContentStyle: false,
-      okButtonStyle: false,
-      confirmButtonStyle: false,
-      okButtonTextStyle: false,
-      confirmButtonTextStyle: false,
-      titleTextStyle: false,
-      descTextStyle: false,
-      start: false,
-      useNativeDriver: true,
-      bounciness: 12,
-      onClose: false,
-      onCloseComplete: false,
-      onOpenComplete: false,
-      onOpen: false,
-      duration: 180,
-      closeDuration: 160,
-      show: false,
-      open: false,
+      icon: null,
+      iconHeaderStyle: null,
+      containerStyle: null,
+      modalContainerStyle: null,
+      buttonContentStyle: null,
+      okButtonStyle: null,
+      confirmButtonStyle: null,
+      okButtonTextStyle: null,
+      confirmButtonTextStyle: null,
+      titleTextStyle: null,
+      descTextStyle: null,
+      onOpen: null,
+      onOpenComplete: null,
+      onClose: null,
+      onCloseComplete: null,
+      zIndex: DEFAULT_POPUP_Z,
+      viaPortal: false,
+      closeOnPressMask: true,
+      // Card animation
+      animation: POPUP_ANIMATIONS.fadeSlide,
+      from: POPUP_FROM.center,
+      duration: 260,
+      closeDuration: 200,
+      bounciness: 8,
+      speed: 12,
+      popupAnimation: null,
+      animKey: 0,
+      dismissToken: 0,
     };
-
-    this.state = {...this.defaultState};
-    this.openAnimationInProgress = false;
-    this.closeAnimationInProgress = false;
-    this.measureFallbackTimer = null;
-    this.autoHideTimer = null;
-
-    this.updateDimensions = this.updateDimensions.bind(this);
   }
 
-  static show({...config}) {
-    this.popupInstance.start(config);
+  static show(config = {}) {
+    if (!this.popupInstance) {
+      console.warn('[Popup] Root is not mounted yet');
+      return;
+    }
+    this.popupInstance.present(config);
   }
 
   static hide() {
-    this.popupInstance.hidePopup();
+    this.popupInstance?.dismiss();
+  }
+
+  /** Called by portal / modal card after close animation finishes. */
+  static finishDismiss() {
+    this.popupInstance?.completeDismiss();
   }
 
   componentDidMount() {
-    this.dimensionsSubscription = Dimensions.addEventListener('change', this.updateDimensions);
+    this.dimensionsSubscription = Dimensions.addEventListener('change', this.onDimensionsChange);
   }
 
   componentWillUnmount() {
     this.dimensionsSubscription?.remove?.();
-    this.clearTimers();
+    this.clearAutoHide();
   }
 
-  clearTimers() {
-    if (this.measureFallbackTimer) {
-      clearTimeout(this.measureFallbackTimer);
-      this.measureFallbackTimer = null;
+  onDimensionsChange = () => {
+    const {width, height} = getWindowSize();
+    this.width = width;
+    this.height = height;
+    if (this.state.open) {
+      this.forceUpdate();
     }
+  };
+
+  clearAutoHide() {
     if (this.autoHideTimer) {
       clearTimeout(this.autoHideTimer);
       this.autoHideTimer = null;
     }
   }
 
-  start({...config}) {
+  normalizeConfig(config = {}) {
     const type = config.type || 'warning';
-    const nextConfig = {...config};
+    const next = {...config};
 
-    if (nextConfig.confirmText == null && nextConfig.cancelButtonText != null) {
-      nextConfig.confirmText = nextConfig.cancelButtonText;
+    if (next.confirmText == null && next.cancelButtonText != null) {
+      next.confirmText = next.cancelButtonText;
+    }
+    if (type === 'confirm' && next.iconEnabled === undefined) {
+      next.iconEnabled = false;
     }
 
-    if (type === 'confirm' && nextConfig.iconEnabled === undefined) {
-      nextConfig.iconEnabled = false;
-    }
+    const anim = resolvePopupAnimation(next);
 
-    this.clearTimers();
-    this.closeAnimationInProgress = false;
-    this.openAnimationInProgress = false;
-    this.positionPopup.setValue(this.height);
-
-    this.setState({
-      ...this.defaultState,
-      ...nextConfig,
+    return {
+      ...this.createIdleState(),
+      ...next,
       type,
-      start: true,
-      show: false,
       open: true,
-      popupHeight: 0,
-    }, () => {
-      // If onLayout is delayed inside Modal, still open with a fallback height.
-      this.measureFallbackTimer = setTimeout(() => {
-        if (this.state.open && this.state.start && !this.state.show && !this.openAnimationInProgress) {
-          const fallbackHeight = this.state.popupHeight > 0 ? this.state.popupHeight : 220;
-          this.setState({popupHeight: fallbackHeight}, () => this.startPopup());
-        }
-      }, 80);
-    });
+      title: next.title || '',
+      textBody: next.textBody || '',
+      buttonText: next.buttonText || 'Ok',
+      confirmText: next.confirmText || 'Cancel',
+      background: next.background || DEFAULT_DIM,
+      maskColor: next.maskColor ?? null,
+      maskOpacity: next.maskOpacity ?? next.opacity ?? null,
+      mask: next.mask && typeof next.mask === 'object' ? next.mask : null,
+      iconEnabled: next.iconEnabled !== false,
+      buttonEnabled: next.buttonEnabled !== false,
+      bodyComponent: next.bodyComponent || null,
+      bodyComponentForce: next.bodyComponentForce === true,
+      zIndex: Number.isFinite(next.zIndex) ? next.zIndex : DEFAULT_POPUP_Z,
+      closeOnPressMask: next.closeOnPressMask !== false,
+      animation: anim.type,
+      from: anim.from,
+      duration: anim.duration,
+      closeDuration: anim.closeDuration,
+      bounciness: anim.bounciness,
+      speed: anim.speed,
+    };
   }
 
-  startPopup() {
-    if (this.state.show || !this.state.start || this.openAnimationInProgress || this.closeAnimationInProgress) {
+  present(config = {}) {
+    this.clearAutoHide();
+    this.pendingCloseComplete = null;
+    const normalized = this.normalizeConfig(config);
+
+    const usePortal = OverlayBus.isHostActive() || OverlayBus.hasListener();
+
+    if (usePortal) {
+      normalized.viaPortal = true;
+      normalized.open = false;
+      this.modalAnimKey += 1;
+      this.setState(normalized, () => {
+        OverlayBus.show(normalized);
+        if (typeof normalized.onOpen === 'function') {
+          normalized.onOpen();
+        }
+        if (typeof normalized.onOpenComplete === 'function') {
+          normalized.onOpenComplete();
+        }
+        if (normalized.timing) {
+          const ms = normalized.timing > 0 ? normalized.timing : 5000;
+          this.autoHideTimer = setTimeout(() => this.dismiss(), ms);
+        }
+      });
       return;
     }
 
-    this.openAnimationInProgress = true;
-    this.clearTimers();
-
-    if (typeof this.state.onOpen === 'function') {
-      this.state.onOpen();
-    }
-
-    const targetY = Math.max(40, (this.height / 2) - (this.state.popupHeight / 2));
-
-    // Keep open=true for the whole animation so Modal stays mounted.
-    this.setState({start: false}, () => {
-      this.positionPopup.setValue(this.height);
-
-      Animated.spring(this.positionPopup, {
-        toValue: targetY,
-        bounciness: this.state.bounciness,
-        speed: 14,
-        useNativeDriver: true,
-      }).start(({finished}) => {
-        this.openAnimationInProgress = false;
-        if (!finished || !this.state.open) {
-          return;
-        }
-
-        this.setState({show: true}, () => {
-          if (typeof this.state.onOpenComplete === 'function') {
-            this.state.onOpenComplete();
-          }
-        });
-      });
-
-      if (this.state.timing !== 0) {
-        const duration = this.state.timing > 0 ? this.state.timing : 5000;
-        this.autoHideTimer = setTimeout(() => this.hidePopup(), duration);
+    OverlayBus.hide();
+    normalized.viaPortal = false;
+    this.modalAnimKey += 1;
+    normalized.animKey = this.modalAnimKey;
+    normalized.dismissToken = 0;
+    this.setState(normalized, () => {
+      if (typeof this.state.onOpen === 'function') {
+        this.state.onOpen();
+      }
+      if (typeof this.state.onOpenComplete === 'function') {
+        this.state.onOpenComplete();
+      }
+      if (this.state.timing) {
+        const ms = this.state.timing > 0 ? this.state.timing : 5000;
+        this.autoHideTimer = setTimeout(() => this.dismiss(), ms);
       }
     });
   }
 
-  hidePopup() {
-    const {onCloseComplete, onClose, open} = this.state;
-    if (!open || this.closeAnimationInProgress) {
+  dismiss = () => {
+    const wasOpen = this.state.open || this.state.viaPortal;
+    if (!wasOpen && !OverlayBus.get()) {
       return;
     }
 
-    this.closeAnimationInProgress = true;
-    this.openAnimationInProgress = false;
-    this.clearTimers();
+    this.clearAutoHide();
+    const {onClose, onCloseComplete, viaPortal} = this.state;
+    this.pendingCloseComplete = onCloseComplete;
 
     if (typeof onClose === 'function') {
       onClose();
     }
 
-    this.positionPopup.stopAnimation();
-
-    Animated.timing(this.positionPopup, {
-      toValue: this.height,
-      duration: this.state.closeDuration,
-      easing: Easing.in(Easing.cubic),
-      useNativeDriver: true,
-    }).start(() => {
-      this.closeAnimationInProgress = false;
-      this.positionPopup.setValue(this.height);
-      this.setState({...this.defaultState}, () => {
-        if (typeof onCloseComplete === 'function') {
-          onCloseComplete();
-        }
-      });
-    });
-  }
-
-  handleImage(type) {
-    switch (type) {
-      case 'success':
-        return this.state.icon || require('../assets/success.png');
-      case 'danger':
-        return this.state.icon || require('../assets/error.png');
-      case 'warning':
-        return this.state.icon || require('../assets/warning.png');
-      case 'confirm':
-        return this.state.icon || require('../assets/warning.png');
-      default:
-        return this.state.icon || require('../assets/warning.png');
+    // Sheet already tearing down / bus cleared — skip card exit anim.
+    if (viaPortal && !OverlayBus.get() && !OverlayBus.isHostActive()) {
+      this.completeDismiss();
+      return;
     }
-  }
 
-  updateDimensions = () => {
-    setTimeout(() => {
-      const {height, width} = Platform.OS === 'android'
-        ? Dimensions.get('screen')
-        : Dimensions.get('window');
+    if (viaPortal || (OverlayBus.isHostActive() && OverlayBus.get())) {
+      const current = OverlayBus.get() || this.state;
+      OverlayBus.show({...current, __dismissing: true});
+      return;
+    }
 
-      this.height = height;
-      this.width = width;
-      this.setState({});
-    }, 100);
+    // Modal path — animate card out, then unmount
+    this.modalDismissToken += 1;
+    this.setState({dismissToken: this.modalDismissToken});
   };
 
-  renderConfirmButtons(callback, cancelCallback, buttonText, confirmText) {
-    return (
-      <View style={[styles.buttonRow, this.state.buttonContentStyle]}>
-        <Pressable
-          style={({pressed}) => [
-            styles.Button,
-            styles.cancelOutline,
-            this.state.confirmButtonStyle,
-            pressed && styles.cancelOutlinePressed,
-          ]}
-          android_ripple={{color: 'rgba(17, 17, 17, 0.08)'}}
-          onPress={() => {
-            if (typeof cancelCallback === 'function') {
-              cancelCallback();
-            } else {
-              this.hidePopup();
-            }
-          }}
-        >
-          <Text style={[styles.cancelText, this.state.confirmButtonTextStyle]} numberOfLines={1}>
-            {confirmText}
-          </Text>
-        </Pressable>
+  completeDismiss = () => {
+    OverlayBus.hide();
+    const onCloseComplete = this.pendingCloseComplete;
+    this.pendingCloseComplete = null;
+    this.setState(this.createIdleState(), () => {
+      if (typeof onCloseComplete === 'function') {
+        onCloseComplete();
+      }
+    });
+  };
 
-        <Pressable
-          style={({pressed}) => [
-            styles.Button,
-            styles.primaryButton,
-            this.state.okButtonStyle,
-            pressed && styles.primaryButtonPressed,
-          ]}
-          android_ripple={{color: 'rgba(255, 255, 255, 0.2)'}}
-          onPress={() => {
-            if (typeof callback === 'function') {
-              callback();
-            }
-          }}
-        >
-          <Text style={[styles.primaryText, this.state.okButtonTextStyle]} numberOfLines={1}>
-            {buttonText}
-          </Text>
-        </Pressable>
-      </View>
-    );
-  }
+  start = (config) => {
+    this.present(config);
+  };
+
+  hidePopup = () => {
+    this.dismiss();
+  };
+
+  onPrimaryPress = () => {
+    const {callback} = this.state;
+    if (typeof callback === 'function') {
+      callback();
+      return;
+    }
+    this.dismiss();
+  };
+
+  onCancelPress = () => {
+    const {cancelCallback} = this.state;
+    if (typeof cancelCallback === 'function') {
+      cancelCallback();
+      return;
+    }
+    this.dismiss();
+  };
 
   render() {
     const {
-      title,
-      type,
-      textBody,
-      buttonEnabled,
-      buttonText,
-      confirmText,
-      callback,
-      cancelCallback,
-      background,
-      iconEnabled,
-      iconHeaderStyle,
-      start,
-      show,
       open,
-      bodyComponent,
       containerStyle,
-      modalContainerStyle,
-      bodyComponentForce,
+      viaPortal,
+      animKey,
+      dismissToken,
+      closeOnPressMask,
     } = this.state;
 
-    const typeName = type + 'ButtonStyle';
-    const BodyComponentElement = bodyComponent ? bodyComponent : false;
-    const isConfirm = type === 'confirm';
-    const dimColor = background && background !== 'transparent' ? background : DEFAULT_DIM;
+    if (viaPortal || !open) {
+      return null;
+    }
+
+    const dimColor = resolveMaskColor(this.state);
 
     return (
-      <View style={styles.modalHost} pointerEvents="box-none">
-        <Modal
-          visible={open === true}
-          transparent
-          animationType="none"
-          presentationStyle="overFullScreen"
-          statusBarTranslucent
-          hardwareAccelerated
-          onRequestClose={() => this.hidePopup()}
+      <Modal
+        visible
+        transparent
+        animationType="none"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent
+        hardwareAccelerated
+        onRequestClose={this.dismiss}
+      >
+        <View
+          testID="popup-root"
+          style={[
+            styles.root,
+            {
+              width: this.width,
+              height: this.height,
+            },
+            containerStyle,
+          ]}
         >
-          {/*
-            Static dim (no Animated opacity) — same Fabric-safe pattern as SPSheet.
-            Nested Modal stacks above SPSheet so alerts from sheets are visible.
-          */}
-          <View
-            collapsable={false}
-            pointerEvents={show || start ? 'auto' : 'box-none'}
+          {/* Static mask — never animated */}
+          <Pressable
+            testID="popup-mask"
+            accessibilityRole="button"
+            accessibilityLabel="Close popup"
+            disabled={closeOnPressMask === false}
+            onPress={() => {
+              if (closeOnPressMask !== false) {
+                this.dismiss();
+              }
+            }}
             style={[
-              styles.Container,
+              styles.modalDim,
               {
                 width: this.width,
                 height: this.height,
                 backgroundColor: dimColor,
               },
-              containerStyle,
             ]}
-          >
-            <Animated.View
-              onLayout={event => {
-                if (!start || bodyComponentForce || this.openAnimationInProgress || show) {
-                  return;
-                }
-                const height = event.nativeEvent.layout.height;
-                if (!height) {
-                  return;
-                }
-                this.setState({popupHeight: height}, () => this.startPopup());
-              }}
-              style={[
-                styles.Message,
-                this.state.popupHeight > 0 ? {minHeight: this.state.popupHeight} : null,
-                modalContainerStyle,
-                {transform: [{translateY: this.positionPopup}]},
-              ]}
-              pointerEvents={show || start ? 'auto' : 'box-none'}
-            >
-              {bodyComponentForce ? (
-                BodyComponentElement ? (
-                  <BodyComponentElement
-                    {...this.props}
-                    onLayout={event => {
-                      if (!event || !start || this.state.show || this.openAnimationInProgress) {
-                        return;
-                      }
-                      const height = event.nativeEvent.layout.height;
-                      if (!height) {
-                        return;
-                      }
-                      this.setState({popupHeight: height}, () => this.startPopup());
-                    }}
-                  />
-                ) : null
-              ) : (
-                <>
-                  {iconEnabled ? (
-                    <>
-                      <View style={[styles.Header, iconHeaderStyle]} />
-                      <Image
-                        source={this.handleImage(type)}
-                        resizeMode="contain"
-                        style={styles.Image}
-                      />
-                    </>
-                  ) : null}
-                  <View style={[styles.Content, !iconEnabled && styles.contentCompact]}>
-                    {title && title.length > 0 ? (
-                      <Text style={[styles.Title, this.state.titleTextStyle]}>{title}</Text>
-                    ) : null}
-                    {textBody ? (
-                      <Text style={[styles.Desc, this.state.descTextStyle]}>{textBody}</Text>
-                    ) : null}
-                    {BodyComponentElement ? <BodyComponentElement {...this.props} /> : null}
-                    {isConfirm ? (
-                      this.renderConfirmButtons(callback, cancelCallback, buttonText, confirmText)
-                    ) : (
-                      <View style={[styles.buttonRow, styles.buttonRowSingle, this.state.buttonContentStyle]}>
-                        {buttonEnabled ? (
-                          <TouchableOpacity
-                            style={[styles.Button, styles[typeName], styles.primaryButton, this.state.okButtonStyle]}
-                            activeOpacity={0.85}
-                            onPress={() => {
-                              if (typeof callback === 'function') {
-                                callback();
-                              }
-                            }}
-                          >
-                            <Text style={[styles.primaryText, this.state.okButtonTextStyle]}>{buttonText}</Text>
-                          </TouchableOpacity>
-                        ) : null}
-                      </View>
-                    )}
-                  </View>
-                </>
-              )}
-            </Animated.View>
+          />
+          <View style={styles.center} pointerEvents="box-none">
+            <AnimatedPopupCard
+              config={this.state}
+              animKey={animKey}
+              dismissToken={dismissToken}
+              onPrimaryPress={this.onPrimaryPress}
+              onCancelPress={this.onCancelPress}
+              onCloseAnimationComplete={this.completeDismiss}
+              extraProps={this.props}
+            />
           </View>
-        </Modal>
-      </View>
+        </View>
+      </Modal>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  modalHost: {},
-  Container: {
+  root: {
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'flex-start',
   },
-  Message: {
-    width: '88%',
+  modalDim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  center: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    zIndex: 2,
+  },
+  portalRoot: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  portalDim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  portalCenter: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    zIndex: 2,
+  },
+  card: {
+    width: '100%',
     maxWidth: 360,
     backgroundColor: SURFACE,
     borderRadius: 20,
-    alignItems: 'center',
     overflow: 'hidden',
-    position: 'absolute',
-    left: '6%',
+    alignItems: 'center',
+    zIndex: 3,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 8},
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.14,
     shadowRadius: 24,
-    elevation: 12,
+    elevation: 24,
   },
-  Content: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 24,
+  iconWrap: {
     width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  contentCompact: {
-    paddingTop: 24,
-  },
-  Header: {
+  iconSpacer: {
     height: 72,
     width: 100,
     backgroundColor: SURFACE,
   },
-  Image: {
+  icon: {
     width: 44,
     height: 44,
     position: 'absolute',
     top: 20,
   },
-  Title: {
+  content: {
+    width: '100%',
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 24,
+  },
+  contentCompact: {
+    paddingTop: 24,
+  },
+  title: {
     color: TEXT_PRIMARY,
     fontSize: 20,
     fontWeight: '700',
@@ -482,7 +788,7 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     marginBottom: 8,
   },
-  Desc: {
+  desc: {
     color: TEXT_SECONDARY,
     fontSize: 15,
     fontWeight: '400',
@@ -498,7 +804,7 @@ const styles = StyleSheet.create({
   buttonRowSingle: {
     marginTop: 20,
   },
-  Button: {
+  button: {
     flex: 1,
     minHeight: 48,
     justifyContent: 'center',
@@ -509,25 +815,22 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: PRIMARY,
   },
-  primaryButtonPressed: {
+  primaryPressed: {
     backgroundColor: PRIMARY_PRESSED,
-    opacity: 0.92,
   },
   primaryText: {
-    color: '#ffffff',
+    color: '#fff',
     fontSize: 15,
     fontWeight: '700',
     textAlign: 'center',
   },
-  cancelOutline: {
+  cancelButton: {
     backgroundColor: SURFACE,
     borderWidth: 1,
     borderColor: BORDER,
   },
-  cancelOutlinePressed: {
+  cancelPressed: {
     backgroundColor: '#F0F0F0',
-    borderColor: '#D0D0D0',
-    opacity: 0.82,
   },
   cancelText: {
     color: TEXT_PRIMARY,
@@ -535,20 +838,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  successButtonStyle: {
-    backgroundColor: PRIMARY,
-  },
-  dangerButtonStyle: {
-    backgroundColor: PRIMARY,
-  },
-  warningButtonStyle: {
-    backgroundColor: PRIMARY,
-  },
-  confirmButtonStyle: {
-    backgroundColor: SURFACE,
-    borderWidth: 1,
-    borderColor: BORDER,
-  },
 });
 
+export {POPUP_ANIMATIONS, POPUP_FROM};
 export default Popup;

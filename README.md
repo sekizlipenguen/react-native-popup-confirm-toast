@@ -65,9 +65,11 @@ ActionToast.hide();
 | `onClose` | function | Fired when toast hides | `null` |
 | `styles` | object | `{ wrap, bar, actionButton, message, closeButton }` | `{}` |
 
-## SPSheet (v2.0)
+## SPSheet (v2.1)
 
-Bottom sheet with **auto height**, **measure-before-open**, and **keyboard-aware** positioning.
+Hook-based sheet with **auto height**, **measure-before-open**, **keyboard-aware** positioning, and **customizable sheet open/close animations**.
+
+> **Fabric note:** The dim/mask uses a **static** `backgroundColor` on the Modal root (`WIDTH × HEIGHT`). Sheet motion (slide / fade / spring) still animates with the native driver. This is intentional — Animated opacity on the dim is unreliable inside RN Modal on New Architecture.
 
 ### Quick start — fixed height
 
@@ -75,8 +77,145 @@ Bottom sheet with **auto height**, **measure-before-open**, and **keyboard-aware
 SPSheet.show({
   height: 320,
   dragTopOnly: true,
+  closeOnPressMask: true, // tap dim to close (default)
+  closeOnDragDown: true,  // swipe handle / sheet to close (default)
   component: MySheetBody,
 });
+```
+
+### Animations
+
+```javascript
+import {
+  SPSheet,
+  SHEET_ANIMATIONS,
+  SHEET_FROM,
+  BACKDROP_ANIMATIONS,
+  LAYER_Z,
+} from '@sekizlipenguen/react-native-popup-confirm-toast';
+
+// Classic bottom sheet (default)
+SPSheet.show({
+  height: 360,
+  animation: SHEET_ANIMATIONS.slide, // slide | fade | fadeSlide | spring | none
+  from: SHEET_FROM.bottom,           // bottom | top | left | right | center
+  backdropAnimation: BACKDROP_ANIMATIONS.none, // API kept; dim is static on Fabric
+  closeOnPressMask: true,
+  component: MySheetBody,
+});
+
+// Fade + slide from top
+SPSheet.show({
+  height: 280,
+  animation: 'fadeSlide',
+  from: 'top',
+  duration: 320,
+  closeDuration: 220,
+  component: MySheetBody,
+});
+
+// Center modal-style sheet with spring
+SPSheet.show({
+  autoHeight: true,
+  animation: 'spring',
+  from: 'center',
+  bounciness: 8,
+  speed: 12,
+  component: MySheetBody,
+});
+
+// Detailed override
+SPSheet.show({
+  height: 400,
+  sheetAnimation: {
+    type: 'spring',
+    from: 'bottom',
+    duration: 300,
+    closeDuration: 220,
+    bounciness: 6,
+    speed: 14,
+  },
+  zIndex: LAYER_Z.sheet, // default 10; Popup uses 100 so alerts cover the sheet
+  component: MySheetBody,
+});
+```
+
+### Popup above SPSheet
+
+When a sheet is open, `Popup.show()` does **not** open a second Modal (iOS often fails). Instead it portals into the sheet Modal:
+
+- Popup gets its own full-screen dim **above** the drawer
+- Default `zIndex`: sheet `10`, popup `100` (`LAYER_Z`)
+- Closing the popup leaves the sheet open; closing the sheet also clears any portal popup
+
+```javascript
+SPSheet.show({ autoHeight: true, component: ReviewForm });
+// later, from inside the sheet:
+Popup.show({ type: 'warning', title: 'Uyarı', textBody: 'Yorum en az 20 karakter olmalı' });
+```
+
+### Popup card animations + mask config
+
+Mask is **static** (Fabric-safe). Only the **card** animates.
+
+```javascript
+import {
+  Popup,
+  POPUP_ANIMATIONS,
+  POPUP_FROM,
+} from '@sekizlipenguen/react-native-popup-confirm-toast';
+
+Popup.show({
+  type: 'warning',
+  title: 'Uyarı',
+  textBody: 'Bir şeyler ters gitti',
+  // Card motion
+  animation: POPUP_ANIMATIONS.fadeSlide, // slide | fade | fadeSlide | spring | none
+  from: POPUP_FROM.center,               // bottom | top | left | right | center
+  duration: 260,
+  closeDuration: 200,
+  // Static mask (never animated)
+  background: 'rgba(0,0,0,0.5)', // or:
+  maskColor: '#000',
+  maskOpacity: 0.45,
+  // mask: { color: '#111', opacity: 0.6 },
+  closeOnPressMask: true,
+});
+```
+
+Same mask knobs work on **SPSheet**:
+
+```javascript
+SPSheet.show({
+  height: 360,
+  background: 'rgba(0,0,0,0.5)',
+  maskColor: '#000000',
+  maskOpacity: 0.4,
+  component: MySheetBody,
+});
+```
+
+### Dismiss behaviour
+
+| Option | Default | Behaviour |
+|--------|---------|-----------|
+| `closeOnPressMask` | `true` | Tap the dimmed area outside the sheet → close |
+| `closeOnDragDown` | `true` | Drag along the entry axis past ~25% → close |
+| `closeOnPressBack` | `true` | Android hardware back / Modal `onRequestClose` → close |
+| `dragTopOnly` | `false` | When `true`, only the handle captures the pan gesture |
+
+```javascript
+SPSheet.show({
+  height: 320,
+  closeOnPressMask: true,
+  closeOnDragDown: true,
+  closeOnPressBack: true,
+  dragTopOnly: true,
+  component: MySheetBody,
+});
+
+SPSheet.hide();
+SPSheet.isOpen(); // boolean
 ```
 
 ### Auto height (recommended for forms)
@@ -90,6 +229,7 @@ SPSheet.show({
   keyboardHeightAdjustment: true,
   dragTopOnly: true,
   closeOnDragDown: true,
+  closeOnPressMask: true,
   component: ProductReviewSheetBody,
 });
 ```
@@ -135,6 +275,14 @@ function ProductReviewSheetBody({ sheetProps }) {
 | `closeOnPressMask` | boolean | Tap backdrop to close | `true` |
 | `closeOnPressBack` | boolean | Android back to close | `true` |
 | `component` | FC | Body component; receives `sheetProps` | `null` |
+| `animation` | string | `slide` \| `fade` \| `fadeSlide` \| `spring` \| `none` | `slide` |
+| `from` | string | `bottom` \| `top` \| `left` \| `right` \| `center` | `bottom` |
+| `backdropAnimation` | string \| object | Kept for API compat; dim is **static** on Fabric Modal | `fade` |
+| `sheetAnimation` | object | Full override: `{ type, from, duration, closeDuration, bounciness, speed }` | — |
+| `zIndex` | number | Stack order inside Modal host | `10` |
+| `closeOnPressMask` | boolean | Tap dim outside sheet to close | `true` |
+| `closeOnDragDown` | boolean | Drag to dismiss | `true` |
+| `closeOnPressBack` | boolean | Android back / Modal request close | `true` |
 | `onOpen` / `onOpenComplete` / `onClose` / `onCloseComplete` | function | Lifecycle callbacks | — |
 
 ### Static methods
@@ -145,6 +293,7 @@ function ProductReviewSheetBody({ sheetProps }) {
 | `SPSheet.hide()` | Close sheet |
 | `SPSheet.setHeight(height, onComplete?)` | Change height after open |
 | `SPSheet.reportContentHeight(height, onComplete?)` | Same as `setHeight`; use from body `onLayout` |
+| `SPSheet.isOpen()` | `true` while Modal is open |
 
 ### `sheetProps` passed to body
 
@@ -153,6 +302,8 @@ function ProductReviewSheetBody({ sheetProps }) {
 | `sheetHeight` | number | Current sheet height |
 | `keyboardInset` | number | Active keyboard lift (px) |
 | `measuring` | boolean | `true` during off-screen measure phase |
+| `animation` | object | Resolved sheet animation config |
+| `from` | string | Entry direction |
 
 ### Keyboard behaviour (iOS)
 
@@ -464,21 +615,29 @@ const DrawerContent = ({onClose}) => {
 
 | Key                        | Type                     | Description                                                               | Default            |
 |----------------------------|--------------------------|---------------------------------------------------------------------------|--------------------|
-| `background`               | string                   |                                                                           | rgba(0, 0, 0, 0.5) |
+| `background`               | string                   | Static mask color                                                     | rgba(0, 0, 0, 0.5) |
+| `maskColor`                | string                   | Mask color override                                                   | —                  |
+| `maskOpacity` / `opacity`  | number                   | Mask opacity 0–1                                                      | —                  |
+| `mask`                     | object                   | `{ color, opacity }`                                                  | —                  |
 | `height`                   | number                   | auto height (min: 250)                                                    | 250                |
-| `duration`                 | number                   | animation time used when opening                                          | 250(ms)            |
-| `closeDuration`            | number                   | animation time used when closing                                          | 300(ms)            |
-| `closeOnDragDown`          | boolean                  | Use drag with motion to close the window                                  | true               |
-| `closeOnPressMask`         | boolean                  | press the outside space to close the window                               | true               |
-| `closeOnPressBack`         | boolean                  | Press the back key to close the window (Android only)                     | true               |
+| `duration`                 | number                   | open animation duration                                                   | 280(ms)            |
+| `closeDuration`            | number                   | close animation duration                                                  | 240(ms)            |
+| `animation`                | string                   | `slide` \| `fade` \| `fadeSlide` \| `spring` \| `none`                    | `slide`            |
+| `from`                     | string                   | `bottom` \| `top` \| `left` \| `right` \| `center`                        | `bottom`           |
+| `backdropAnimation`        | string \| object         | API kept; dim is static on Fabric Modal (see note above)                  | `fade`             |
+| `sheetAnimation`           | object                   | detailed override for sheet motion                                        | —                  |
+| `zIndex`                   | number                   | stack order inside Modal (Popup default 100)                              | 10                 |
+| `closeOnDragDown`          | boolean                  | Drag along entry axis to close                                            | true               |
+| `closeOnPressMask`         | boolean                  | Tap dimmed area outside sheet to close                                    | true               |
+| `closeOnPressBack`         | boolean                  | Android back / Modal onRequestClose                                       | true               |
 | `dragTopOnly`              | boolean                  | use only the top area of the draggable icon to close the window           | false              |
 | `component`                | component(hook or class) | custom modal component container                                          | null               | 
 | `onOpen`                   | function                 | works after the window is opened                                          | null               |
 | `onOpenComplete`           | function                 | works after the window is opened                                          | null               |
 | `onClose`                  | function                 | works after window is closed                                              | null               |
 | `onCloseComplete`          | function                 | works after window is closed                                              | null               |
-| `customStyles`             | object                   | customStyles: { draggableIcon: {}, container: {}, draggableContainer:{} } | {}                 |
-| `timing`                   | number                   | Use this parameter for automatic shutdown.                                | 0(ms)              |
+| `customStyles`             | object                   | `{ container, draggableIcon, draggableContainer, backdrop, overlay, handle }` | {}            |
+| `timing`                   | number                   | deprecated alias for `duration`                                           | —                  |
 | `keyboardHeightAdjustment` | boolean                  | Lift sheet above keyboard; iOS gap fill                                   | false              |
 | `autoHeight`               | boolean                  | Content-driven height; measure-before-open                                | false              |
 | `maxHeight`                | number                   | Maximum sheet height (px)                                                 | 92% of screen      |
@@ -498,7 +657,14 @@ const DrawerContent = ({onClose}) => {
 | `confirmText`            | string                             |                                                                                                    | Cancel                                                                                                                    |
 | `callback`               | function                           | ok button press                                                                                    | popupHidden                                                                                                               |
 | `cancelCallback`         | function                           | cancel button press                                                                                | popupHidden                                                                                                               |
-| `background`             | string                             |                                                                                                    | rgba(0, 0, 0, 0.5)                                                                                                        |
+| `background`             | string                             | Static mask color (Fabric-safe)                                                                    | rgba(0, 0, 0, 0.5)                                                                                                        |
+| `maskColor`              | string                             | Mask color override                                                                                | —                                                                                                                         |
+| `maskOpacity` / `opacity`| number                             | Mask opacity 0–1                                                                                   | —                                                                                                                         |
+| `mask`                   | object                             | `{ color, opacity }`                                                                               | —                                                                                                                         |
+| `animation`              | string                             | Card: `slide` \| `fade` \| `fadeSlide` \| `spring` \| `none`                                       | `fadeSlide`                                                                                                               |
+| `from`                   | string                             | Card entry: `bottom` \| `top` \| `left` \| `right` \| `center`                                     | `center`                                                                                                                  |
+| `popupAnimation`         | object                             | Detailed card animation override                                                                   | —                                                                                                                         |
+| `closeOnPressMask`       | boolean                            | Tap mask to close                                                                                  | true                                                                                                                      |
 | `timing`                 | number                             | 0 > autoClose                                                                                      | 0                                                                                                                         |
 | `iconEnabled`            | boolean                            |                                                                                                    | true <br/>                                                                                                                |
 | `iconHeaderStyle`        | object                             |                                                                                                    | {height: 75, width: 100, backgroundColor: '#fff'}                                                                         |

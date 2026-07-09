@@ -1,8 +1,13 @@
 import Root from './src/main/Root';
-import Popup from './src/main/Popup';
+import Popup, {POPUP_ANIMATIONS, POPUP_FROM} from './src/main/Popup';
 import Toast from './src/main/Toast';
 import ActionToast from './src/main/ActionToast';
-import SPSheet from './src/main/SPSheet';
+import SPSheet, {
+  LAYER_Z,
+  SHEET_ANIMATIONS,
+  SHEET_FROM,
+  BACKDROP_ANIMATIONS,
+} from './src/main/SPSheet';
 import Drawer from './src/main/Drawer';
 import {getStatusBarHeight, isIPhoneWithMonobrow} from './src/main/Helper';
 
@@ -15,4 +20,10 @@ export {
   Drawer,
   getStatusBarHeight,
   isIPhoneWithMonobrow,
+  LAYER_Z,
+  SHEET_ANIMATIONS,
+  SHEET_FROM,
+  BACKDROP_ANIMATIONS,
+  POPUP_ANIMATIONS,
+  POPUP_FROM,
 };

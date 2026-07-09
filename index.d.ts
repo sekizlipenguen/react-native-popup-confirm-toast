@@ -61,6 +61,22 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         onLayout?: (event: LayoutChangeEvent) => void;
     }
 
+    export interface MaskConfig {
+        /** Mask color (#RGB / #RRGGBB / rgb / rgba) */
+        color?: string;
+        /** Opacity 0–1 applied on top of color */
+        opacity?: number;
+    }
+
+    export interface PopupAnimationConfig {
+        type?: 'slide' | 'fade' | 'fadeSlide' | 'spring' | 'none';
+        from?: 'bottom' | 'top' | 'left' | 'right' | 'center';
+        duration?: number;
+        closeDuration?: number;
+        bounciness?: number;
+        speed?: number;
+    }
+
     export interface PopupConfig {
         title?: string;
         textBody?: string;
@@ -84,18 +100,52 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         confirmButtonTextStyle?: StyleProp<TextStyle>;
         titleTextStyle?: StyleProp<TextStyle>;
         descTextStyle?: StyleProp<TextStyle>;
+        /**
+         * Static mask color (Fabric-safe). Also accepts rgba.
+         * Prefer `maskColor` / `maskOpacity` / `mask` for finer control.
+         */
         background?: string;
+        /** Mask color override */
+        maskColor?: string;
+        /** Mask opacity 0–1 (applied to maskColor/background) */
+        maskOpacity?: number;
+        /** Alias of maskOpacity */
+        opacity?: number;
+        /** Nested mask: `{ color, opacity }` */
+        mask?: MaskConfig;
+        /** Tap mask to close (default: true) */
+        closeOnPressMask?: boolean;
         bodyComponent?: ComponentType<PopupBodyProps> | FC<PopupBodyProps>;
         bodyComponentForce?: boolean;
         timing?: number;
+        /** Card open duration ms (default: 260) */
         duration?: number;
+        /** Card close duration ms (default: 200) */
         closeDuration?: number;
+        /**
+         * Card animation: `slide` | `fade` | `fadeSlide` | `spring` | `none`
+         * Default: `fadeSlide`
+         */
+        animation?: 'slide' | 'fade' | 'fadeSlide' | 'spring' | 'none';
+        /**
+         * Card entry direction: `bottom` | `top` | `left` | `right` | `center`
+         * Default: `center`
+         */
+        from?: 'bottom' | 'top' | 'left' | 'right' | 'center';
+        /** Detailed card animation override */
+        popupAnimation?: PopupAnimationConfig;
         bounciness?: number;
+        speed?: number;
         useNativeDriver?: boolean;
         onOpen?: () => void;
         onOpenComplete?: () => void;
         onClose?: () => void;
         onCloseComplete?: () => void;
+        /**
+         * Stacking order when shown above an open SPSheet.
+         * Default: 100 (SPSheet default is 10). Higher covers lower.
+         */
+        zIndex?: number;
     }
 
     /** Props passed to SPSheet `component` as `sheetProps` */
@@ -110,9 +160,34 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         [key: string]: any;
     }
 
+    export interface SheetAnimationConfig {
+        /** Sheet motion type */
+        type?: 'slide' | 'fade' | 'fadeSlide' | 'spring' | 'none';
+        /** Entry direction for slide/spring/fadeSlide */
+        from?: 'bottom' | 'top' | 'left' | 'right' | 'center';
+        duration?: number;
+        closeDuration?: number;
+        bounciness?: number;
+        speed?: number;
+    }
+
+    export interface BackdropAnimationConfig {
+        type?: 'fade' | 'none';
+        duration?: number;
+        closeDuration?: number;
+    }
+
     export interface SheetConfig {
         /** Dim / mask color (default: rgba(0,0,0,0.5)) */
         background?: string;
+        /** Mask color override */
+        maskColor?: string;
+        /** Mask opacity 0–1 */
+        maskOpacity?: number;
+        /** Alias of maskOpacity */
+        opacity?: number;
+        /** Nested mask: `{ color, opacity }` */
+        mask?: MaskConfig;
         /**
          * Fixed sheet height. If omitted or <= 0, `autoHeight` is used
          * (measure content, then open at measured size).
@@ -124,9 +199,9 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         maxHeight?: number;
         /** Allow shrinking after open (default: true) */
         allowHeightShrink?: boolean;
-        /** Open animation duration ms (default: 250) */
+        /** Open animation duration ms (default: 280) */
         duration?: number;
-        /** Close animation duration ms (default: 300) */
+        /** Close animation duration ms (default: 240) */
         closeDuration?: number;
         /** Drag handle / body to dismiss (default: true) */
         closeOnDragDown?: boolean;
@@ -146,11 +221,39 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
             draggableIcon?: StyleProp<ViewStyle>;
             container?: StyleProp<ViewStyle>;
             draggableContainer?: StyleProp<ViewStyle>;
+            backdrop?: StyleProp<ViewStyle>;
+            overlay?: StyleProp<ViewStyle>;
+            handle?: StyleProp<ViewStyle>;
         };
         /** @deprecated use `duration` */
         timing?: number;
         /** Lift sheet above keyboard (default: false) */
         keyboardHeightAdjustment?: boolean;
+        /**
+         * Stacking order inside the shared Modal host.
+         * Default: 10. Popup defaults to 100 so alerts cover the sheet.
+         */
+        zIndex?: number;
+        /**
+         * Sheet animation preset.
+         * `slide` | `fade` | `fadeSlide` | `spring` | `none`
+         * Default: `slide`
+         */
+        animation?: 'slide' | 'fade' | 'fadeSlide' | 'spring' | 'none';
+        /**
+         * Entry edge / origin.
+         * `bottom` | `top` | `left` | `right` | `center`
+         * Default: `bottom`
+         */
+        from?: 'bottom' | 'top' | 'left' | 'right' | 'center';
+        /** Backdrop dim animation: `fade` | `none` | BackdropAnimationConfig */
+        backdropAnimation?: 'fade' | 'none' | BackdropAnimationConfig;
+        /** Detailed sheet animation override (wins over `animation` / `from`) */
+        sheetAnimation?: SheetAnimationConfig;
+        /** Spring bounciness when animation=`spring` */
+        bounciness?: number;
+        /** Spring speed when animation=`spring` */
+        speed?: number;
     }
 
     export interface DrawerConfig {
@@ -180,6 +283,20 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
     export interface Popup {
         show: (config?: PopupConfig) => void;
         hide: () => void;
+        POPUP_ANIMATIONS?: {
+            slide: 'slide';
+            fade: 'fade';
+            fadeSlide: 'fadeSlide';
+            spring: 'spring';
+            none: 'none';
+        };
+        POPUP_FROM?: {
+            bottom: 'bottom';
+            top: 'top';
+            left: 'left';
+            right: 'right';
+            center: 'center';
+        };
     }
 
     export interface SPSheet {
@@ -188,6 +305,27 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         setHeight: (height: number, onComplete?: () => void) => void;
         /** Alias of `setHeight` for content-driven sizing from sheet body */
         reportContentHeight: (height: number, onComplete?: () => void) => void;
+        /** Whether the sheet Modal is currently open */
+        isOpen?: () => boolean;
+        SHEET_ANIMATIONS?: {
+            slide: 'slide';
+            fade: 'fade';
+            fadeSlide: 'fadeSlide';
+            spring: 'spring';
+            none: 'none';
+        };
+        SHEET_FROM?: {
+            bottom: 'bottom';
+            top: 'top';
+            left: 'left';
+            right: 'right';
+            center: 'center';
+        };
+        BACKDROP_ANIMATIONS?: {
+            fade: 'fade';
+            none: 'none';
+        };
+        LAYER_Z?: { sheet: number; popup: number };
     }
 
     export interface Drawer {
@@ -208,4 +346,38 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
     export const Root: FC<RootProps>;
     export const getStatusBarHeight: () => number;
     export const isIPhoneWithMonobrow: () => boolean;
+    /** Default layer zIndex values: { sheet: 10, popup: 100 } */
+    export const LAYER_Z: { sheet: number; popup: number };
+    export const SHEET_ANIMATIONS: {
+        slide: 'slide';
+        fade: 'fade';
+        fadeSlide: 'fadeSlide';
+        spring: 'spring';
+        none: 'none';
+    };
+    export const SHEET_FROM: {
+        bottom: 'bottom';
+        top: 'top';
+        left: 'left';
+        right: 'right';
+        center: 'center';
+    };
+    export const BACKDROP_ANIMATIONS: {
+        fade: 'fade';
+        none: 'none';
+    };
+    export const POPUP_ANIMATIONS: {
+        slide: 'slide';
+        fade: 'fade';
+        fadeSlide: 'fadeSlide';
+        spring: 'spring';
+        none: 'none';
+    };
+    export const POPUP_FROM: {
+        bottom: 'bottom';
+        top: 'top';
+        left: 'left';
+        right: 'right';
+        center: 'center';
+    };
 }
