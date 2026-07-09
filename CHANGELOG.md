@@ -1,3 +1,11 @@
+## [2.0.1] - 2026-07-09
+
+### Fixed
+
+- **Popup behind SPSheet** — `Popup` now uses native `Modal` (`presentationStyle="overFullScreen"`) like SPSheet, so alerts/confirms opened from a sheet (e.g. review validation) appear on top instead of under the sheet.
+
+---
+
 ## [2.0.0] - 2026-07-09
 
 Major release with **ActionToast**, a fully reworked **SPSheet** (auto height, keyboard, measure-before-open, Fabric-safe dim), and safer callback handling.

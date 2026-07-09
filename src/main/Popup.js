@@ -1,5 +1,16 @@
 import React, {Component} from 'react';
-import {Animated, Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  Image,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const PRIMARY = '#D6001F';
 const PRIMARY_PRESSED = '#B8001A';
@@ -249,30 +260,42 @@ class Popup extends Component {
   }
 
   render() {
-    const {title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, iconHeaderStyle, start} = this.state;
+    const {title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, iconHeaderStyle, start, show} = this.state;
     const {bodyComponent, containerStyle, modalContainerStyle, positionPopup, positionView, opacity, bodyComponentForce} = this.state;
 
     const typeName = type + 'ButtonStyle';
     const BodyComponentElement = bodyComponent ? bodyComponent : false;
     const isConfirm = type === 'confirm';
+    // Native Modal so Popup stacks above SPSheet (also Modal). Absolute views always sit under Modals.
+    const modalVisible = start || show;
 
     return (
-        <Animated.View
+      <View style={styles.modalHost} pointerEvents="box-none">
+        <Modal
+          visible={modalVisible}
+          transparent
+          animationType="none"
+          presentationStyle="overFullScreen"
+          statusBarTranslucent
+          hardwareAccelerated
+          onRequestClose={() => this.hidePopup()}
+        >
+          <Animated.View
             ref={c => this._root = c}
-            pointerEvents={this.state.show ? 'auto' : 'box-none'}
+            pointerEvents={show ? 'auto' : 'box-none'}
             style={[
-              styles.Container, {
+              styles.Container,
+              {
                 width: this.width,
                 height: this.height,
-                backgroundColor: background || 'transparent',
+                backgroundColor: background || 'rgba(0, 0, 0, 0.5)',
                 opacity: opacity,
-                transform: [
-                  {translateY: positionView},
-                ],
+                transform: [{translateY: positionView}],
               },
               containerStyle,
-            ]}>
-          <Animated.View
+            ]}
+          >
+            <Animated.View
               onLayout={event => {
                 if (start && !bodyComponentForce) {
                   const height = event.nativeEvent.layout.height;
@@ -281,107 +304,95 @@ class Popup extends Component {
                   });
                 }
               }}
-              style={
-                [
-                  styles.Message,
-                  {
-                    minHeight: this.state.popupHeight,
-                  },
-                  modalContainerStyle,
-                  {
-                    transform: [
-                      {translateY: positionPopup},
-                    ],
-                  },
-                ]
-              }
-              pointerEvents={this.state.show ? 'auto' : 'box-none'}
-          >
-            {
-              bodyComponentForce ? (
-                  BodyComponentElement ? (
-                      <BodyComponentElement {...this.props} onLayout={(event) => {
-                        if (event && start && !this.state.show) {
-                          const height = event.nativeEvent.layout.height;
-                          if (this.state.popupHeight !== height) {
-                            this.setState({popupHeight: height}, () => {
-                              this.startPopup();
-                            });
-                          } else if (this.state.popupHeight === 0) {
-                            this.setState({popupHeight: height}, () => {
-                              this.startPopup();
-                            });
-                          }
+              style={[
+                styles.Message,
+                {
+                  minHeight: this.state.popupHeight,
+                },
+                modalContainerStyle,
+                {
+                  transform: [{translateY: positionPopup}],
+                },
+              ]}
+              pointerEvents={show ? 'auto' : 'box-none'}
+            >
+              {bodyComponentForce ? (
+                BodyComponentElement ? (
+                  <BodyComponentElement
+                    {...this.props}
+                    onLayout={event => {
+                      if (event && start && !this.state.show) {
+                        const height = event.nativeEvent.layout.height;
+                        if (this.state.popupHeight !== height) {
+                          this.setState({popupHeight: height}, () => {
+                            this.startPopup();
+                          });
+                        } else if (this.state.popupHeight === 0) {
+                          this.setState({popupHeight: height}, () => {
+                            this.startPopup();
+                          });
                         }
-                      }}/>
-                  ) : null
+                      }
+                    }}
+                  />
+                ) : null
               ) : (
-                  <>
-                    {
-                        iconEnabled && (
-                            <>
-                              <View style={[styles.Header, iconHeaderStyle]}/>
-                              <Image
-                                  source={this.handleImage(type)}
-                                  resizeMode="contain"
-                                  style={styles.Image}
-                              />
-                            </>
-                        )
-                    }
-                    <View style={[styles.Content, !iconEnabled && styles.contentCompact]}>
-                      {
-                          title && title.length > 0 && (
-                              <Text style={[styles.Title, this.state.titleTextStyle]}>{title}</Text>
-                          )
-                      }
-                      {textBody ? (
-                        <Text style={[styles.Desc, this.state.descTextStyle]}>{textBody}</Text>
-                      ) : null}
-                      {
-                        BodyComponentElement ? (
-                            <BodyComponentElement {...this.props} />
-                        ) : null
-                      }
-                      {isConfirm ? (
-                        this.renderConfirmButtons(callback, cancelCallback, buttonText, confirmText)
-                      ) : (
-                        <View style={[styles.buttonRow, styles.buttonRowSingle, this.state.buttonContentStyle]}>
-                          {
-                              buttonEnabled && (
-                                  <TouchableOpacity
-                                    style={[styles.Button, styles[typeName], styles.primaryButton, this.state.okButtonStyle]}
-                                    activeOpacity={0.85}
-                                    onPress={() => {
-                                      if (typeof callback === 'function') {
-                                        callback();
-                                      }
-                                    }}
-                                  >
-                                    <Text style={[styles.primaryText, this.state.okButtonTextStyle]}>{buttonText}</Text>
-                                  </TouchableOpacity>
-                              )
-                          }
-                        </View>
-                      )}
-                    </View>
-                  </>
-              )
-            }
+                <>
+                  {iconEnabled ? (
+                    <>
+                      <View style={[styles.Header, iconHeaderStyle]} />
+                      <Image
+                        source={this.handleImage(type)}
+                        resizeMode="contain"
+                        style={styles.Image}
+                      />
+                    </>
+                  ) : null}
+                  <View style={[styles.Content, !iconEnabled && styles.contentCompact]}>
+                    {title && title.length > 0 ? (
+                      <Text style={[styles.Title, this.state.titleTextStyle]}>{title}</Text>
+                    ) : null}
+                    {textBody ? (
+                      <Text style={[styles.Desc, this.state.descTextStyle]}>{textBody}</Text>
+                    ) : null}
+                    {BodyComponentElement ? <BodyComponentElement {...this.props} /> : null}
+                    {isConfirm ? (
+                      this.renderConfirmButtons(callback, cancelCallback, buttonText, confirmText)
+                    ) : (
+                      <View style={[styles.buttonRow, styles.buttonRowSingle, this.state.buttonContentStyle]}>
+                        {buttonEnabled ? (
+                          <TouchableOpacity
+                            style={[styles.Button, styles[typeName], styles.primaryButton, this.state.okButtonStyle]}
+                            activeOpacity={0.85}
+                            onPress={() => {
+                              if (typeof callback === 'function') {
+                                callback();
+                              }
+                            }}
+                          >
+                            <Text style={[styles.primaryText, this.state.okButtonTextStyle]}>{buttonText}</Text>
+                          </TouchableOpacity>
+                        ) : null}
+                      </View>
+                    )}
+                  </View>
+                </>
+              )}
+            </Animated.View>
           </Animated.View>
-        </Animated.View>
+        </Modal>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  modalHost: {
+    // Host wrapper — Modal portals above other app Modals (e.g. SPSheet).
+  },
   Container: {
-    position: 'absolute',
-    zIndex: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     alignItems: 'center',
-    top: 0,
-    left: 0,
+    justifyContent: 'flex-start',
   },
   Message: {
     width: '88%',
