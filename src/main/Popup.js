@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {
   Animated,
   Dimensions,
+  Easing,
   Image,
   Modal,
   Platform,
@@ -18,6 +19,7 @@ const TEXT_PRIMARY = '#111111';
 const TEXT_SECONDARY = '#666666';
 const BORDER = '#E5E5E5';
 const SURFACE = '#FFFFFF';
+const DEFAULT_DIM = 'rgba(0, 0, 0, 0.5)';
 
 class Popup extends Component {
   static popupInstance;
@@ -28,8 +30,7 @@ class Popup extends Component {
     this.height = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
     this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
-    this.positionView = new Animated.Value(this.height);
-    this.opacity = new Animated.Value(0);
+    // Only the card slides. Dim is a static backgroundColor (Fabric-safe).
     this.positionPopup = new Animated.Value(this.height);
 
     this.defaultState = {
@@ -44,7 +45,7 @@ class Popup extends Component {
       confirmText: 'Cancel',
       callback: () => this.hidePopup(),
       cancelCallback: () => this.hidePopup(),
-      background: 'rgba(0, 0, 0, 0.5)',
+      background: DEFAULT_DIM,
       timing: 0,
       iconEnabled: true,
       icon: false,
@@ -65,8 +66,8 @@ class Popup extends Component {
       onCloseComplete: false,
       onOpenComplete: false,
       onOpen: false,
-      duration: 100,
-      closeDuration: 100,
+      duration: 180,
+      closeDuration: 160,
       show: false,
       open: false,
     };
@@ -74,6 +75,8 @@ class Popup extends Component {
     this.state = {...this.defaultState};
     this.openAnimationInProgress = false;
     this.closeAnimationInProgress = false;
+    this.measureFallbackTimer = null;
+    this.autoHideTimer = null;
 
     this.updateDimensions = this.updateDimensions.bind(this);
   }
@@ -92,12 +95,18 @@ class Popup extends Component {
 
   componentWillUnmount() {
     this.dimensionsSubscription?.remove?.();
+    this.clearTimers();
   }
 
-  resetAnimatedValues() {
-    this.positionView.setValue(this.height);
-    this.opacity.setValue(0);
-    this.positionPopup.setValue(this.height);
+  clearTimers() {
+    if (this.measureFallbackTimer) {
+      clearTimeout(this.measureFallbackTimer);
+      this.measureFallbackTimer = null;
+    }
+    if (this.autoHideTimer) {
+      clearTimeout(this.autoHideTimer);
+      this.autoHideTimer = null;
+    }
   }
 
   start({...config}) {
@@ -112,9 +121,10 @@ class Popup extends Component {
       nextConfig.iconEnabled = false;
     }
 
+    this.clearTimers();
     this.closeAnimationInProgress = false;
     this.openAnimationInProgress = false;
-    this.resetAnimatedValues();
+    this.positionPopup.setValue(this.height);
 
     this.setState({
       ...this.defaultState,
@@ -125,17 +135,13 @@ class Popup extends Component {
       open: true,
       popupHeight: 0,
     }, () => {
-      // Fallback if onLayout is delayed/skipped inside Modal (Fabric).
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          if (this.state.open && this.state.start && !this.state.show && !this.openAnimationInProgress) {
-            const fallbackHeight = this.state.popupHeight > 0 ? this.state.popupHeight : 220;
-            this.setState({popupHeight: fallbackHeight}, () => {
-              this.startPopup();
-            });
-          }
-        }, 120);
-      });
+      // If onLayout is delayed inside Modal, still open with a fallback height.
+      this.measureFallbackTimer = setTimeout(() => {
+        if (this.state.open && this.state.start && !this.state.show && !this.openAnimationInProgress) {
+          const fallbackHeight = this.state.popupHeight > 0 ? this.state.popupHeight : 220;
+          this.setState({popupHeight: fallbackHeight}, () => this.startPopup());
+        }
+      }, 80);
     });
   }
 
@@ -145,31 +151,24 @@ class Popup extends Component {
     }
 
     this.openAnimationInProgress = true;
+    this.clearTimers();
 
     if (typeof this.state.onOpen === 'function') {
       this.state.onOpen();
     }
 
-    // Keep `open: true` for the whole animation. Clearing `start` alone used to
-    // set Modal visible=false (start||show) and the popup never appeared.
+    const targetY = Math.max(40, (this.height / 2) - (this.state.popupHeight / 2));
+
+    // Keep open=true for the whole animation so Modal stays mounted.
     this.setState({start: false}, () => {
-      Animated.parallel([
-        Animated.timing(this.positionView, {
-          toValue: 0,
-          duration: this.state.duration,
-          useNativeDriver: this.state.useNativeDriver,
-        }),
-        Animated.timing(this.opacity, {
-          toValue: 1,
-          duration: Math.max(this.state.duration * 3, 180),
-          useNativeDriver: this.state.useNativeDriver,
-        }),
-        Animated.spring(this.positionPopup, {
-          toValue: (this.height / 2) - (this.state.popupHeight / 2),
-          bounciness: this.state.bounciness,
-          useNativeDriver: this.state.useNativeDriver,
-        }),
-      ]).start(({finished}) => {
+      this.positionPopup.setValue(this.height);
+
+      Animated.spring(this.positionPopup, {
+        toValue: targetY,
+        bounciness: this.state.bounciness,
+        speed: 14,
+        useNativeDriver: true,
+      }).start(({finished}) => {
         this.openAnimationInProgress = false;
         if (!finished || !this.state.open) {
           return;
@@ -184,9 +183,7 @@ class Popup extends Component {
 
       if (this.state.timing !== 0) {
         const duration = this.state.timing > 0 ? this.state.timing : 5000;
-        setTimeout(() => {
-          this.hidePopup();
-        }, duration);
+        this.autoHideTimer = setTimeout(() => this.hidePopup(), duration);
       }
     });
   }
@@ -199,34 +196,22 @@ class Popup extends Component {
 
     this.closeAnimationInProgress = true;
     this.openAnimationInProgress = false;
+    this.clearTimers();
 
     if (typeof onClose === 'function') {
       onClose();
     }
 
     this.positionPopup.stopAnimation();
-    this.opacity.stopAnimation();
-    this.positionView.stopAnimation();
 
-    Animated.parallel([
-      Animated.timing(this.positionPopup, {
-        toValue: this.height,
-        duration: Math.max(this.state.closeDuration * 2.5, 120),
-        useNativeDriver: this.state.useNativeDriver,
-      }),
-      Animated.timing(this.opacity, {
-        toValue: 0,
-        duration: Math.max(this.state.closeDuration * 3, 120),
-        useNativeDriver: this.state.useNativeDriver,
-      }),
-      Animated.timing(this.positionView, {
-        toValue: this.height,
-        duration: this.state.closeDuration,
-        useNativeDriver: this.state.useNativeDriver,
-      }),
-    ]).start(() => {
+    Animated.timing(this.positionPopup, {
+      toValue: this.height,
+      duration: this.state.closeDuration,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
       this.closeAnimationInProgress = false;
-      this.resetAnimatedValues();
+      this.positionPopup.setValue(this.height);
       this.setState({...this.defaultState}, () => {
         if (typeof onCloseComplete === 'function') {
           onCloseComplete();
@@ -333,14 +318,12 @@ class Popup extends Component {
     const typeName = type + 'ButtonStyle';
     const BodyComponentElement = bodyComponent ? bodyComponent : false;
     const isConfirm = type === 'confirm';
-    // `open` stays true from show() until hide completes — keeps Modal mounted
-    // while start flips false during the open animation.
-    const modalVisible = open === true;
+    const dimColor = background && background !== 'transparent' ? background : DEFAULT_DIM;
 
     return (
       <View style={styles.modalHost} pointerEvents="box-none">
         <Modal
-          visible={modalVisible}
+          visible={open === true}
           transparent
           animationType="none"
           presentationStyle="overFullScreen"
@@ -348,17 +331,19 @@ class Popup extends Component {
           hardwareAccelerated
           onRequestClose={() => this.hidePopup()}
         >
-          <Animated.View
-            ref={c => (this._root = c)}
+          {/*
+            Static dim (no Animated opacity) — same Fabric-safe pattern as SPSheet.
+            Nested Modal stacks above SPSheet so alerts from sheets are visible.
+          */}
+          <View
+            collapsable={false}
             pointerEvents={show || start ? 'auto' : 'box-none'}
             style={[
               styles.Container,
               {
                 width: this.width,
                 height: this.height,
-                backgroundColor: background || 'rgba(0, 0, 0, 0.5)',
-                opacity: this.opacity,
-                transform: [{translateY: this.positionView}],
+                backgroundColor: dimColor,
               },
               containerStyle,
             ]}
@@ -372,19 +357,13 @@ class Popup extends Component {
                 if (!height) {
                   return;
                 }
-                this.setState({popupHeight: height}, () => {
-                  this.startPopup();
-                });
+                this.setState({popupHeight: height}, () => this.startPopup());
               }}
               style={[
                 styles.Message,
-                {
-                  minHeight: this.state.popupHeight,
-                },
+                this.state.popupHeight > 0 ? {minHeight: this.state.popupHeight} : null,
                 modalContainerStyle,
-                {
-                  transform: [{translateY: this.positionPopup}],
-                },
+                {transform: [{translateY: this.positionPopup}]},
               ]}
               pointerEvents={show || start ? 'auto' : 'box-none'}
             >
@@ -400,15 +379,7 @@ class Popup extends Component {
                       if (!height) {
                         return;
                       }
-                      if (this.state.popupHeight !== height) {
-                        this.setState({popupHeight: height}, () => {
-                          this.startPopup();
-                        });
-                      } else if (this.state.popupHeight === 0) {
-                        this.setState({popupHeight: height}, () => {
-                          this.startPopup();
-                        });
-                      }
+                      this.setState({popupHeight: height}, () => this.startPopup());
                     }}
                   />
                 ) : null
@@ -455,7 +426,7 @@ class Popup extends Component {
                 </>
               )}
             </Animated.View>
-          </Animated.View>
+          </View>
         </Modal>
       </View>
     );
@@ -463,9 +434,7 @@ class Popup extends Component {
 }
 
 const styles = StyleSheet.create({
-  modalHost: {
-    // Host wrapper — Modal portals above other app Modals (e.g. SPSheet).
-  },
+  modalHost: {},
   Container: {
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -478,6 +447,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden',
     position: 'absolute',
+    left: '6%',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 8},
     shadowOpacity: 0.12,

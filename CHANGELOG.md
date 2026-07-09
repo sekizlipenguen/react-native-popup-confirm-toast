@@ -2,8 +2,9 @@
 
 ### Fixed
 
-- **Popup behind SPSheet** — `Popup` now uses native `Modal` (`presentationStyle="overFullScreen"`) like SPSheet, so alerts/confirms opened from a sheet appear on top.
-- **Popup never appearing after Modal migration** — open lifecycle now keeps `open: true` for the whole animation (`start` alone no longer drives `Modal.visible`). Animated values live on the instance; measure fallback starts the animation if `onLayout` is delayed.
+- **Popup behind SPSheet** — `Popup` uses native `Modal` (`presentationStyle="overFullScreen"`) so alerts opened from a sheet appear on top.
+- **Popup never appearing** — keep `open: true` for the whole lifecycle; do not drive `Modal.visible` from `start` alone.
+- **Popup invisible on Fabric** — removed Animated opacity on the dim layer (same SPSheet lesson). Dim is a static `backgroundColor`; only the card slides with native driver.
 
 ---
 
