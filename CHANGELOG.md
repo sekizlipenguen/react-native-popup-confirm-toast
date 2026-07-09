@@ -11,7 +11,7 @@ Major release with **ActionToast**, a fully reworked **SPSheet** (auto height, k
 - **`allowHeightShrink`** — allow or block height reduction after open.
 - **Measure-before-open** — `autoHeight` sheets render off-screen first, report height, then animate once at the correct size (no small-then-grow flicker).
 - **`sheetProps` on body component** — `{ sheetHeight, keyboardInset, measuring }` passed to `component`.
-- TypeScript definitions for `ActionToast`, `SheetConfig`, and `reportContentHeight`.
+- TypeScript definitions for `ActionToast`, `SheetConfig`, `SheetBodyProps`, `reportContentHeight`, and full Popup/Toast option surfaces.
 
 ### Changed
 
