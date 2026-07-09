@@ -28,10 +28,11 @@ class Popup extends Component {
     this.height = Platform.OS === 'android' ? Dimensions.get('screen').height : Dimensions.get('window').height;
     this.width = Platform.OS === 'android' ? Dimensions.get('screen').width : Dimensions.get('window').width;
 
+    this.positionView = new Animated.Value(this.height);
+    this.opacity = new Animated.Value(0);
+    this.positionPopup = new Animated.Value(this.height);
+
     this.defaultState = {
-      positionView: new Animated.Value(this.height),
-      opacity: new Animated.Value(0),
-      positionPopup: new Animated.Value(this.height),
       popupHeight: 0,
       title: false,
       type: 'warning',
@@ -67,12 +68,14 @@ class Popup extends Component {
       duration: 100,
       closeDuration: 100,
       show: false,
+      open: false,
     };
 
-    this.state = this.defaultState;
+    this.state = {...this.defaultState};
+    this.openAnimationInProgress = false;
+    this.closeAnimationInProgress = false;
 
     this.updateDimensions = this.updateDimensions.bind(this);
-
   }
 
   static show({...config}) {
@@ -88,7 +91,13 @@ class Popup extends Component {
   }
 
   componentWillUnmount() {
-    this.dimensionsSubscription?.remove();
+    this.dimensionsSubscription?.remove?.();
+  }
+
+  resetAnimatedValues() {
+    this.positionView.setValue(this.height);
+    this.opacity.setValue(0);
+    this.positionPopup.setValue(this.height);
   }
 
   start({...config}) {
@@ -103,43 +112,69 @@ class Popup extends Component {
       nextConfig.iconEnabled = false;
     }
 
+    this.closeAnimationInProgress = false;
+    this.openAnimationInProgress = false;
+    this.resetAnimatedValues();
+
     this.setState({
       ...this.defaultState,
       ...nextConfig,
       type,
       start: true,
+      show: false,
+      open: true,
+      popupHeight: 0,
+    }, () => {
+      // Fallback if onLayout is delayed/skipped inside Modal (Fabric).
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          if (this.state.open && this.state.start && !this.state.show && !this.openAnimationInProgress) {
+            const fallbackHeight = this.state.popupHeight > 0 ? this.state.popupHeight : 220;
+            this.setState({popupHeight: fallbackHeight}, () => {
+              this.startPopup();
+            });
+          }
+        }, 120);
+      });
     });
   }
 
   startPopup() {
-    if (this.state.show || !this.state.start) {
+    if (this.state.show || !this.state.start || this.openAnimationInProgress || this.closeAnimationInProgress) {
       return;
     }
+
+    this.openAnimationInProgress = true;
 
     if (typeof this.state.onOpen === 'function') {
       this.state.onOpen();
     }
 
-    this.setState({
-      start: false,
-    }, () => {
-      Animated.sequence([
-        Animated.timing(this.state.positionView, {
+    // Keep `open: true` for the whole animation. Clearing `start` alone used to
+    // set Modal visible=false (start||show) and the popup never appeared.
+    this.setState({start: false}, () => {
+      Animated.parallel([
+        Animated.timing(this.positionView, {
           toValue: 0,
           duration: this.state.duration,
           useNativeDriver: this.state.useNativeDriver,
         }),
-        Animated.timing(this.state.opacity, {
+        Animated.timing(this.opacity, {
           toValue: 1,
-          duration: this.state.duration * 3,
+          duration: Math.max(this.state.duration * 3, 180),
           useNativeDriver: this.state.useNativeDriver,
         }),
-        Animated.spring(this.state.positionPopup, {
+        Animated.spring(this.positionPopup, {
           toValue: (this.height / 2) - (this.state.popupHeight / 2),
           bounciness: this.state.bounciness,
           useNativeDriver: this.state.useNativeDriver,
         }),
-      ]).start(() => {
+      ]).start(({finished}) => {
+        this.openAnimationInProgress = false;
+        if (!finished || !this.state.open) {
+          return;
+        }
+
         this.setState({show: true}, () => {
           if (typeof this.state.onOpenComplete === 'function') {
             this.state.onOpenComplete();
@@ -157,28 +192,42 @@ class Popup extends Component {
   }
 
   hidePopup() {
-    const {positionPopup, opacity, positionView, onCloseComplete, onClose} = this.state;
+    const {onCloseComplete, onClose, open} = this.state;
+    if (!open || this.closeAnimationInProgress) {
+      return;
+    }
+
+    this.closeAnimationInProgress = true;
+    this.openAnimationInProgress = false;
+
     if (typeof onClose === 'function') {
       onClose();
     }
-    Animated.sequence([
-      Animated.timing(positionPopup, {
+
+    this.positionPopup.stopAnimation();
+    this.opacity.stopAnimation();
+    this.positionView.stopAnimation();
+
+    Animated.parallel([
+      Animated.timing(this.positionPopup, {
         toValue: this.height,
-        duration: this.state.closeDuration * 2.5,
+        duration: Math.max(this.state.closeDuration * 2.5, 120),
         useNativeDriver: this.state.useNativeDriver,
       }),
-      Animated.timing(opacity, {
+      Animated.timing(this.opacity, {
         toValue: 0,
-        duration: this.state.closeDuration * 3,
+        duration: Math.max(this.state.closeDuration * 3, 120),
         useNativeDriver: this.state.useNativeDriver,
       }),
-      Animated.timing(positionView, {
+      Animated.timing(this.positionView, {
         toValue: this.height,
         duration: this.state.closeDuration,
         useNativeDriver: this.state.useNativeDriver,
       }),
     ]).start(() => {
-      this.setState(this.defaultState, () => {
+      this.closeAnimationInProgress = false;
+      this.resetAnimatedValues();
+      this.setState({...this.defaultState}, () => {
         if (typeof onCloseComplete === 'function') {
           onCloseComplete();
         }
@@ -204,8 +253,8 @@ class Popup extends Component {
   updateDimensions = () => {
     setTimeout(() => {
       const {height, width} = Platform.OS === 'android'
-          ? Dimensions.get('screen')
-          : Dimensions.get('window');
+        ? Dimensions.get('screen')
+        : Dimensions.get('window');
 
       this.height = height;
       this.width = width;
@@ -260,14 +309,33 @@ class Popup extends Component {
   }
 
   render() {
-    const {title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, iconHeaderStyle, start, show} = this.state;
-    const {bodyComponent, containerStyle, modalContainerStyle, positionPopup, positionView, opacity, bodyComponentForce} = this.state;
+    const {
+      title,
+      type,
+      textBody,
+      buttonEnabled,
+      buttonText,
+      confirmText,
+      callback,
+      cancelCallback,
+      background,
+      iconEnabled,
+      iconHeaderStyle,
+      start,
+      show,
+      open,
+      bodyComponent,
+      containerStyle,
+      modalContainerStyle,
+      bodyComponentForce,
+    } = this.state;
 
     const typeName = type + 'ButtonStyle';
     const BodyComponentElement = bodyComponent ? bodyComponent : false;
     const isConfirm = type === 'confirm';
-    // Native Modal so Popup stacks above SPSheet (also Modal). Absolute views always sit under Modals.
-    const modalVisible = start || show;
+    // `open` stays true from show() until hide completes — keeps Modal mounted
+    // while start flips false during the open animation.
+    const modalVisible = open === true;
 
     return (
       <View style={styles.modalHost} pointerEvents="box-none">
@@ -281,28 +349,32 @@ class Popup extends Component {
           onRequestClose={() => this.hidePopup()}
         >
           <Animated.View
-            ref={c => this._root = c}
-            pointerEvents={show ? 'auto' : 'box-none'}
+            ref={c => (this._root = c)}
+            pointerEvents={show || start ? 'auto' : 'box-none'}
             style={[
               styles.Container,
               {
                 width: this.width,
                 height: this.height,
                 backgroundColor: background || 'rgba(0, 0, 0, 0.5)',
-                opacity: opacity,
-                transform: [{translateY: positionView}],
+                opacity: this.opacity,
+                transform: [{translateY: this.positionView}],
               },
               containerStyle,
             ]}
           >
             <Animated.View
               onLayout={event => {
-                if (start && !bodyComponentForce) {
-                  const height = event.nativeEvent.layout.height;
-                  this.setState({popupHeight: height}, () => {
-                    this.startPopup();
-                  });
+                if (!start || bodyComponentForce || this.openAnimationInProgress || show) {
+                  return;
                 }
+                const height = event.nativeEvent.layout.height;
+                if (!height) {
+                  return;
+                }
+                this.setState({popupHeight: height}, () => {
+                  this.startPopup();
+                });
               }}
               style={[
                 styles.Message,
@@ -311,27 +383,31 @@ class Popup extends Component {
                 },
                 modalContainerStyle,
                 {
-                  transform: [{translateY: positionPopup}],
+                  transform: [{translateY: this.positionPopup}],
                 },
               ]}
-              pointerEvents={show ? 'auto' : 'box-none'}
+              pointerEvents={show || start ? 'auto' : 'box-none'}
             >
               {bodyComponentForce ? (
                 BodyComponentElement ? (
                   <BodyComponentElement
                     {...this.props}
                     onLayout={event => {
-                      if (event && start && !this.state.show) {
-                        const height = event.nativeEvent.layout.height;
-                        if (this.state.popupHeight !== height) {
-                          this.setState({popupHeight: height}, () => {
-                            this.startPopup();
-                          });
-                        } else if (this.state.popupHeight === 0) {
-                          this.setState({popupHeight: height}, () => {
-                            this.startPopup();
-                          });
-                        }
+                      if (!event || !start || this.state.show || this.openAnimationInProgress) {
+                        return;
+                      }
+                      const height = event.nativeEvent.layout.height;
+                      if (!height) {
+                        return;
+                      }
+                      if (this.state.popupHeight !== height) {
+                        this.setState({popupHeight: height}, () => {
+                          this.startPopup();
+                        });
+                      } else if (this.state.popupHeight === 0) {
+                        this.setState({popupHeight: height}, () => {
+                          this.startPopup();
+                        });
                       }
                     }}
                   />

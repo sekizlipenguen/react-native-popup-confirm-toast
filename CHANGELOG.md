@@ -2,7 +2,8 @@
 
 ### Fixed
 
-- **Popup behind SPSheet** — `Popup` now uses native `Modal` (`presentationStyle="overFullScreen"`) like SPSheet, so alerts/confirms opened from a sheet (e.g. review validation) appear on top instead of under the sheet.
+- **Popup behind SPSheet** — `Popup` now uses native `Modal` (`presentationStyle="overFullScreen"`) like SPSheet, so alerts/confirms opened from a sheet appear on top.
+- **Popup never appearing after Modal migration** — open lifecycle now keeps `open: true` for the whole animation (`start` alone no longer drives `Modal.visible`). Animated values live on the instance; measure fallback starts the animation if `onLayout` is delayed.
 
 ---
 
