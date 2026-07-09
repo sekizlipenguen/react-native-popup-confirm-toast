@@ -2,7 +2,6 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
     import {FC, ReactNode} from "react";
     import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
 
-    // Toast Config
     export interface ToastConfig {
         title?: string;
         text?: string;
@@ -26,12 +25,37 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         onCloseComplete?: () => void;
     }
 
-    // Popup Config
+    export interface ActionToastActionConfig {
+        node?: ReactNode;
+        onPress?: () => void;
+        backgroundColor?: string;
+        accessibilityLabel?: string;
+        closeAccessibilityLabel?: string;
+        closeNode?: ReactNode;
+    }
+
+    export interface ActionToastConfig {
+        message?: string;
+        text?: string;
+        duration?: number;
+        bottomOffset?: number;
+        action?: ActionToastActionConfig | null;
+        onClose?: () => void;
+        styles?: {
+            wrap?: StyleProp<ViewStyle>;
+            bar?: StyleProp<ViewStyle>;
+            actionButton?: StyleProp<ViewStyle>;
+            message?: StyleProp<TextStyle>;
+            closeButton?: StyleProp<ViewStyle>;
+        };
+    }
+
     export interface PopupConfig {
         title?: string;
         textBody?: string;
         type?: "success" | "info" | "danger" | "warning" | "confirm";
         buttonText?: string;
+        cancelButtonText?: string;
         confirmText?: string;
         cancelCallback?: () => void;
         callback?: () => void;
@@ -49,17 +73,25 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         onCloseComplete?: () => void;
     }
 
-    // Sheet Config
+    export interface SheetBodyProps {
+        sheetHeight?: number;
+        keyboardInset?: number;
+        measuring?: boolean;
+    }
+
     export interface SheetConfig {
         background?: string;
         height?: number;
+        autoHeight?: boolean;
+        maxHeight?: number;
+        allowHeightShrink?: boolean;
         duration?: number;
         closeDuration?: number;
         closeOnDragDown?: boolean;
         closeOnPressMask?: boolean;
         closeOnPressBack?: boolean;
         dragTopOnly?: boolean;
-        component?: FC<{ sheetProps: any }>;
+        component?: FC<{ sheetProps?: SheetBodyProps }>;
         onOpen?: () => void;
         onOpenComplete?: () => void;
         onClose?: () => void;
@@ -73,7 +105,6 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         keyboardHeightAdjustment?: boolean;
     }
 
-    // Drawer Config
     export interface DrawerConfig {
         position?: "left" | "right" | "top" | "bottom";
         drawerWidth?: number;
@@ -93,6 +124,11 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         hide: () => void;
     }
 
+    export interface ActionToast {
+        show: (config: ActionToastConfig) => void;
+        hide: () => void;
+    }
+
     export interface Popup {
         show: (config: PopupConfig) => void;
         hide: () => void;
@@ -102,6 +138,7 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         show: (config: SheetConfig) => void;
         hide: () => void;
         setHeight: (height: number, onComplete?: () => void) => void;
+        reportContentHeight: (height: number, onComplete?: () => void) => void;
     }
 
     export interface Drawer {
@@ -109,13 +146,13 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         hide: () => void;
     }
 
-    // Root Props Definition
     export interface RootProps {
         children?: ReactNode;
         style?: StyleProp<ViewStyle>;
     }
 
     export const Toast: Toast;
+    export const ActionToast: ActionToast;
     export const Popup: Popup;
     export const SPSheet: SPSheet;
     export const Drawer: Drawer;

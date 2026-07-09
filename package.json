@@ -1,7 +1,7 @@
 {
   "name": "@sekizlipenguen/react-native-popup-confirm-toast",
-  "version": "1.1.1",
-  "description": "A flexible and customizable popup, toast, bottom sheet, and drawer library for React Native. Supports Android, iOS, and Web with React Native 0.60+.",
+  "version": "2.0.0",
+  "description": "Popup, toast, action toast, bottom sheet (SPSheet), and drawer for React Native. Auto-height sheets, keyboard-aware, iOS/Android/Web.",
   "main": "index.js",
   "types": "index.d.ts",
   "typings": "index.d.ts",
@@ -51,6 +51,14 @@
   "engines": {
     "react-native": ">=0.60"
   },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "bugs": {
     "url": "https://github.com/sekizlipenguen/react-native-popup-confirm-toast/issues"
   },

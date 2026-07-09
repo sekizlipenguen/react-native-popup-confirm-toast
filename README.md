@@ -34,9 +34,135 @@ A flexible and user-friendly popup, toast, and bottom sheet solution for React N
 |:-----------------:|:--------------------:|
 | ![](assets/3.gif) |  ![](assets/4.gif)   |
 
-## Usage
+## ActionToast (v2.0)
 
-## Installation
+Floating bottom action bar for cart success, quick CTA and dismiss — ideal for e-commerce flows. **Mounted automatically in `Root`** — no extra setup.
+
+```javascript
+import { ActionToast } from '@sekizlipenguen/react-native-popup-confirm-toast';
+
+ActionToast.show({
+  message: 'Ürün sepete eklendi',
+  duration: 4000,
+  bottomOffset: 80, // tab bar height
+  action: {
+    node: <YourIcon size={20} color="#fff" />,
+    backgroundColor: '#D6001F',
+    onPress: () => navigation.navigate('Cart'),
+    accessibilityLabel: 'Go to cart',
+  },
+});
+
+ActionToast.hide();
+```
+
+| Key | Type | Description | Default |
+|-----|------|-------------|---------|
+| `message` / `text` | string | Toast message | `''` |
+| `duration` | number | Auto-hide ms | `4000` |
+| `bottomOffset` | number | Distance from bottom (tab bar) | `16` |
+| `action` | object | `{ node, onPress, backgroundColor, accessibilityLabel }` | `null` |
+| `onClose` | function | Fired when toast hides | `null` |
+| `styles` | object | `{ wrap, bar, actionButton, message, closeButton }` | `{}` |
+
+## SPSheet (v2.0)
+
+Bottom sheet with **auto height**, **measure-before-open**, and **keyboard-aware** positioning.
+
+### Quick start — fixed height
+
+```javascript
+SPSheet.show({
+  height: 320,
+  dragTopOnly: true,
+  component: MySheetBody,
+});
+```
+
+### Auto height (recommended for forms)
+
+Content is measured **off-screen first**, then the sheet opens once at the correct height — no small-then-grow flicker.
+
+```javascript
+SPSheet.show({
+  autoHeight: true,
+  allowHeightShrink: true,
+  keyboardHeightAdjustment: true,
+  dragTopOnly: true,
+  closeOnDragDown: true,
+  component: ProductReviewSheetBody,
+});
+```
+
+Inside the body component:
+
+```javascript
+function ProductReviewSheetBody({ sheetProps }) {
+  const insets = useSafeAreaInsets();
+  const sheetHeight = sheetProps?.sheetHeight || 0;
+  const isMeasuring = sheetProps?.measuring === true;
+
+  return (
+    <ScrollView
+      style={sheetHeight && !isMeasuring ? { maxHeight: sheetHeight - 17 } : undefined}
+      contentContainerStyle={{ paddingBottom: insets.bottom }}
+    >
+      <View
+        onLayout={(e) => {
+          const h = e.nativeEvent.layout.height;
+          // First layout: report immediately (no debounce) for measure-before-open
+          SPSheet.reportContentHeight(h + 17 + insets.bottom);
+        }}
+      >
+        {/* form content */}
+      </View>
+    </ScrollView>
+  );
+}
+```
+
+### SPSheet API highlights
+
+| Key | Type | Description | Default |
+|-----|------|-------------|---------|
+| `height` | number | Fixed height (px). Ignored when `autoHeight: true` | min 100 |
+| `autoHeight` | boolean | Content-driven height | `false` |
+| `maxHeight` | number | Max sheet height | 92% of screen |
+| `allowHeightShrink` | boolean | Allow height to decrease after open | `true` |
+| `keyboardHeightAdjustment` | boolean | Lift sheet above keyboard (iOS + Android) | `false` |
+| `dragTopOnly` | boolean | Drag handle only (not whole sheet) | `false` |
+| `closeOnDragDown` | boolean | Swipe down to close | `true` |
+| `closeOnPressMask` | boolean | Tap backdrop to close | `true` |
+| `closeOnPressBack` | boolean | Android back to close | `true` |
+| `component` | FC | Body component; receives `sheetProps` | `null` |
+| `onOpen` / `onOpenComplete` / `onClose` / `onCloseComplete` | function | Lifecycle callbacks | — |
+
+### Static methods
+
+| Method | Description |
+|--------|-------------|
+| `SPSheet.show(config)` | Open sheet |
+| `SPSheet.hide()` | Close sheet |
+| `SPSheet.setHeight(height, onComplete?)` | Change height after open |
+| `SPSheet.reportContentHeight(height, onComplete?)` | Same as `setHeight`; use from body `onLayout` |
+
+### `sheetProps` passed to body
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `sheetHeight` | number | Current sheet height |
+| `keyboardInset` | number | Active keyboard lift (px) |
+| `measuring` | boolean | `true` during off-screen measure phase |
+
+### Keyboard behaviour (iOS)
+
+When `keyboardHeightAdjustment: true`:
+
+1. Sheet moves up via `positionPopup` (not margin hacks).
+2. White fill covers the rounded gap between sheet and keyboard top edge.
+3. Combine with a bounded `ScrollView` + scroll-to-focused-field in your body for best UX.
+
+---
 
 Using npm:
 
@@ -353,7 +479,10 @@ const DrawerContent = ({onClose}) => {
 | `onCloseComplete`          | function                 | works after window is closed                                              | null               |
 | `customStyles`             | object                   | customStyles: { draggableIcon: {}, container: {}, draggableContainer:{} } | {}                 |
 | `timing`                   | number                   | Use this parameter for automatic shutdown.                                | 0(ms)              |
-| `keyboardHeightAdjustment` | boolean                  | re-adjusts the height when the keyboard is opened                         | false              |
+| `keyboardHeightAdjustment` | boolean                  | Lift sheet above keyboard; iOS gap fill                                   | false              |
+| `autoHeight`               | boolean                  | Content-driven height; measure-before-open                                | false              |
+| `maxHeight`                | number                   | Maximum sheet height (px)                                                 | 92% of screen      |
+| `allowHeightShrink`        | boolean                  | Allow height to decrease after open                                       | true               |
 
 ### Popup
 
@@ -438,7 +567,10 @@ const DrawerContent = ({onClose}) => {
 |----------------|-------------|------------------------------------------------------------------------|-------------------------------------|
 | SPSheet        | show        | const spSheet = SPSheet; spSheet.show(config);                         |                                     |
 | SPSheet        | hide        | const spSheet = SPSheet; spSheet.hide();                               |                                     |
-| SPSheet        | setHeight   | const spSheet = SPSheet; spSheet.setHeight(500,completeEventFunction); | allows you to change the box height |
+| SPSheet        | setHeight   | SPSheet.setHeight(500, onComplete)                                     | Change height after open            |
+| SPSheet        | reportContentHeight | SPSheet.reportContentHeight(500, onComplete)                   | Same as setHeight; use from body    |
+| ActionToast    | show        | ActionToast.show(config)                                               | Show bottom action toast            |
+| ActionToast    | hide        | ActionToast.hide()                                                     | Hide action toast                   |
 | Popup          | show        | const popup = Popup; popup.show(config);                               |                                     |
 | Popup          | hide        | const popup = Popup; popup.hide();                                     |                                     |
 | Toast          | show        | const toast = Toast; toast.show(config);                               |                                     |

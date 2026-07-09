@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {Animated, Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Animated, Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+
+const PRIMARY = '#D6001F';
+const PRIMARY_PRESSED = '#B8001A';
+const TEXT_PRIMARY = '#111111';
+const TEXT_SECONDARY = '#666666';
+const BORDER = '#E5E5E5';
+const SURFACE = '#FFFFFF';
 
 class Popup extends Component {
   static popupInstance;
@@ -41,7 +48,7 @@ class Popup extends Component {
       descTextStyle: false,
       start: false,
       useNativeDriver: true,
-      bounciness: 15,
+      bounciness: 12,
       onClose: false,
       onCloseComplete: false,
       onOpenComplete: false,
@@ -74,23 +81,34 @@ class Popup extends Component {
   }
 
   start({...config}) {
+    const type = config.type || 'warning';
+    const nextConfig = {...config};
+
+    if (nextConfig.confirmText == null && nextConfig.cancelButtonText != null) {
+      nextConfig.confirmText = nextConfig.cancelButtonText;
+    }
+
+    if (type === 'confirm' && nextConfig.iconEnabled === undefined) {
+      nextConfig.iconEnabled = false;
+    }
 
     this.setState({
       ...this.defaultState,
-      ...config,
+      ...nextConfig,
+      type,
       start: true,
     });
   }
 
   startPopup() {
-    // Eğer popup zaten gösteriliyorsa veya start false ise, tekrar başlatma
     if (this.state.show || !this.state.start) {
       return;
     }
 
-    if (typeof this.state.onOpen == 'function') {
-      return this.state.onOpen();
+    if (typeof this.state.onOpen === 'function') {
+      this.state.onOpen();
     }
+
     this.setState({
       start: false,
     }, () => {
@@ -112,8 +130,8 @@ class Popup extends Component {
         }),
       ]).start(() => {
         this.setState({show: true}, () => {
-          if (typeof this.state.onOpenComplete == 'function') {
-            return this.state.onOpenComplete();
+          if (typeof this.state.onOpenComplete === 'function') {
+            this.state.onOpenComplete();
           }
         });
       });
@@ -129,8 +147,8 @@ class Popup extends Component {
 
   hidePopup() {
     const {positionPopup, opacity, positionView, onCloseComplete, onClose} = this.state;
-    if (typeof onClose == 'function') {
-      return onClose();
+    if (typeof onClose === 'function') {
+      onClose();
     }
     Animated.sequence([
       Animated.timing(positionPopup, {
@@ -150,8 +168,8 @@ class Popup extends Component {
       }),
     ]).start(() => {
       this.setState(this.defaultState, () => {
-        if (onCloseComplete && typeof onCloseComplete == 'function') {
-          return onCloseComplete();
+        if (typeof onCloseComplete === 'function') {
+          onCloseComplete();
         }
       });
     });
@@ -166,6 +184,8 @@ class Popup extends Component {
       case 'warning':
         return this.state.icon || require('../assets/warning.png');
       case 'confirm':
+        return this.state.icon || require('../assets/warning.png');
+      default:
         return this.state.icon || require('../assets/warning.png');
     }
   }
@@ -182,12 +202,60 @@ class Popup extends Component {
     }, 100);
   };
 
+  renderConfirmButtons(callback, cancelCallback, buttonText, confirmText) {
+    return (
+      <View style={[styles.buttonRow, this.state.buttonContentStyle]}>
+        <Pressable
+          style={({pressed}) => [
+            styles.Button,
+            styles.cancelOutline,
+            this.state.confirmButtonStyle,
+            pressed && styles.cancelOutlinePressed,
+          ]}
+          android_ripple={{color: 'rgba(17, 17, 17, 0.08)'}}
+          onPress={() => {
+            if (typeof cancelCallback === 'function') {
+              cancelCallback();
+            } else {
+              this.hidePopup();
+            }
+          }}
+        >
+          <Text style={[styles.cancelText, this.state.confirmButtonTextStyle]} numberOfLines={1}>
+            {confirmText}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={({pressed}) => [
+            styles.Button,
+            styles.primaryButton,
+            this.state.okButtonStyle,
+            pressed && styles.primaryButtonPressed,
+          ]}
+          android_ripple={{color: 'rgba(255, 255, 255, 0.2)'}}
+          onPress={() => {
+            if (typeof callback === 'function') {
+              callback();
+            }
+          }}
+        >
+          <Text style={[styles.primaryText, this.state.okButtonTextStyle]} numberOfLines={1}>
+            {buttonText}
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   render() {
     const {title, type, textBody, buttonEnabled, buttonText, confirmText, callback, cancelCallback, background, iconEnabled, iconHeaderStyle, start} = this.state;
     const {bodyComponent, containerStyle, modalContainerStyle, positionPopup, positionView, opacity, bodyComponentForce} = this.state;
 
     const typeName = type + 'ButtonStyle';
     const BodyComponentElement = bodyComponent ? bodyComponent : false;
+    const isConfirm = type === 'confirm';
+
     return (
         <Animated.View
             ref={c => this._root = c}
@@ -235,13 +303,11 @@ class Popup extends Component {
                       <BodyComponentElement {...this.props} onLayout={(event) => {
                         if (event && start && !this.state.show) {
                           const height = event.nativeEvent.layout.height;
-                          // Eğer popupHeight zaten set edilmişse ve aynıysa, tekrar startPopup çağırma
                           if (this.state.popupHeight !== height) {
                             this.setState({popupHeight: height}, () => {
                               this.startPopup();
                             });
                           } else if (this.state.popupHeight === 0) {
-                            // İlk kez set ediliyorsa
                             this.setState({popupHeight: height}, () => {
                               this.startPopup();
                             });
@@ -263,47 +329,41 @@ class Popup extends Component {
                             </>
                         )
                     }
-                    <View style={styles.Content}>
+                    <View style={[styles.Content, !iconEnabled && styles.contentCompact]}>
                       {
                           title && title.length > 0 && (
                               <Text style={[styles.Title, this.state.titleTextStyle]}>{title}</Text>
                           )
                       }
-                      <Text style={[styles.Desc, this.state.descTextStyle]}>{textBody}</Text>
+                      {textBody ? (
+                        <Text style={[styles.Desc, this.state.descTextStyle]}>{textBody}</Text>
+                      ) : null}
                       {
                         BodyComponentElement ? (
                             <BodyComponentElement {...this.props} />
                         ) : null
                       }
-                      <View style={this.state.buttonContentStyle}>
-                        {
-                            buttonEnabled && (
-                                <TouchableOpacity style={[styles.Button, styles[typeName], this.state.okButtonStyle]} onPress={() => {
-                                  if (typeof callback == 'function') {
-                                    return callback();
-                                  }
-                                }}>
-                                  <Text style={[styles.TextButton, this.state.okButtonTextStyle]}>{buttonText}</Text>
-                                </TouchableOpacity>
-                            )
-                        }
-                        {
-                            type === 'confirm' && (
-                                <>
-                                  <TouchableOpacity style={[styles.Button, styles.confirm, this.state.confirmButtonStyle]} onPress={() => {
-                                    if (typeof cancelCallback == 'function') {
-                                      return cancelCallback();
-                                    } else {
-                                      this.hidePopup();
-                                    }
-
-                                  }}>
-                                    <Text style={[styles.TextButton, styles[type + 'Text'], this.state.confirmButtonTextStyle]}>{confirmText}</Text>
+                      {isConfirm ? (
+                        this.renderConfirmButtons(callback, cancelCallback, buttonText, confirmText)
+                      ) : (
+                        <View style={[styles.buttonRow, styles.buttonRowSingle, this.state.buttonContentStyle]}>
+                          {
+                              buttonEnabled && (
+                                  <TouchableOpacity
+                                    style={[styles.Button, styles[typeName], styles.primaryButton, this.state.okButtonStyle]}
+                                    activeOpacity={0.85}
+                                    onPress={() => {
+                                      if (typeof callback === 'function') {
+                                        callback();
+                                      }
+                                    }}
+                                  >
+                                    <Text style={[styles.primaryText, this.state.okButtonTextStyle]}>{buttonText}</Text>
                                   </TouchableOpacity>
-                                </>
-                            )
-                        }
-                      </View>
+                              )
+                          }
+                        </View>
+                      )}
                     </View>
                   </>
               )
@@ -324,81 +384,114 @@ const styles = StyleSheet.create({
     left: 0,
   },
   Message: {
-    width: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    width: '88%',
+    maxWidth: 360,
+    backgroundColor: SURFACE,
+    borderRadius: 20,
     alignItems: 'center',
     overflow: 'hidden',
     position: 'absolute',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 12,
   },
   Content: {
-    padding: 20,
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 24,
     width: '100%',
   },
+  contentCompact: {
+    paddingTop: 24,
+  },
   Header: {
-    height: 75,
+    height: 72,
     width: 100,
-    backgroundColor: '#fff',
+    backgroundColor: SURFACE,
   },
   Image: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     position: 'absolute',
     top: 20,
   },
   Title: {
-    color: '#1e1e1e',
-    fontSize: 18,
-    fontWeight: '600',
-    fontStyle: 'normal',
+    color: TEXT_PRIMARY,
+    fontSize: 20,
+    fontWeight: '700',
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 10,
+    lineHeight: 26,
+    marginBottom: 8,
   },
   Desc: {
-    color: '#111111',
-    fontSize: 16,
+    color: TEXT_SECONDARY,
+    fontSize: 15,
     fontWeight: '400',
-    fontStyle: 'normal',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 24,
+    gap: 12,
+  },
+  buttonRowSingle: {
+    marginTop: 20,
   },
   Button: {
     flex: 1,
-    height: 48,
+    minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
-    borderRadius: 8,
-    backgroundColor: '#702c91',
+    borderRadius: 999,
+    paddingHorizontal: 12,
   },
-  TextButton: {
+  primaryButton: {
+    backgroundColor: PRIMARY,
+  },
+  primaryButtonPressed: {
+    backgroundColor: PRIMARY_PRESSED,
+    opacity: 0.92,
+  },
+  primaryText: {
     color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-    fontStyle: 'normal',
+    fontSize: 15,
+    fontWeight: '700',
     textAlign: 'center',
-    lineHeight: 20,
+  },
+  cancelOutline: {
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  cancelOutlinePressed: {
+    backgroundColor: '#F0F0F0',
+    borderColor: '#D0D0D0',
+    opacity: 0.82,
+  },
+  cancelText: {
+    color: TEXT_PRIMARY,
+    fontSize: 15,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   successButtonStyle: {
-    backgroundColor: '#702c91',
+    backgroundColor: PRIMARY,
   },
   dangerButtonStyle: {
-    backgroundColor: '#702c91',
+    backgroundColor: PRIMARY,
   },
   warningButtonStyle: {
-    backgroundColor: '#702c91',
+    backgroundColor: PRIMARY,
   },
   confirmButtonStyle: {
-    backgroundColor: '#702c91',
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-  confirm: {
-    backgroundColor: 'transparent',
-  },
-  confirmText: {
-    color: '#111111',
-  },
-
 });
 
 export default Popup;

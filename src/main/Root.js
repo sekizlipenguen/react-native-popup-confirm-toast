@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import Popup from './Popup';
 import Toast from './Toast';
+import ActionToast from './ActionToast';
 import SPSheet from './SPSheet';
 import Drawer from './Drawer';
 
@@ -23,6 +24,13 @@ class Root extends Component {
               ref={c => {
                 if (c) {
                   Toast.toastInstance = c;
+                }
+              }}
+          />
+          <ActionToast
+              ref={c => {
+                if (c) {
+                  ActionToast.actionToastInstance = c;
                 }
               }}
           />
