@@ -1,3 +1,11 @@
+## [2.1.1] - 2026-07-10
+
+### Changed
+
+- Version bump for npm publish of the 2.1 hook SPSheet / animated Popup / configurable mask release.
+
+---
+
 ## [2.1.0] - 2026-07-10
 
 ### Added
