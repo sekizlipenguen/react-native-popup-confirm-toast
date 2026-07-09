@@ -6,7 +6,9 @@
 
 # @sekizlipenguen/react-native-popup-confirm-toast
 
-A flexible and user-friendly popup, toast, and bottom sheet solution for React Native. This package provides customizable components for displaying interactive messages, confirmation dialogs, and toast notifications in your mobile applications.
+A flexible popup, toast, action toast, bottom sheet (**SPSheet**), and drawer for React Native — iOS / Android / Web.
+
+**v2.1** highlights: hook-based SPSheet, animated Popup cards, configurable mask color/opacity, Fabric-safe static dims, Popup portal above open sheets.
 
 **Note:** This package has been moved to the `@sekizlipenguen` scope for improved organization and better support for future updates.
 
@@ -271,18 +273,19 @@ function ProductReviewSheetBody({ sheetProps }) {
 | `allowHeightShrink` | boolean | Allow height to decrease after open | `true` |
 | `keyboardHeightAdjustment` | boolean | Lift sheet above keyboard (iOS + Android) | `false` |
 | `dragTopOnly` | boolean | Drag handle only (not whole sheet) | `false` |
-| `closeOnDragDown` | boolean | Swipe down to close | `true` |
-| `closeOnPressMask` | boolean | Tap backdrop to close | `true` |
-| `closeOnPressBack` | boolean | Android back to close | `true` |
+| `closeOnDragDown` | boolean | Drag to dismiss | `true` |
+| `closeOnPressMask` | boolean | Tap dim outside sheet to close | `true` |
+| `closeOnPressBack` | boolean | Android back / Modal request close | `true` |
 | `component` | FC | Body component; receives `sheetProps` | `null` |
+| `background` | string | Static mask color | `rgba(0,0,0,0.5)` |
+| `maskColor` | string | Mask color override | — |
+| `maskOpacity` / `opacity` | number | Mask opacity 0–1 | — |
+| `mask` | object | `{ color, opacity }` | — |
 | `animation` | string | `slide` \| `fade` \| `fadeSlide` \| `spring` \| `none` | `slide` |
 | `from` | string | `bottom` \| `top` \| `left` \| `right` \| `center` | `bottom` |
-| `backdropAnimation` | string \| object | Kept for API compat; dim is **static** on Fabric Modal | `fade` |
+| `backdropAnimation` | string \| object | API kept; dim is **static** on Fabric Modal | `fade` |
 | `sheetAnimation` | object | Full override: `{ type, from, duration, closeDuration, bounciness, speed }` | — |
 | `zIndex` | number | Stack order inside Modal host | `10` |
-| `closeOnPressMask` | boolean | Tap dim outside sheet to close | `true` |
-| `closeOnDragDown` | boolean | Drag to dismiss | `true` |
-| `closeOnPressBack` | boolean | Android back / Modal request close | `true` |
 | `onOpen` / `onOpenComplete` / `onClose` / `onCloseComplete` | function | Lifecycle callbacks | — |
 
 ### Static methods
@@ -309,7 +312,7 @@ function ProductReviewSheetBody({ sheetProps }) {
 
 When `keyboardHeightAdjustment: true`:
 
-1. Sheet moves up via `positionPopup` (not margin hacks).
+1. Sheet lifts via bottom inset above the keyboard.
 2. White fill covers the rounded gap between sheet and keyboard top edge.
 3. Combine with a bounded `ScrollView` + scroll-to-focused-field in your body for best UX.
 
@@ -735,6 +738,7 @@ const DrawerContent = ({onClose}) => {
 | SPSheet        | hide        | const spSheet = SPSheet; spSheet.hide();                               |                                     |
 | SPSheet        | setHeight   | SPSheet.setHeight(500, onComplete)                                     | Change height after open            |
 | SPSheet        | reportContentHeight | SPSheet.reportContentHeight(500, onComplete)                   | Same as setHeight; use from body    |
+| SPSheet        | isOpen      | SPSheet.isOpen()                                                       | Whether sheet Modal is open         |
 | ActionToast    | show        | ActionToast.show(config)                                               | Show bottom action toast            |
 | ActionToast    | hide        | ActionToast.hide()                                                     | Hide action toast                   |
 | Popup          | show        | const popup = Popup; popup.show(config);                               |                                     |

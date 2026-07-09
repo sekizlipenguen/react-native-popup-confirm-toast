@@ -32,8 +32,8 @@
 
 ### Changed
 
-- Default open/close durations: `280` / `240` ms.
-- Backdrop dim uses native-driver opacity fade (sheet motion remains native-driver translate / opacity / scale).
+- Default open/close durations: sheet `280` / `240` ms; popup card `260` / `200` ms.
+- Dim/mask is **static** on Modal root (explicit size + color). Sheet/card motion uses native-driver translate / opacity / scale.
 
 ---
 
