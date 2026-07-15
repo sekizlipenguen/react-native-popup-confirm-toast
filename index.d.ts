@@ -1,18 +1,38 @@
-declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
-    import {ComponentType, FC, ReactNode} from "react";
-    import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
+import {ComponentType, FC, ReactNode} from "react";
+import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
 
+    export type ToastPosition =
+        | "top"
+        | "bottom"
+        | "center"
+        | "topLeft"
+        | "topRight"
+        | "bottomLeft"
+        | "bottomRight";
+
+    export type ToastAnimation = "slide" | "fade" | "fadeSlide" | "spring" | "none";
+    export type ToastMode = "stack" | "queue";
+    export type ToastType = "success" | "error" | "danger" | "warning" | "info" | "loading" | string;
+
+    /**
+     * Legacy banner Toast config. UI removed in v2.2 — mapped to ActionToast.
+     * `timeColor` / statusBar* are ignored.
+     */
     export interface ToastConfig {
         title?: string;
         text?: string;
+        message?: string;
         titleTextStyle?: StyleProp<TextStyle>;
         descTextStyle?: StyleProp<TextStyle>;
         backgroundColor?: string;
+        /** @deprecated ignored — banner progress removed */
         timeColor?: string;
         position?: "top" | "bottom";
         icon?: ComponentType<any> | ReactNode;
         timing?: number;
+        duration?: number;
         type?: string;
+        id?: string | number;
         statusBarType?: "default" | "dark-content" | "light-content";
         statusBarTranslucent?: boolean;
         statusBarHidden?: boolean;
@@ -37,23 +57,57 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
     }
 
     export interface ActionToastConfig {
+        id?: string | number;
+        title?: string;
         /** Primary message text */
         message?: string;
         /** Alias of `message` */
         text?: string;
-        /** Auto-hide duration in ms (default: 4000) */
-        duration?: number;
-        /** Distance from bottom safe area / screen edge (default: 16) */
+        type?: ToastType;
+        icon?: ComponentType<any> | ReactNode | string | null | false;
+        backgroundColor?: string;
+        textColor?: string;
+        iconColor?: string;
+        /** Auto-hide duration in ms; `0` = persistent (default: 4000) */
+        duration?: number | false;
+        position?: ToastPosition;
+        animation?: ToastAnimation;
+        /** `stack` = up to maxVisible; `queue` = one at a time */
+        mode?: ToastMode;
+        maxVisible?: number;
+        /** Edge inset (aliases `bottomOffset`) */
+        offset?: number;
+        /** Distance from bottom / used as offset (default: 16) */
         bottomOffset?: number;
+        onPress?: () => void;
+        /** Dismiss after card `onPress` (default: true when onPress set) */
+        pressDismiss?: boolean;
         action?: ActionToastActionConfig | null;
+        closeable?: boolean;
         onClose?: () => void;
+        onCloseComplete?: () => void;
+        onOpen?: () => void;
+        onOpenComplete?: () => void;
         styles?: {
             wrap?: StyleProp<ViewStyle>;
             bar?: StyleProp<ViewStyle>;
             actionButton?: StyleProp<ViewStyle>;
             message?: StyleProp<TextStyle>;
+            title?: StyleProp<TextStyle>;
+            icon?: StyleProp<ViewStyle>;
             closeButton?: StyleProp<ViewStyle>;
         };
+    }
+
+    export interface ActionToastDefaults {
+        position?: ToastPosition;
+        animation?: ToastAnimation;
+        mode?: ToastMode;
+        maxVisible?: number;
+        offset?: number;
+        bottomOffset?: number;
+        type?: ToastType;
+        duration?: number | false;
     }
 
     export interface PopupBodyProps {
@@ -271,13 +325,18 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
     }
 
     export interface Toast {
-        show: (config?: ToastConfig) => void;
+        /** @deprecated Prefer ActionToast.show — redirected to ActionToast card stack */
+        show: (config?: ToastConfig) => string | undefined;
         hide: () => void;
     }
 
     export interface ActionToast {
-        show: (config?: ActionToastConfig) => void;
-        hide: () => void;
+        /** Shows a toast and returns its generated/provided id when Root is mounted. */
+        show: (config?: ActionToastConfig) => string | undefined;
+        /** Hide by id, or the newest toast when id omitted */
+        hide: (id?: string | number) => void;
+        clear: () => void;
+        setDefaults: (defaults?: ActionToastDefaults) => void;
     }
 
     export interface Popup {
@@ -380,4 +439,23 @@ declare module "@sekizlipenguen/react-native-popup-confirm-toast" {
         right: 'right';
         center: 'center';
     };
-}
+    export const TOAST_POSITIONS: {
+        top: 'top';
+        bottom: 'bottom';
+        center: 'center';
+        topLeft: 'topLeft';
+        topRight: 'topRight';
+        bottomLeft: 'bottomLeft';
+        bottomRight: 'bottomRight';
+    };
+    export const TOAST_ANIMATIONS: {
+        slide: 'slide';
+        fade: 'fade';
+        fadeSlide: 'fadeSlide';
+        spring: 'spring';
+        none: 'none';
+    };
+    export const TOAST_MODES: {
+        stack: 'stack';
+        queue: 'queue';
+    };

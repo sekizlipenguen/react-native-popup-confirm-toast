@@ -1,36 +1,21 @@
 import React, {Component} from 'react';
+import {View} from 'react-native';
 
 import PropTypes from 'prop-types';
 import Popup from './Popup';
-import Toast from './Toast';
 import ActionToast from './ActionToast';
 import SPSheet from './SPSheet';
 import Drawer from './Drawer';
 
 /**
- * Mount order matters on iOS: later Modals stack above earlier ones.
- * Popup must be last so standalone alerts appear above SPSheet / Drawer.
- * (When sheet is open, Popup portals inside SPSheet Modal instead.)
+ * Mount order: ActionToast is last among overlays. On iOS it renders through
+ * FullWindowOverlay; on other platforms it stays as the last absolute overlay.
  */
 class Root extends Component {
   render() {
     return (
-      <>
+      <View style={[rootStyles.root, this.props.style]} pointerEvents="box-none">
         {this.props.children}
-        <Toast
-          ref={c => {
-            if (c) {
-              Toast.toastInstance = c;
-            }
-          }}
-        />
-        <ActionToast
-          ref={c => {
-            if (c) {
-              ActionToast.actionToastInstance = c;
-            }
-          }}
-        />
         <Drawer
           ref={c => {
             if (c) {
@@ -52,7 +37,14 @@ class Root extends Component {
             }
           }}
         />
-      </>
+        <ActionToast
+          ref={c => {
+            if (c) {
+              ActionToast.actionToastInstance = c;
+            }
+          }}
+        />
+      </View>
     );
   }
 }
@@ -63,6 +55,12 @@ Root.propTypes = {
     PropTypes.number,
     PropTypes.array,
   ]),
+};
+
+const rootStyles = {
+  root: {
+    flex: 1,
+  },
 };
 
 export default Root;

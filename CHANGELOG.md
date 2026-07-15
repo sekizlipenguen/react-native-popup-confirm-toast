@@ -1,3 +1,36 @@
+## [2.2.0] - 2026-07-15
+
+### Added
+
+- **ActionToast stack / queue** — `mode: 'stack' | 'queue'`, `maxVisible` (default 3). Overflow waits in FIFO; dismissed toasts promote the next.
+- **Positions** — `top` | `bottom` | `center` | `topLeft` | `topRight` | `bottomLeft` | `bottomRight`.
+- **Animations** — `slide` | `fade` | `fadeSlide` | `spring` | `none` (entry direction from position).
+- **Customization** — `type` presets, `icon`, `backgroundColor` / `textColor` / `iconColor`, card `onPress`, `pressDismiss`, `closeable`, `title`, `id` replace, `ActionToast.clear()`, `ActionToast.setDefaults()`.
+- **Exports** — `TOAST_POSITIONS`, `TOAST_ANIMATIONS`, `TOAST_MODES`.
+- **Git-only playground** — development screen covering positions, stack/queue, animations, CTA, id replacement, legacy shim, and an automatic visual tour. The `examples/` directory is excluded from npm.
+
+### Changed
+
+- **Legacy banner Toast UI removed.** `Toast.show` / `Toast.hide` remain and redirect to ActionToast (card). `timeColor` / statusBar* options ignored. Prefer `ActionToast.show`.
+- Root no longer mounts the old full-width Toast view.
+- `react-native-screens >= 3.16.0` is now an explicit peer dependency. ActionToast uses `FullWindowOverlay` on iOS and a non-blocking root overlay on Android/Web.
+
+### Fixed
+
+- Top, center, and corner positions now render in an explicitly sized full-screen host above native-stack screens.
+- Queue interruptions remain strictly one-at-a-time, including consecutive queue calls and stack calls made while a queue card is active.
+- `id` replacement resets auto-dismiss timing; `ActionToast.show()` returns the resolved id.
+- `fade`, `slide`, `fadeSlide`, `spring`, and `none` now execute distinct entrance behavior.
+- `ActionToast.clear()` removes visible and pending items without firing close callbacks for cards that never opened.
+- Root applies its public `style` prop and updates toast placement after screen-size/orientation changes.
+- The package smoke test now imports the production queue and legacy-mapper sources instead of testing duplicated implementations.
+
+### Compatibility
+
+- Existing `ActionToast.show({ message, duration, bottomOffset, action })` cart flow still works (white bar + CTA when no `type` / `backgroundColor`).
+
+---
+
 ## [2.1.1] - 2026-07-10
 
 ### Changed

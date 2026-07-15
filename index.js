@@ -1,7 +1,11 @@
 import Root from './src/main/Root';
 import Popup, {POPUP_ANIMATIONS, POPUP_FROM} from './src/main/Popup';
 import Toast from './src/main/Toast';
-import ActionToast from './src/main/ActionToast';
+import ActionToast, {
+  TOAST_ANIMATIONS,
+  TOAST_MODES,
+  TOAST_POSITIONS,
+} from './src/main/ActionToast';
 import SPSheet, {
   LAYER_Z,
   SHEET_ANIMATIONS,
@@ -26,4 +30,7 @@ export {
   BACKDROP_ANIMATIONS,
   POPUP_ANIMATIONS,
   POPUP_FROM,
+  TOAST_POSITIONS,
+  TOAST_ANIMATIONS,
+  TOAST_MODES,
 };

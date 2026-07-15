@@ -14,31 +14,47 @@ const DEVICE_SPECS = [
   {width: 440, height: 956, statusBarHeight: 51}, // iPhone 16 Pro Max
 ];
 
-const {height: W_HEIGHT, width: W_WIDTH} = Dimensions.get('window');
+function getIOSStatusBarInfo() {
+  if (Platform.OS !== 'ios' || Platform.isTVOS) {
+    return {height: 0, hasNotch: false};
+  }
 
-let statusBarHeight = 20; // Varsayılan Status Bar Yüksekliği
-let isIPhoneWithMonobrow_v = false;
+  if (Platform.isPad) {
+    return {height: 24, hasNotch: false};
+  }
 
-// Cihaz Boyutlarını Kontrol Et
-if (Platform.OS === 'ios' && !Platform.isPad && !Platform.isTVOS) {
+  const {height, width} = Dimensions.get('window');
+  const shortEdge = Math.min(width, height);
+  const longEdge = Math.max(width, height);
   const device = DEVICE_SPECS.find(
-      (d) => d.width === W_WIDTH && d.height === W_HEIGHT,
+    spec =>
+      spec.width === shortEdge &&
+      spec.height === longEdge,
   );
 
   if (device) {
-    statusBarHeight = device.statusBarHeight;
-    isIPhoneWithMonobrow_v = true;
+    return {height: device.statusBarHeight, hasNotch: true};
   }
+
+  // Yeni iPhone ölçüleri listeye eklenmeden de Dynamic Island/notch altında kalma.
+  if (shortEdge >= 393 && longEdge >= 852) {
+    return {height: 50, hasNotch: true};
+  }
+  if (shortEdge >= 375 && longEdge >= 812) {
+    return {height: 44, hasNotch: true};
+  }
+
+  return {height: 20, hasNotch: false};
 }
 
 // Monobrow Kontrol Fonksiyonu
-export const isIPhoneWithMonobrow = () => isIPhoneWithMonobrow_v;
+export const isIPhoneWithMonobrow = () => getIOSStatusBarInfo().hasNotch;
 
 // Status Bar Yüksekliği Fonksiyonu
 export function getStatusBarHeight(skipAndroid = false) {
   return Platform.select({
-    ios: statusBarHeight,
-    android: skipAndroid ? 0 : StatusBar.currentHeight,
+    ios: getIOSStatusBarInfo().height,
+    android: skipAndroid ? 0 : (StatusBar.currentHeight || 0),
     default: 0,
   });
 }

@@ -8,6 +8,8 @@
 
 A flexible popup, toast, action toast, bottom sheet (**SPSheet**), and drawer for React Native — iOS / Android / Web.
 
+**v2.2** highlights: ActionToast **stack/queue**, multi-position, animations, full style/CTA customization. Legacy banner `Toast.show` redirects to ActionToast (old UI removed).
+
 **v2.1** highlights: hook-based SPSheet, animated Popup cards, configurable mask color/opacity, Fabric-safe static dims, Popup portal above open sheets.
 
 **Note:** This package has been moved to the `@sekizlipenguen` scope for improved organization and better support for future updates.
@@ -30,42 +32,119 @@ A flexible popup, toast, action toast, bottom sheet (**SPSheet**), and drawer fo
 |:----------------------:|:-----------------------:|:-------------------------:|:-----------------------------:|
 | ![](assets/popup1.gif) | ![](assets/popup2.gif)  |  ![](assets/popup3.gif)   |    ![](assets/popup4.gif)     |
 
-## Example Toast Message
+## Example ActionToast (v2.2)
+
+Stack / queue, positions, animations, types, CTA, and the playground visual tour:
+
+| ActionToast Playground |
+|:----------------------:|
+| ![](assets/action.gif) |
+
+## Example Toast Message (legacy)
+
+Legacy banner visuals (pre-v2.2). `Toast.show` now redirects to ActionToast cards — see the demo above.
 
 | Example Toast Top | Example Toast Bottom |
 |:-----------------:|:--------------------:|
 | ![](assets/3.gif) |  ![](assets/4.gif)   |
 
-## ActionToast (v2.0)
+## ActionToast (v2.2)
 
-Floating bottom action bar for cart success, quick CTA and dismiss — ideal for e-commerce flows. **Mounted automatically in `Root`** — no extra setup.
+Card toast host (stack or queue) with positions, animations, icons, colors, and optional CTA — **mounted automatically in `Root`**. iOS uses `react-native-screens` `FullWindowOverlay` so cards stay above native-stack screens; Android/Web use the non-blocking root overlay.
+
+See the [Example ActionToast](#example-actiontoast-v22) demo above for the playground visual tour.
 
 ```javascript
-import { ActionToast } from '@sekizlipenguen/react-native-popup-confirm-toast';
+import { ActionToast, TOAST_POSITIONS } from '@sekizlipenguen/react-native-popup-confirm-toast';
 
+// Cart / CTA (legacy white bar when action is set without type/backgroundColor)
 ActionToast.show({
   message: 'Ürün sepete eklendi',
   duration: 4000,
-  bottomOffset: 80, // tab bar height
+  bottomOffset: 80,
   action: {
     node: <YourIcon size={20} color="#fff" />,
     backgroundColor: '#D6001F',
     onPress: () => navigation.navigate('Cart'),
-    accessibilityLabel: 'Go to cart',
   },
 });
 
-ActionToast.hide();
+// Colored notification + stack
+ActionToast.show({
+  type: 'success',
+  title: 'Başarılı',
+  message: 'Sipariş numarası kopyalandı',
+  position: TOAST_POSITIONS.bottom,
+  animation: 'spring',
+  mode: 'stack',
+  maxVisible: 3,
+  backgroundColor: '#6CA22C',
+});
+
+const toastId = ActionToast.show({ message: 'Kaydedildi' });
+ActionToast.hide(toastId);
+ActionToast.hide();      // newest
+ActionToast.clear();     // all
+ActionToast.setDefaults({ position: 'bottom', maxVisible: 3, mode: 'stack' });
 ```
 
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
-| `message` / `text` | string | Toast message | `''` |
-| `duration` | number | Auto-hide ms | `4000` |
-| `bottomOffset` | number | Distance from bottom (tab bar) | `16` |
-| `action` | object | `{ node, onPress, backgroundColor, accessibilityLabel }` | `null` |
-| `onClose` | function | Fired when toast hides | `null` |
-| `styles` | object | `{ wrap, bar, actionButton, message, closeButton }` | `{}` |
+| `id` | string/number | Replace same id if already queued/visible | auto |
+| `title` | string | Optional title | — |
+| `message` / `text` | string | Body | `''` |
+| `type` | string | `success` \| `error` \| `warning` \| `info` \| `loading` | — |
+| `icon` | node \| string \| null | Overrides type glyph; `null` hides | preset |
+| `backgroundColor` / `textColor` / `iconColor` | string | Override type colors | preset |
+| `duration` | number | Auto-hide ms; `0` = sticky | `4000` |
+| `position` | enum | `top` `bottom` `center` `topLeft` `topRight` `bottomLeft` `bottomRight` | `bottom` |
+| `animation` | enum | `slide` `fade` `fadeSlide` `spring` `none` | `spring` |
+| `mode` | enum | `stack` \| `queue` | `stack` |
+| `maxVisible` | number | Concurrent cards in stack mode | `3` |
+| `offset` / `bottomOffset` | number | Edge inset | `16` |
+| `onPress` | function | Whole-card press | — |
+| `pressDismiss` | boolean | Dismiss after `onPress` | `true` if onPress |
+| `action` | object | Side CTA `{ node, onPress, backgroundColor, … }` | `null` |
+| `closeable` | boolean | Show × | `true` |
+| `styles` | object | `{ wrap, bar, title, message, icon, actionButton, closeButton }` | `{}` |
+| `onOpen` / `onOpenComplete` / `onClose` / `onCloseComplete` | function | Lifecycle | — |
+
+`queue` always keeps one card visible. A new queue toast temporarily interrupts the current card(s); interrupted cards resume one by one after it closes. Stack cards shown while a queue toast is active wait behind it.
+
+### Git-only test screen
+
+The repository includes a ready-to-use
+[ActionToast Playground](https://github.com/sekizlipenguen/react-native-popup-confirm-toast/tree/main/examples)
+with all positions, stack/queue, animations, CTA, id replacement, legacy
+`Toast.show`, and an automatic visual tour. Copy it into a development-only
+navigation route. The `examples/` directory is intentionally excluded from the
+npm package.
+
+## Legacy Toast → ActionToast shim
+
+Full-width banner Toast UI was **removed in v2.2**. `Toast.show` / `Toast.hide` still work and map to ActionToast:
+
+| Legacy | Maps to |
+|--------|---------|
+| `title` | `title` |
+| `text` | `message` |
+| `timing` | `duration` |
+| `position` top/bottom | same |
+| `backgroundColor` / `icon` | same |
+| `timeColor`, statusBar* | ignored |
+
+```javascript
+// Still valid — renders as ActionToast card
+Toast.show({
+  title: "I'm Eight!",
+  text: 'Hello',
+  backgroundColor: '#702c91',
+  timing: 3000,
+  position: 'top',
+});
+```
+
+Prefer `ActionToast.show` for new code.
 
 ## SPSheet (v2.1)
 
@@ -321,14 +400,16 @@ When `keyboardHeightAdjustment: true`:
 Using npm:
 
 ```bash
-npm install @sekizlipenguen/react-native-popup-confirm-toast
+npm install @sekizlipenguen/react-native-popup-confirm-toast react-native-screens
 ```
 
 Using yarn:
 
 ```bash
-yarn add @sekizlipenguen/react-native-popup-confirm-toast
+yarn add @sekizlipenguen/react-native-popup-confirm-toast react-native-screens
 ```
+
+`react-native-screens >= 3.16.0` is a peer dependency used by ActionToast on iOS. Projects using React Navigation usually already have it. After a new native installation, run `pod install` in the iOS directory.
 
 ## Usage
 
@@ -689,30 +770,13 @@ const DrawerContent = ({onClose}) => {
 | `duration`               | boolean                            |                                                                                                    | 100                                                                                                                       |
 | `closeDuration`          | boolean                            |                                                                                                    | 100                                                                                                                       |
 
-### Toast
+### Toast (legacy shim → ActionToast)
 
-| Key                      | Type      | Description                                       | Default                                                       |
-|--------------------------|-----------|---------------------------------------------------|---------------------------------------------------------------|
-| `title`                  | string    |                                                   | false                                                         |
-| `text`                   | string    | Description                                       | false                                                         |
-| `titleTextStyle`         | object    |                                                   | {color: '#fff',fontWeight: 'bold',fontSize: 16}               |
-| `descTextStyle`          | object    |                                                   | {marginTop: 5,fontSize: 13,color: '#fff', fontWeight: '400',} |
-| `backgroundColor`        | string    |                                                   | #1da1f2                                                       |
-| `timeColor`              | string    | time backgroundColor                              | #1c6896                                                       |
-| `position`               | enum      | parameters => top, bottom                         | bottom                                                        |
-| `icon`                   | component | (react-native-vector-icons or <Image/> component) | null                                                          |
-| `timing`                 | number    |                                                   | 5000 ms                                                       |
-| `statusBarType`          | string    |                                                   | default                                                       |
-| `statusBarTranslucent`   | boolean   |                                                   | false                                                         |
-| `statusBarHidden`        | boolean   |                                                   | false                                                         |
-| `statusBarAndroidHidden` | boolean   |                                                   | true                                                          |
-| `statusBarAppleHidden`   | boolean   |                                                   | false                                                         |
-| `hiddenDuration`         | number    |                                                   | 200 ms                                                        |
-| `startDuration`          | number    |                                                   | 200 ms                                                        |
-| `onOpen`                 | function  | works after the window is opened                  | null                                                          |
-| `onOpenComplete`         | function  | works after the window is opened                  | null                                                          |
-| `onClose`                | function  | works after window is closed                      | null                                                          |
-| `onCloseComplete`        | function  | works after window is closed                      | null                                                          |
+| Key | Type | Notes |
+|-----|------|-------|
+| `title` / `text` / `timing` / `position` / `backgroundColor` / `icon` | — | Mapped to ActionToast |
+| `timeColor`, statusBar*, `hiddenDuration`, `startDuration` | — | Ignored |
+| Prefer | — | `ActionToast.show` |
 
 ### Drawer
 
@@ -739,12 +803,14 @@ const DrawerContent = ({onClose}) => {
 | SPSheet        | setHeight   | SPSheet.setHeight(500, onComplete)                                     | Change height after open            |
 | SPSheet        | reportContentHeight | SPSheet.reportContentHeight(500, onComplete)                   | Same as setHeight; use from body    |
 | SPSheet        | isOpen      | SPSheet.isOpen()                                                       | Whether sheet Modal is open         |
-| ActionToast    | show        | ActionToast.show(config)                                               | Show bottom action toast            |
-| ActionToast    | hide        | ActionToast.hide()                                                     | Hide action toast                   |
+| ActionToast    | show        | ActionToast.show(config)                                               | Show toast (stack/queue)            |
+| ActionToast    | hide        | ActionToast.hide(id?)                                                  | Hide newest or by id                |
+| ActionToast    | clear       | ActionToast.clear()                                                    | Clear all                           |
+| ActionToast    | setDefaults | ActionToast.setDefaults(config)                                        | Global defaults                     |
 | Popup          | show        | const popup = Popup; popup.show(config);                               |                                     |
 | Popup          | hide        | const popup = Popup; popup.hide();                                     |                                     |
-| Toast          | show        | const toast = Toast; toast.show(config);                               |                                     |
-| Toast          | hide        | const toast = Toast; toast.hide();                                     |                                     |
+| Toast          | show        | Toast.show(config)                                                     | Legacy → ActionToast shim           |
+| Toast          | hide        | Toast.hide()                                                           | Legacy → ActionToast.hide           |
 | Drawer         | show        | const drawer = Drawer; drawer.show(config);                            |                                     |
 | Drawer         | hide        | const drawer = Drawer; drawer.hide();                                  |                                     |
 

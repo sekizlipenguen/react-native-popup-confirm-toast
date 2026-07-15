@@ -1,10 +1,14 @@
 {
   "name": "@sekizlipenguen/react-native-popup-confirm-toast",
-  "version": "2.1.1",
-  "description": "Popup, toast, action toast, bottom sheet (SPSheet), and drawer for React Native. Hook-based SPSheet, animated Popup cards, configurable masks, Fabric-safe.",
+  "version": "2.2.0",
+  "description": "Popup, toast stack (ActionToast), bottom sheet (SPSheet), and drawer for React Native. Queue/stack toasts, positions, animations. Legacy Toast.show redirects to ActionToast.",
   "main": "index.js",
   "types": "index.d.ts",
   "typings": "index.d.ts",
+  "scripts": {
+    "test": "node scripts/smoke-toast-queue.cjs",
+    "prepack": "npm test"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/sekizlipenguen/react-native-popup-confirm-toast.git"
@@ -45,16 +49,23 @@
   ],
   "author": "SekizliPenguen",
   "license": "MIT",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": ">=0.63",
+    "react-native-screens": ">=3.16.0"
+  },
   "devDependencies": {
     "metro-react-native-babel-preset": "^0.65.2"
   },
   "engines": {
-    "react-native": ">=0.60"
+    "react-native": ">=0.63"
   },
   "files": [
     "index.js",
     "index.d.ts",
     "src",
+    "assets",
+    "scripts",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
