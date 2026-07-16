@@ -47,11 +47,97 @@ import {
   resetBackdropHidden,
   resetSheetHidden,
 } from './animations';
+import {
+  SafeAreaProvider,
+  initialWindowMetrics,
+  useSheetBottomInset,
+} from './safeArea';
 
 function useLatest(value) {
   const ref = useRef(value);
   ref.current = value;
   return ref;
+}
+
+/**
+ * Modal içinde ayrı SafeAreaProvider altında çalışır (RN Modal yeni window).
+ * BottomTabBar gibi: alt sheet’e insets.bottom pad + height’e ekler.
+ */
+function SheetFrame({
+  sheetAnim,
+  sheetHeightStyle,
+  sheetValues,
+  keyboardGapFill,
+  config,
+  dragHandlers,
+  handleHandlers,
+  isEdgeSheet,
+  BodyComponent,
+  height,
+  keyboardInset,
+  measuring,
+  childrenHandleTop,
+  childrenHandleBottom,
+}) {
+  const bottomInset = useSheetBottomInset(sheetAnim.from === SHEET_FROM.bottom);
+  // Ölçüm sırasında pad ekleme — yoksa measuredHeight + display’de çift sayılır.
+  const applyInset = !measuring && bottomInset > 0;
+  const heightStyle = useMemo(() => {
+    if (!sheetHeightStyle || !sheetHeightStyle.height) {
+      return sheetHeightStyle;
+    }
+    if (!applyInset) {
+      return sheetHeightStyle;
+    }
+    return {...sheetHeightStyle, height: sheetHeightStyle.height + bottomInset};
+  }, [applyInset, bottomInset, sheetHeightStyle]);
+
+  return (
+    <Animated.View
+      {...(dragHandlers || {})}
+      style={[
+        styles.container,
+        sheetAnim.from === SHEET_FROM.top && styles.containerTop,
+        sheetAnim.from === SHEET_FROM.left && styles.containerSide,
+        sheetAnim.from === SHEET_FROM.right && styles.containerSide,
+        sheetAnim.from === SHEET_FROM.center && styles.containerCenter,
+        heightStyle,
+        getSheetTransformStyle(sheetValues),
+        {
+          overflow: keyboardGapFill > 0 ? 'visible' : 'hidden',
+          paddingBottom: applyInset ? bottomInset : undefined,
+        },
+        config.customStyles?.container,
+      ]}
+    >
+      {childrenHandleTop}
+      {childrenHandleBottom}
+      {BodyComponent ? (
+        <BodyComponent
+          sheetProps={{
+            sheetHeight: height,
+            keyboardInset,
+            measuring,
+            bottomInset,
+            animation: sheetAnim,
+            from: sheetAnim.from,
+          }}
+        />
+      ) : null}
+      {Platform.OS === 'ios' && keyboardGapFill > 0 && sheetAnim.from === SHEET_FROM.bottom ? (
+        <View
+          pointerEvents="none"
+          style={[
+            styles.keyboardGapFill,
+            {
+              height: keyboardGapFill,
+              bottom: -keyboardGapFill,
+            },
+          ]}
+        />
+      ) : null}
+    </Animated.View>
+  );
 }
 
 /**
@@ -537,6 +623,7 @@ const SPSheetHost = forwardRef(function SPSheetHost(_props, ref) {
         animationType="none"
         presentationStyle="overFullScreen"
         statusBarTranslucent
+        navigationBarTranslucent
         hardwareAccelerated
         onRequestClose={() => {
           if (config.closeOnPressBack !== false) {
@@ -545,150 +632,137 @@ const SPSheetHost = forwardRef(function SPSheetHost(_props, ref) {
         }}
       >
         {/*
-          Shared host for sheet dim + PopupPortal.
-          Portal must be a sibling ABOVE the sheet layer so alerts cover the drawer.
+          Modal yeni Android window → app SafeAreaProvider inset’leri buraya gelmez.
+          React Navigation / RNC docs: Modal içinde ayrı SafeAreaProvider.
         */}
-        <View
-          collapsable={false}
-          pointerEvents="box-none"
-          style={{width: WIDTH, height: HEIGHT}}
+        <SafeAreaProvider
+          initialMetrics={initialWindowMetrics}
+          style={{flex: 1, width: WIDTH, height: HEIGHT}}
         >
           {/*
-            THE DIM IS THIS ROOT PRESSABLE (Fabric-safe — proven in 2.0.0).
-            Explicit WIDTH × HEIGHT + static backgroundColor.
-            Tap outside sheet → onPress closes (closeOnPressMask).
-            Sheet is a nested Pressable so its touches do not bubble to the mask.
+            Shared host for sheet dim + PopupPortal.
+            Portal must be a sibling ABOVE the sheet layer so alerts cover the drawer.
           */}
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Close sheet"
-            disabled={config.closeOnPressMask === false}
-            onPress={() => {
-              if (config.closeOnPressMask !== false) {
-                hideInternal();
-              }
-            }}
+          <View
             collapsable={false}
-            style={[
-              styles.overlay,
-              {
-                width: WIDTH,
-                height: HEIGHT,
-                backgroundColor: dimColor,
-                zIndex: 1,
-              },
-              config.customStyles?.overlay,
-              config.customStyles?.backdrop,
-            ]}
+            pointerEvents="box-none"
+            style={{width: WIDTH, height: HEIGHT}}
           >
+            {/*
+              THE DIM IS THIS ROOT PRESSABLE (Fabric-safe — proven in 2.0.0).
+              Explicit WIDTH × HEIGHT + static backgroundColor.
+              Tap outside sheet → onPress closes (closeOnPressMask).
+              Sheet is a nested Pressable so its touches do not bubble to the mask.
+            */}
             <Pressable
-              // Absorb presses on the sheet so the outer mask does not close.
-              onPress={() => {}}
-              accessible={false}
-              pointerEvents="box-none"
-              style={[
-                hostPositionStyle,
-                {
-                  zIndex: Math.max(2, sheetLayer),
-                  elevation: Math.max(12, sheetLayer),
-                },
-              ]}
-              collapsable={false}
-              onLayout={(event) => {
-                const measured = event.nativeEvent.layout.height;
-
-                if (measuringRef.current) {
-                  flags.measuredHeight = measured;
-                  return;
+              accessibilityRole="button"
+              accessibilityLabel="Close sheet"
+              disabled={config.closeOnPressMask === false}
+              onPress={() => {
+                if (config.closeOnPressMask !== false) {
+                  hideInternal();
                 }
-
-                if (!start || flags.openAnimationInProgress || flags.openAnimationComplete) {
-                  return;
-                }
-
-                const next = measured < MIN_SHEET_HEIGHT ? MIN_SHEET_HEIGHT : measured;
-                setHeight(clampHeight(next, configRef.current.maxHeight));
-                setStart(false);
-                requestAnimationFrame(() => startOpenAnimation());
               }}
+              collapsable={false}
+              style={[
+                styles.overlay,
+                {
+                  width: WIDTH,
+                  height: HEIGHT,
+                  backgroundColor: dimColor,
+                  zIndex: 1,
+                },
+                config.customStyles?.overlay,
+                config.customStyles?.backdrop,
+              ]}
             >
-              <Animated.View
-                {...(dragHandlers || {})}
+              <Pressable
+                // Absorb presses on the sheet so the outer mask does not close.
+                onPress={() => {}}
+                accessible={false}
+                pointerEvents="box-none"
                 style={[
-                  styles.container,
-                  sheetAnim.from === SHEET_FROM.top && styles.containerTop,
-                  sheetAnim.from === SHEET_FROM.left && styles.containerSide,
-                  sheetAnim.from === SHEET_FROM.right && styles.containerSide,
-                  sheetAnim.from === SHEET_FROM.center && styles.containerCenter,
-                  sheetHeightStyle,
-                  getSheetTransformStyle(sheetValues),
+                  hostPositionStyle,
                   {
-                    overflow: keyboardGapFill > 0 ? 'visible' : 'hidden',
+                    zIndex: Math.max(2, sheetLayer),
+                    elevation: Math.max(12, sheetLayer),
                   },
-                  config.customStyles?.container,
                 ]}
+                collapsable={false}
+                onLayout={(event) => {
+                  const measured = event.nativeEvent.layout.height;
+
+                  if (measuringRef.current) {
+                    flags.measuredHeight = measured;
+                    return;
+                  }
+
+                  if (!start || flags.openAnimationInProgress || flags.openAnimationComplete) {
+                    return;
+                  }
+
+                  const next = measured < MIN_SHEET_HEIGHT ? MIN_SHEET_HEIGHT : measured;
+                  setHeight(clampHeight(next, configRef.current.maxHeight));
+                  setStart(false);
+                  requestAnimationFrame(() => startOpenAnimation());
+                }}
               >
-              {config.closeOnDragDown && isEdgeSheet && sheetAnim.from === SHEET_FROM.bottom ? (
-                <View
-                  {...(handleHandlers || {})}
-                  style={[styles.draggableContainer, config.customStyles?.draggableContainer]}
-                >
-                  <View
-                    style={[
-                      styles.draggableIcon,
-                      config.customStyles?.draggableIcon,
-                      config.customStyles?.handle,
-                    ]}
-                  />
-                </View>
-              ) : null}
-
-              {config.closeOnDragDown && sheetAnim.from === SHEET_FROM.top ? (
-                <View
-                  {...(handleHandlers || {})}
-                  style={[styles.draggableContainerBottom, config.customStyles?.draggableContainer]}
-                >
-                  <View
-                    style={[
-                      styles.draggableIcon,
-                      config.customStyles?.draggableIcon,
-                      config.customStyles?.handle,
-                    ]}
-                  />
-                </View>
-              ) : null}
-
-              {BodyComponent ? (
-                <BodyComponent
-                  sheetProps={{
-                    sheetHeight: height,
-                    keyboardInset,
-                    measuring,
-                    animation: sheetAnim,
-                    from: sheetAnim.from,
-                  }}
+                <SheetFrame
+                  sheetAnim={sheetAnim}
+                  sheetHeightStyle={sheetHeightStyle}
+                  sheetValues={sheetValues}
+                  keyboardGapFill={keyboardGapFill}
+                  config={config}
+                  dragHandlers={dragHandlers}
+                  handleHandlers={handleHandlers}
+                  isEdgeSheet={isEdgeSheet}
+                  BodyComponent={BodyComponent}
+                  height={height}
+                  keyboardInset={keyboardInset}
+                  measuring={measuring}
+                  childrenHandleTop={
+                    config.closeOnDragDown && isEdgeSheet && sheetAnim.from === SHEET_FROM.bottom ? (
+                      <View
+                        {...(handleHandlers || {})}
+                        style={[styles.draggableContainer, config.customStyles?.draggableContainer]}
+                      >
+                        <View
+                          style={[
+                            styles.draggableIcon,
+                            config.customStyles?.draggableIcon,
+                            config.customStyles?.handle,
+                          ]}
+                        />
+                      </View>
+                    ) : null
+                  }
+                  childrenHandleBottom={
+                    config.closeOnDragDown && sheetAnim.from === SHEET_FROM.top ? (
+                      <View
+                        {...(handleHandlers || {})}
+                        style={[
+                          styles.draggableContainerBottom,
+                          config.customStyles?.draggableContainer,
+                        ]}
+                      >
+                        <View
+                          style={[
+                            styles.draggableIcon,
+                            config.customStyles?.draggableIcon,
+                            config.customStyles?.handle,
+                          ]}
+                        />
+                      </View>
+                    ) : null
+                  }
                 />
-              ) : null}
+              </Pressable>
+            </Pressable>
 
-              {Platform.OS === 'ios' && keyboardGapFill > 0 && sheetAnim.from === SHEET_FROM.bottom ? (
-                <View
-                  pointerEvents="none"
-                  style={[
-                    styles.keyboardGapFill,
-                    {
-                      height: keyboardGapFill,
-                      bottom: -keyboardGapFill,
-                    },
-                  ]}
-                />
-              ) : null}
-            </Animated.View>
-          </Pressable>
-        </Pressable>
-
-          {/* Popup above sheet + sheet dim — own Fabric-safe mask */}
-          {open ? <PopupPortal /> : null}
-        </View>
+            {/* Popup above sheet + sheet dim — own Fabric-safe mask */}
+            {open ? <PopupPortal /> : null}
+          </View>
+        </SafeAreaProvider>
       </Modal>
     </View>
   );

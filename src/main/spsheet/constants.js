@@ -1,12 +1,11 @@
-export const ANDROID_API_LEVEL = require('react-native').Platform.Version;
 export const Platform = require('react-native').Platform;
 export const Dimensions = require('react-native').Dimensions;
 
+// Android: Modal navigationBarTranslucent / edge-to-edge ile screen yüksekliği
+// gerekir. window.height nav bar’ı dışarıda bırakır → altta siyah şerit.
 export const HEIGHT =
   Platform.OS === 'android'
-    ? ANDROID_API_LEVEL >= 29
-      ? Dimensions.get('window').height
-      : Dimensions.get('screen').height
+    ? Dimensions.get('screen').height
     : Dimensions.get('window').height;
 
 export const WIDTH =

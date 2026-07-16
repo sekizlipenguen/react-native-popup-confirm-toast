@@ -1,3 +1,13 @@
+## [2.2.2] - 2026-07-17
+
+### Fixed
+
+- **Android SPSheet bottom gap / nav overlap** — Modal uses `navigationBarTranslucent` + screen height so the sheet draws edge-to-edge (no black strip under the sheet).
+- **SPSheet safe area (React Navigation parity)** — nested `SafeAreaProvider` inside the Modal window; bottom sheets get `paddingBottom: insets.bottom` (with `screen − window` fallback when insets are 0). Content sits above the 3-button / gesture nav like BottomTabBar.
+- Optional peer: `react-native-safe-area-context` (>=4). Without it, Dimensions fallback is used.
+
+---
+
 ## [2.2.1] - 2026-07-16
 
 ### Fixed

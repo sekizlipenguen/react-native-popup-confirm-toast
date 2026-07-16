@@ -207,6 +207,10 @@ import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
         sheetHeight?: number;
         keyboardInset?: number;
         measuring?: boolean;
+        /** Android/iOS system nav / home-indicator inset applied by SPSheet */
+        bottomInset?: number;
+        animation?: SheetAnimationConfig;
+        from?: 'bottom' | 'top' | 'left' | 'right' | 'center';
     }
 
     export interface SheetComponentProps {
