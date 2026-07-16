@@ -1,0 +1,5 @@
+# Demo GIFs live in git for GitHub README; exclude from npm (was ~28MB, publish hangs).
+assets/
+examples/
+*.gif
+.DS_Store

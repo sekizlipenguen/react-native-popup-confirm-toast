@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sekizlipenguen/react-native-popup-confirm-toast.git"
+    "url": "git+https://github.com/sekizlipenguen/react-native-popup-confirm-toast.git"
   },
   "keywords": [
     "react-native",
@@ -64,7 +64,6 @@
     "index.js",
     "index.d.ts",
     "src",
-    "assets",
     "scripts",
     "README.md",
     "CHANGELOG.md",
