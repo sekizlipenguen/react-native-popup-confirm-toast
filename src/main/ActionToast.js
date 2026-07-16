@@ -4,9 +4,9 @@ import {
   Animated,
   Dimensions,
   Easing,
+  Modal,
   Platform,
   Pressable,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -39,7 +39,10 @@ const ENTER_DURATION = 220;
 const EXIT_DURATION = 160;
 
 function windowSize() {
-  return Dimensions.get('window');
+  // Android Fabric: absoluteFill-only host 0×0 olabiliyor; açık boyut + screen daha güvenli.
+  // iOS FullWindowOverlay: window yeterli.
+  const dims = Dimensions.get(Platform.OS === 'android' ? 'screen' : 'window');
+  return {width: dims.width, height: dims.height};
 }
 
 function resolveColors(config) {
@@ -621,8 +624,8 @@ class ActionToast extends Component {
   getStackContainerStyle(position, offset) {
     const {width: W, height: H} = windowSize();
     const inset = typeof offset === 'number' ? offset : DEFAULT_OFFSET;
-    const status =
-      (Platform.OS === 'android' ? StatusBar.currentHeight : getStatusBarHeight()) || 0;
+    // Modal statusBarTranslucent: top* status bar altına inmeli
+    const status = getStatusBarHeight() || 0;
     const cardW = Math.min(W - 32, 360);
     const approxCardH = 64;
     const {isTop, isBottom, isCenter, isLeft, isRight} = positionFromKey(position);
@@ -706,15 +709,15 @@ class ActionToast extends Component {
   }
 
   renderOverlayBody() {
-    const {width, height} = windowSize();
+    const sized = windowSize();
     return (
       <View
-        style={[styles.overlayFill, {width, height}]}
+        style={[styles.overlayFill, sized]}
         pointerEvents="box-none"
         collapsable={false}
       >
         <View
-          style={[styles.host, {width, height}]}
+          style={[styles.host, sized]}
           pointerEvents="box-none"
           collapsable={false}
         >
@@ -726,25 +729,49 @@ class ActionToast extends Component {
 
   render() {
     const visible = this.state.items.length > 0;
-    if (!visible) {
-      return null;
+    const body = visible ? this.renderOverlayBody() : null;
+
+    if (Platform.OS === 'ios') {
+      if (!visible) {
+        return null;
+      }
+      return <FullWindowOverlay>{body}</FullWindowOverlay>;
     }
 
-    const body = this.renderOverlayBody();
-    return Platform.OS === 'ios'
-      ? <FullWindowOverlay>{body}</FullWindowOverlay>
-      : body;
+    // Android/Web: native stack header'ın üstünde çizmek için Modal
+    // (iOS FullWindowOverlay eşdeğeri). Absolute overlay üst/orta toast'ları
+    // header altında bırakıyordu.
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="none"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent
+        hardwareAccelerated
+        onRequestClose={() => this.clearAll()}
+      >
+        <View
+          pointerEvents="box-none"
+          collapsable={false}
+          style={styles.androidModalRoot}
+        >
+          {body}
+        </View>
+      </Modal>
+    );
   }
 }
 
 const styles = StyleSheet.create({
+  androidModalRoot: {
+    flex: 1,
+  },
   overlayFill: {
     flex: 1,
-    width: '100%',
-    height: '100%',
   },
   host: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
     elevation: 100000,
     zIndex: 100000,
   },

@@ -1,3 +1,14 @@
+## [2.2.1] - 2026-07-16
+
+### Fixed
+
+- **Android ActionToast host** — transparent `Modal` (parity with iOS `FullWindowOverlay`) so cards render above the native stack header; avoids the old in-tree overlay pushing the tab bar.
+- **Android top / center / corner** — visible above native headers via Modal host.
+- **Android top safe area** — `getStatusBarHeight()` uses `safe-area-context` insets when available (plus `StatusBar.currentHeight` / min 24) so top cards clear the status bar under translucent Modal.
+- **iOS FullWindowOverlay** — keeps explicit window `width`/`height` + `flex: 1` body sizing (Fabric).
+
+---
+
 ## [2.2.0] - 2026-07-15
 
 ### Added

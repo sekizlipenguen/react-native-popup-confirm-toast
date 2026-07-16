@@ -14,6 +14,23 @@ const DEVICE_SPECS = [
   {width: 440, height: 956, statusBarHeight: 51}, // iPhone 16 Pro Max
 ];
 
+const ANDROID_STATUS_FALLBACK = 24;
+
+function readSafeAreaTop() {
+  try {
+    // Optional peer — host apps (RN) almost always have it.
+    // eslint-disable-next-line global-require, import/no-extraneous-dependencies
+    const sac = require('react-native-safe-area-context');
+    const top = sac.initialWindowMetrics?.insets?.top;
+    if (typeof top === 'number' && top > 0) {
+      return top;
+    }
+  } catch (_) {
+    // peer yoksa StatusBar'a düş
+  }
+  return 0;
+}
+
 function getIOSStatusBarInfo() {
   if (Platform.OS !== 'ios' || Platform.isTVOS) {
     return {height: 0, hasNotch: false};
@@ -50,11 +67,22 @@ function getIOSStatusBarInfo() {
 // Monobrow Kontrol Fonksiyonu
 export const isIPhoneWithMonobrow = () => getIOSStatusBarInfo().hasNotch;
 
-// Status Bar Yüksekliği Fonksiyonu
+/**
+ * Status / safe-area üst inset.
+ * Android Modal statusBarTranslucent iken StatusBar.currentHeight bazen 0;
+ * safe-area-context + fallback ile status bar üstüne binmeyi önler.
+ */
 export function getStatusBarHeight(skipAndroid = false) {
-  return Platform.select({
-    ios: getIOSStatusBarInfo().height,
-    android: skipAndroid ? 0 : (StatusBar.currentHeight || 0),
-    default: 0,
-  });
+  if (Platform.OS === 'ios') {
+    return getIOSStatusBarInfo().height;
+  }
+  if (Platform.OS === 'android') {
+    if (skipAndroid) {
+      return 0;
+    }
+    const fromStatus = StatusBar.currentHeight || 0;
+    const fromSafe = readSafeAreaTop();
+    return Math.max(fromStatus, fromSafe, ANDROID_STATUS_FALLBACK);
+  }
+  return 0;
 }

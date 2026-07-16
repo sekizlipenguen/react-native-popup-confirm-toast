@@ -50,7 +50,7 @@ Legacy banner visuals (pre-v2.2). `Toast.show` now redirects to ActionToast card
 
 ## ActionToast (v2.2)
 
-Card toast host (stack or queue) with positions, animations, icons, colors, and optional CTA — **mounted automatically in `Root`**. iOS uses `react-native-screens` `FullWindowOverlay` so cards stay above native-stack screens; Android/Web use the non-blocking root overlay.
+Card toast host (stack or queue) with positions, animations, icons, colors, and optional CTA — **mounted automatically in `Root`**. iOS uses `react-native-screens` `FullWindowOverlay`; Android/Web use a transparent `Modal` so cards stay above the native stack.
 
 See the [Example ActionToast](#example-actiontoast-v22) demo above for the playground visual tour.
 
