@@ -18,19 +18,19 @@ A flexible popup, toast, action toast, bottom sheet (**SPSheet**), and drawer fo
 
 |    Custom Example 1    |    Custom Example 2    |    Custom Example 3    |    Custom Example 4    |
 |:----------------------:|:----------------------:|:----------------------:|:----------------------:|
-| ![](assets/popup6.gif) | ![](assets/popup5.gif) | ![](assets/popup7.gif) | ![](assets/popup8.gif) |
+| ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/popup6.gif) | ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/popup5.gif) | ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/popup7.gif) | ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/popup8.gif) |
 
 ## Example Drawer
 
 |       Drawer Left       |      Drawer Right       |       Drawer Top        |      Drawer Bottom      |
 |:-----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
-| ![](assets/drawer2.gif) | ![](assets/drawer1.gif) | ![](assets/drawer3.gif) | ![](assets/drawer4.gif) |
+| ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/drawer2.gif) | ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/drawer1.gif) | ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/drawer3.gif) | ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/drawer4.gif) |
 
 ## Example Popup Message
 
 |    Example Message     | Example Confirm Message | Example Message AutoClose | Example Custom Body Component |
 |:----------------------:|:-----------------------:|:-------------------------:|:-----------------------------:|
-| ![](assets/popup1.gif) | ![](assets/popup2.gif)  |  ![](assets/popup3.gif)   |    ![](assets/popup4.gif)     |
+| ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/popup1.gif) | ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/popup2.gif)  |  ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/popup3.gif)   |    ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/popup4.gif)     |
 
 ## Example ActionToast (v2.2)
 
@@ -38,7 +38,7 @@ Stack / queue, positions, animations, types, CTA, and the playground visual tour
 
 | ActionToast Playground |
 |:----------------------:|
-| ![](assets/action.gif) |
+| ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/action.gif) |
 
 ## Example Toast Message (legacy)
 
@@ -46,7 +46,7 @@ Legacy banner visuals (pre-v2.2). `Toast.show` now redirects to ActionToast card
 
 | Example Toast Top | Example Toast Bottom |
 |:-----------------:|:--------------------:|
-| ![](assets/3.gif) |  ![](assets/4.gif)   |
+| ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/3.gif) |  ![](https://raw.githubusercontent.com/sekizlipenguen/react-native-popup-confirm-toast/main/assets/4.gif)   |
 
 ## ActionToast (v2.2)
 
