@@ -122,6 +122,12 @@ function normalizeConfig(config = {}, defaults = {}) {
         : !!merged.onPress,
     action: merged.action || null,
     closeable: typeof merged.closeable === 'boolean' ? merged.closeable : true,
+    messageNumberOfLines:
+      merged.messageNumberOfLines === false || merged.messageNumberOfLines === 0
+        ? 0
+        : typeof merged.messageNumberOfLines === 'number'
+          ? merged.messageNumberOfLines
+          : 3,
     styles: merged.styles || {},
     onClose: typeof merged.onClose === 'function' ? merged.onClose : null,
     onCloseComplete:
@@ -370,6 +376,7 @@ class ToastCard extends Component {
       action,
       closeable,
       legacyCart,
+      messageNumberOfLines,
       styles: styleCfg,
     } = item;
 
@@ -414,7 +421,7 @@ class ToastCard extends Component {
                 title ? styles.messageUnderTitle : null,
                 styleCfg.message,
               ]}
-              numberOfLines={3}
+              {...(messageNumberOfLines > 0 ? {numberOfLines: messageNumberOfLines} : null)}
             >
               {message}
             </Text>

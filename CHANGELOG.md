@@ -1,3 +1,11 @@
+## [2.2.3] - 2026-07-17
+
+### Added
+
+- **ActionToast `messageNumberOfLines`** — default remains `3` (short toast UX). Pass `0` or `false` for unlimited lines (no ellipsis). Bottom/top center toasts already use near full width (`left/right: 16`).
+
+---
+
 ## [2.2.2] - 2026-07-17
 
 ### Fixed

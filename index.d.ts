@@ -84,6 +84,11 @@ import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
         pressDismiss?: boolean;
         action?: ActionToastActionConfig | null;
         closeable?: boolean;
+        /**
+         * Message line clamp. Default `3`.
+         * Pass `0` or `false` for unlimited (full wrap, no ellipsis).
+         */
+        messageNumberOfLines?: number | false;
         onClose?: () => void;
         onCloseComplete?: () => void;
         onOpen?: () => void;
