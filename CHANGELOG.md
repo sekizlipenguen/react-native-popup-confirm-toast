@@ -3,7 +3,11 @@
 ### Fixed
 
 - **Popup width after forced portrait (#26)** — `Popup.show` re-reads window size on every present; Modal root `onLayout` corrects stale landscape dimensions (tablet launch landscape → app locked to portrait).
-- **Android PiP ghost Modal (#30)** — When the screen shrinks below 300px (typical PiP window), Root force-hides Popup / ActionToast / SPSheet / Drawer. Does **not** dismiss overlays on normal AppState background (confirm/sheet stay open when returning to the app).
+- **`Popup.forceHide()`** — immediate dismiss helper (no exit animation) for callers that need it.
+
+### Note
+
+- Overlays are **not** auto-dismissed on AppState `background`/`inactive`. Closing everything on background was tried for Android PiP (#30) but is wrong UX for confirm/sheet flows; PiP ghost remains a niche edge case if it still appears with expo-pip.
 
 ---
 
