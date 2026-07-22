@@ -1,3 +1,12 @@
+## [2.2.5] - 2026-07-22
+
+### Fixed
+
+- **Popup width after forced portrait (#26)** — `Popup.show` re-reads window size on every present; Modal root `onLayout` corrects stale landscape dimensions (tablet launch landscape → app locked to portrait).
+- **Android PiP ghost Modal (#30)** — Restored Root cleanup: AppState `background`/`inactive` and tiny screen sizes (`width|height < 300`) force-hide Popup / ActionToast / SPSheet / Drawer so a leftover overlay cannot cover Picture-in-Picture.
+
+---
+
 ## [2.2.4] - 2026-07-22
 
 ### Fixed

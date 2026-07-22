@@ -351,6 +351,8 @@ import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
     export interface Popup {
         show: (config?: PopupConfig) => void;
         hide: () => void;
+        /** Immediate close without exit animation (PiP / app-state cleanup). */
+        forceHide: () => void;
         POPUP_ANIMATIONS?: {
             slide: 'slide';
             fade: 'fade';

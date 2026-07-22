@@ -444,6 +444,11 @@ class Popup extends Component {
     this.popupInstance?.dismiss();
   }
 
+  /** Immediate close (no exit animation) — used for PIP / app-state cleanup. */
+  static forceHide() {
+    this.popupInstance?.forceHide();
+  }
+
   /** Called by portal / modal card after close animation finishes. */
   static finishDismiss() {
     this.popupInstance?.completeDismiss();
@@ -458,11 +463,31 @@ class Popup extends Component {
     this.clearAutoHide();
   }
 
-  onDimensionsChange = () => {
-    const {width, height} = getWindowSize();
+  syncWindowSize = (nextWidth, nextHeight) => {
+    const {width, height} =
+      nextWidth != null && nextHeight != null
+        ? {width: nextWidth, height: nextHeight}
+        : getWindowSize();
+    if (!(width > 0 && height > 0)) {
+      return false;
+    }
+    if (this.width === width && this.height === height) {
+      return false;
+    }
     this.width = width;
     this.height = height;
-    if (this.state.open) {
+    return true;
+  };
+
+  onDimensionsChange = () => {
+    if (this.syncWindowSize() && this.state.open) {
+      this.forceUpdate();
+    }
+  };
+
+  onModalRootLayout = event => {
+    const {width, height} = event?.nativeEvent?.layout || {};
+    if (this.syncWindowSize(width, height) && this.state.open) {
       this.forceUpdate();
     }
   };
@@ -518,6 +543,8 @@ class Popup extends Component {
   present(config = {}) {
     this.clearAutoHide();
     this.pendingCloseComplete = null;
+    // Always re-read size at show time (tablet launch landscape → forced portrait).
+    this.syncWindowSize();
     const normalized = this.normalizeConfig(config);
 
     const usePortal = OverlayBus.isHostActive() || OverlayBus.hasListener();
@@ -603,6 +630,16 @@ class Popup extends Component {
     });
   };
 
+  /** Drop Modal/portal immediately without running close animation. */
+  forceHide = () => {
+    this.clearAutoHide();
+    this.pendingCloseComplete = null;
+    OverlayBus.hide();
+    if (this.state.open || this.state.viaPortal || OverlayBus.get()) {
+      this.setState(this.createIdleState());
+    }
+  };
+
   start = (config) => {
     this.present(config);
   };
@@ -657,6 +694,7 @@ class Popup extends Component {
       >
         <View
           testID="popup-root"
+          onLayout={this.onModalRootLayout}
           style={[
             styles.root,
             {
