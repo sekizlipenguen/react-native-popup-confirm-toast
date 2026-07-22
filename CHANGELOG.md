@@ -3,7 +3,7 @@
 ### Fixed
 
 - **Popup width after forced portrait (#26)** — `Popup.show` re-reads window size on every present; Modal root `onLayout` corrects stale landscape dimensions (tablet launch landscape → app locked to portrait).
-- **Android PiP ghost Modal (#30)** — Restored Root cleanup: AppState `background`/`inactive` and tiny screen sizes (`width|height < 300`) force-hide Popup / ActionToast / SPSheet / Drawer so a leftover overlay cannot cover Picture-in-Picture.
+- **Android PiP ghost Modal (#30)** — When the screen shrinks below 300px (typical PiP window), Root force-hides Popup / ActionToast / SPSheet / Drawer. Does **not** dismiss overlays on normal AppState background (confirm/sheet stay open when returning to the app).
 
 ---
 

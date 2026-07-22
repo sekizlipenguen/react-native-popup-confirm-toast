@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {AppState, Dimensions, View} from 'react-native';
+import {Dimensions, View} from 'react-native';
 
 import PropTypes from 'prop-types';
 import Popup from './Popup';
@@ -13,15 +13,12 @@ import OverlayBus from './OverlayBus';
  * Mount order: ActionToast is last among overlays. On iOS it renders through
  * FullWindowOverlay; on other platforms it stays as the last absolute overlay.
  *
- * Also tears down overlays when the app backgrounds or the window shrinks to a
- * PiP-sized surface (Android Picture-in-Picture can otherwise leave a ghost Modal).
+ * Android Picture-in-Picture can leave a ghost Modal covering the tiny window.
+ * We only tear overlays down when the screen shrinks to a PiP-sized surface —
+ * not on every AppState background (that would dismiss confirm sheets unfairly).
  */
 class Root extends Component {
   componentDidMount() {
-    this.appStateSubscription = AppState.addEventListener(
-      'change',
-      this.handleAppStateChange,
-    );
     this.dimensionsSubscription = Dimensions.addEventListener(
       'change',
       this.handleDimensionsChange,
@@ -29,15 +26,8 @@ class Root extends Component {
   }
 
   componentWillUnmount() {
-    this.appStateSubscription?.remove?.();
     this.dimensionsSubscription?.remove?.();
   }
-
-  handleAppStateChange = nextAppState => {
-    if (nextAppState === 'background' || nextAppState === 'inactive') {
-      this.cleanupOverlays();
-    }
-  };
 
   handleDimensionsChange = () => {
     const {width, height} = Dimensions.get('screen');
