@@ -1,3 +1,11 @@
+## [2.2.4] - 2026-07-22
+
+### Fixed
+
+- **Android ActionToast blocks scroll** — Bottom/stack toasts no longer use a full-screen `Modal` (Dialog), which locked touches behind the toast until dismiss. Bottom toasts use a pass-through absolute overlay; top toasts still use `Modal` so they stay above native headers.
+
+---
+
 ## [2.2.3] - 2026-07-17
 
 ### Added

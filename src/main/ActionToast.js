@@ -745,27 +745,48 @@ class ActionToast extends Component {
       return <FullWindowOverlay>{body}</FullWindowOverlay>;
     }
 
-    // Android/Web: native stack header'ın üstünde çizmek için Modal
-    // (iOS FullWindowOverlay eşdeğeri). Absolute overlay üst/orta toast'ları
-    // header altında bırakıyordu.
-    return (
-      <Modal
-        visible={visible}
-        transparent
-        animationType="none"
-        presentationStyle="overFullScreen"
-        statusBarTranslucent
-        hardwareAccelerated
-        onRequestClose={() => this.clearAll()}
-      >
-        <View
-          pointerEvents="box-none"
-          collapsable={false}
-          style={styles.androidModalRoot}
+    if (!visible) {
+      return null;
+    }
+
+    // Android Modal (Dialog) tüm pencereyi yakalar; pointerEvents="box-none"
+    // arka plan scroll/touch'ı açmaz. Bottom toast'larda absolute overlay kullan.
+    // Üst toast'lar (header üstü) için Modal gerekir.
+    const needsModal = this.state.items.some(item => {
+      const pos = String(item.position || TOAST_POSITIONS.bottom);
+      return pos.startsWith('top');
+    });
+
+    if (needsModal) {
+      return (
+        <Modal
+          visible
+          transparent
+          animationType="none"
+          presentationStyle="overFullScreen"
+          statusBarTranslucent
+          hardwareAccelerated
+          onRequestClose={() => this.clearAll()}
         >
-          {body}
-        </View>
-      </Modal>
+          <View
+            pointerEvents="box-none"
+            collapsable={false}
+            style={styles.androidModalRoot}
+          >
+            {body}
+          </View>
+        </Modal>
+      );
+    }
+
+    return (
+      <View
+        pointerEvents="box-none"
+        collapsable={false}
+        style={styles.androidPassThroughRoot}
+      >
+        {body}
+      </View>
     );
   }
 }
@@ -773,6 +794,11 @@ class ActionToast extends Component {
 const styles = StyleSheet.create({
   androidModalRoot: {
     flex: 1,
+  },
+  androidPassThroughRoot: {
+    ...StyleSheet.absoluteFillObject,
+    elevation: 100000,
+    zIndex: 100000,
   },
   overlayFill: {
     flex: 1,
