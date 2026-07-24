@@ -415,6 +415,8 @@ import {LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from "react-native";
     export const Drawer: Drawer;
     export const Root: FC<RootProps>;
     export const getStatusBarHeight: () => number;
+    /** Android/iOS bottom system nav / home indicator height (API 35+ fallback included). */
+    export const getNavigationBarHeight: () => number;
     export const isIPhoneWithMonobrow: () => boolean;
     /** Default layer zIndex values: { sheet: 10, popup: 100 } */
     export const LAYER_Z: { sheet: number; popup: number };

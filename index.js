@@ -13,7 +13,7 @@ import SPSheet, {
   BACKDROP_ANIMATIONS,
 } from './src/main/SPSheet';
 import Drawer from './src/main/Drawer';
-import {getStatusBarHeight, isIPhoneWithMonobrow} from './src/main/Helper';
+import {getNavigationBarHeight, getStatusBarHeight, isIPhoneWithMonobrow} from './src/main/Helper';
 
 export {
   Root,
@@ -23,6 +23,7 @@ export {
   ActionToast,
   Drawer,
   getStatusBarHeight,
+  getNavigationBarHeight,
   isIPhoneWithMonobrow,
   LAYER_Z,
   SHEET_ANIMATIONS,

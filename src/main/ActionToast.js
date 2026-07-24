@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import {FullWindowOverlay} from 'react-native-screens';
 
-import {getStatusBarHeight} from './Helper';
+import {getNavigationBarHeight, getStatusBarHeight} from './Helper';
 import {
   animationFromForPosition,
   DEFAULT_DURATION,
@@ -630,7 +630,7 @@ class ActionToast extends Component {
    */
   getStackContainerStyle(position, offset) {
     const {width: W, height: H} = windowSize();
-    const inset = typeof offset === 'number' ? offset : DEFAULT_OFFSET;
+    const baseInset = typeof offset === 'number' ? offset : DEFAULT_OFFSET;
     // Modal statusBarTranslucent: top* status bar altına inmeli
     const status = getStatusBarHeight() || 0;
     const cardW = Math.min(W - 32, 360);
@@ -647,7 +647,7 @@ class ActionToast extends Component {
     }
 
     if (isTop) {
-      const top = Math.round(status + inset);
+      const top = Math.round(status + baseInset);
       if (isLeft) {
         return {position: 'absolute', top, left: 16, width: cardW};
       }
@@ -657,7 +657,8 @@ class ActionToast extends Component {
       return {position: 'absolute', top, left: 16, right: 16};
     }
 
-    // bottom*
+    // bottom* — Android 15+ 3-tuş / gesture nav üstünde kalsın
+    const inset = baseInset + (getNavigationBarHeight() || 0);
     if (isLeft) {
       return {position: 'absolute', bottom: inset, left: 16, width: cardW};
     }

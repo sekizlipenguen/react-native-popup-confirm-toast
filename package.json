@@ -1,6 +1,6 @@
 {
   "name": "@sekizlipenguen/react-native-popup-confirm-toast",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "Popup, toast stack (ActionToast), bottom sheet (SPSheet), and drawer for React Native. Queue/stack toasts, positions, animations. Legacy Toast.show redirects to ActionToast.",
   "main": "index.js",
   "types": "index.d.ts",

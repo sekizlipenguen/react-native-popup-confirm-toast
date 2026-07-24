@@ -1,3 +1,13 @@
+## [2.2.6] - 2026-07-24
+
+### Fixed
+
+- **Android 15+ edge-to-edge bottom inset** — When `insets.bottom` and `screen − window` are both 0 (Samsung 3-button / forced edge-to-edge), SPSheet uses a 48dp navigation-bar fallback so sheet content is not covered by the system nav.
+- **ActionToast bottom stack** — Adds `getNavigationBarHeight()` under bottom toasts so they clear the 3-button / gesture nav on API 35+.
+- **`getNavigationBarHeight()`** — Shared helper (safe-area → screen−window → Android 15 fallback).
+
+---
+
 ## [2.2.5] - 2026-07-22
 
 ### Fixed

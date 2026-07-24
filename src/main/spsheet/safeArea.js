@@ -18,12 +18,21 @@ try {
   // peer yok — Dimensions fallback
 }
 
+/** Android 15+ 3-tuş nav tipik yüksekliği (dp). Edge-to-edge’de inset 0 gelince. */
+const ANDROID15_NAV_FALLBACK = 48;
+
+function androidApiLevel() {
+  const v = Platform.Version;
+  return typeof v === 'number' ? v : parseInt(String(v), 10) || 0;
+}
+
 /**
  * Bottom sheet için alt güvenli alan.
  * React Navigation BottomTabBar: paddingBottom += insets.bottom
  *
  * Modal + navigationBarTranslucent altında inset 0 gelebilir;
  * o durumda screen − window ≈ sistem nav yüksekliği (3 tuşlu Android).
+ * Android 15+ edge-to-edge’de screen≈window olduğundan diff de 0 kalır → 48dp fallback.
  */
 export function useSheetBottomInset(enabled) {
   const insets = useSafeAreaInsets();
@@ -35,7 +44,12 @@ export function useSheetBottomInset(enabled) {
   }
   if (Platform.OS === 'android') {
     const diff = Dimensions.get('screen').height - Dimensions.get('window').height;
-    return Math.max(0, Math.round(diff));
+    if (diff > 0) {
+      return Math.max(0, Math.round(diff));
+    }
+    if (androidApiLevel() >= 35) {
+      return ANDROID15_NAV_FALLBACK;
+    }
   }
   return 0;
 }

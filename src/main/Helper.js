@@ -15,6 +15,13 @@ const DEVICE_SPECS = [
 ];
 
 const ANDROID_STATUS_FALLBACK = 24;
+/** Android 15+ 3-tuş nav tipik yüksekliği (dp); edge-to-edge’de inset 0 gelince. */
+const ANDROID15_NAV_FALLBACK = 48;
+
+function androidApiLevel() {
+  const v = Platform.Version;
+  return typeof v === 'number' ? v : parseInt(String(v), 10) || 0;
+}
 
 function readSafeAreaTop() {
   try {
@@ -27,6 +34,20 @@ function readSafeAreaTop() {
     }
   } catch (_) {
     // peer yoksa StatusBar'a düş
+  }
+  return 0;
+}
+
+function readSafeAreaBottom() {
+  try {
+    // eslint-disable-next-line global-require, import/no-extraneous-dependencies
+    const sac = require('react-native-safe-area-context');
+    const bottom = sac.initialWindowMetrics?.insets?.bottom;
+    if (typeof bottom === 'number' && bottom > 0) {
+      return bottom;
+    }
+  } catch (_) {
+    // peer yok
   }
   return 0;
 }
@@ -83,6 +104,32 @@ export function getStatusBarHeight(skipAndroid = false) {
     const fromStatus = StatusBar.currentHeight || 0;
     const fromSafe = readSafeAreaTop();
     return Math.max(fromStatus, fromSafe, ANDROID_STATUS_FALLBACK);
+  }
+  return 0;
+}
+
+/**
+ * Alt sistem nav / home indicator yüksekliği.
+ * Android 15+ edge-to-edge’de insets.bottom ve screen−window sık 0 → 48dp fallback.
+ */
+export function getNavigationBarHeight() {
+  if (Platform.OS === 'ios') {
+    // Home indicator; notch’lu cihazlarda tipik ~34, eski modellerde 0.
+    return getIOSStatusBarInfo().hasNotch ? 34 : 0;
+  }
+  if (Platform.OS !== 'android') {
+    return 0;
+  }
+  const fromSafe = readSafeAreaBottom();
+  if (fromSafe > 0) {
+    return fromSafe;
+  }
+  const diff = Dimensions.get('screen').height - Dimensions.get('window').height;
+  if (diff > 0) {
+    return Math.round(diff);
+  }
+  if (androidApiLevel() >= 35) {
+    return ANDROID15_NAV_FALLBACK;
   }
   return 0;
 }
