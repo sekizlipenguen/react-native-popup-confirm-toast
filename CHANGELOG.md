@@ -1,3 +1,11 @@
+## [2.2.7] - 2026-08-02
+
+### Fixed
+
+- **SPSheet scroll / nested gestures** — Sheet body is no longer wrapped in a nested `Pressable` (`onPress={() => {}}`). Mask and sheet are siblings so `ScrollView` / `FlatList` pans work on empty space inside the sheet.
+
+---
+
 ## [2.2.6] - 2026-07-24
 
 ### Fixed
